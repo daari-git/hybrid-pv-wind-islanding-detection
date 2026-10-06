@@ -34,6 +34,27 @@ Ratings will be fixed and documented in phase 1 (the current model and the thesi
 
 ## Workflow
 
+```mermaid
+flowchart TD
+    A["Baseline hybrid PV-wind model"] --> P1["Phase 1: Clean up model<br/>ratings, grid impedance, variable wind,<br/>frequency measurement, LCL damping"]
+    P1 --> P2["Phase 2: Plant model and PI baseline<br/>transfer function, tuning, SCR sweep"]
+    P2 --> P3["Phase 3: H-infinity controller<br/>uncertainty model, weights, synthesis,<br/>order reduction, discretisation"]
+    P3 --> D1{"Stable across<br/>SCR 2 to 20?"}
+    D1 -- No --> P3
+    D1 -- Yes --> P4["Phase 4: Islanding test bench<br/>RLC load with Q = 1, scripted breaker"]
+    P2 -. "PI baseline" .-> P4
+    P4 --> B["Baselines: passive and active detection<br/>non-detection-zone maps"]
+    P4 --> P5["Phase 5: Dataset generation<br/>islanding and non-islanding events"]
+    P5 --> P6["Phase 6: Features and classifier<br/>split by operating condition, train"]
+    P6 --> D2{"Accuracy and false-trip<br/>targets met on unseen cases?"}
+    D2 -- No --> P5
+    D2 -- Yes --> P7["Phase 7: Closed-loop validation<br/>classifier trips breaker, noise added"]
+    B --> P7
+    P7 --> D3{"Detection under 2 s<br/>and no false trips<br/>during ride-through?"}
+    D3 -- No --> P6
+    D3 -- Yes --> P8["Phase 8: Paper<br/>comparison table, draft, submission"]
+```
+
 ### Phase 1 — Clean up the baseline model
 - Fix one rating for PV and wind and use it everywhere.
 - Replace the near-ideal grid source with a realistic impedance, parameterised by short-circuit ratio (SCR).
