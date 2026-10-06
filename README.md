@@ -112,13 +112,15 @@ flowchart TD
 ## Repository layout
 
 ```
-models/       Simulink models (.slx)
-report/       Original final-year project report, kept locally, not tracked
-scripts/      Parameter, design, batch-simulation and plotting scripts   (planned)
-data/         Raw and processed simulation data, not tracked in git      (planned)
-ml/           Feature extraction, training and evaluation                (planned)
-results/      Figures and tables for the paper                           (planned)
-paper/        Manuscript source                                          (planned)
+MATLAB_R2018a/  Original Simulink models, saved in R2018a (kept unchanged)
+models/         Corrected and extended models, saved in R2024b             (planned)
+scripts/        Parameter, design, batch-simulation and plotting scripts
+data/           Raw and processed simulation data, not tracked in git      (planned)
+ml/             Feature extraction, training and evaluation                (planned)
+results/        Figures and tables for the paper
+paper/          Manuscript source                                          (planned)
+report/         Original final-year project report, kept locally, not tracked
+archive/        Old copies and originals, kept locally, not tracked
 ```
 
 ## Requirements

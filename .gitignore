@@ -1,6 +1,6 @@
-# Not published: thesis report (contains team members' details), duplicate copies, third-party papers
+# Not published: thesis report and archive (contain team members' details), third-party papers and models
 report/
-duplicates/
+archive/
 *.pdf
 
 # Generated simulation data
@@ -12,3 +12,10 @@ slprj/
 *.asv
 *.autosave
 *.mexw64
+
+# Third-party model, licence not confirmed
+MATLAB_R2018a/IEEE_1547_2018_Inverter.slx
+
+# Simulation outputs
+results/*.mat
+results/*.txt
