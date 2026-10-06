@@ -1,0 +1,14 @@
+# Not published: thesis report (contains team members' details), duplicate copies, third-party papers
+report/
+duplicates/
+*.pdf
+
+# Generated simulation data
+data/
+
+# MATLAB / Simulink build and autosave files
+slprj/
+*.slxc
+*.asv
+*.autosave
+*.mexw64
