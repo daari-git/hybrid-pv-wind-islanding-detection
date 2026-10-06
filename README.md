@@ -32,6 +32,21 @@ Passive detection (voltage, frequency, rate of change of frequency) has a non-de
 
 Ratings will be fixed and documented in phase 1 (the current model and the thesis disagree on the PV rating).
 
+## Model
+
+`hybrid_pv_wind_islanding.slx` is the corrected test bed (PI control and a passive detector; the H-infinity controller and ML detector come in later phases).
+
+![Top level of the model](docs/model_top.png)
+
+| Subsystem | Diagram |
+|---|---|
+| Wind turbine, PMSG, rectifier, boost and optimal-torque MPPT | [wind_subsystem.png](docs/wind_subsystem.png) |
+| PV boost converter with perturb-and-observe MPPT | [pv_boost_mppt.png](docs/pv_boost_mppt.png) |
+| Inverter control: PLL, DC-link and current loops | [inverter_control.png](docs/inverter_control.png) |
+| Passive protection: voltage, frequency and rate of change of frequency | [passive_protection.png](docs/passive_protection.png) |
+
+Regenerate the pictures with `export_diagrams` after any model change.
+
 ## Workflow
 
 ```mermaid
@@ -112,15 +127,27 @@ flowchart TD
 ## Repository layout
 
 ```
-MATLAB_R2018a/  Original Simulink models, saved in R2018a (kept unchanged)
-models/         Corrected and extended models, saved in R2024b             (planned)
-scripts/        Parameter, design, batch-simulation and plotting scripts
-data/           Raw and processed simulation data, not tracked in git      (planned)
-ml/             Feature extraction, training and evaluation                (planned)
-results/        Figures and tables for the paper
-paper/          Manuscript source                                          (planned)
-report/         Original final-year project report, kept locally, not tracked
-archive/        Old copies and originals, kept locally, not tracked
+hybrid_pv_wind_islanding.slx   Corrected test-bed model (R2024b), built by scripts/build_model.m
+MATLAB_R2018a/                 Original Simulink models, saved in R2018a (kept unchanged)
+scripts/params.m               Every rating, gain and test setting in one place
+scripts/build_model.m          Rebuilds the corrected model from the original, change by change
+scripts/run_model.m            Runs the model and reports power, DC link, frequency, distortion, trip
+scripts/run_baseline.m         Runs the original model for the before/after comparison
+scripts/export_diagrams.m      Saves the model diagrams to docs/
+docs/                          Model diagrams
+results/                       Simulation outputs, not tracked in git
+data/, ml/, paper/             Planned
+report/, archive/              Kept locally, not tracked
+```
+
+To run an islanding case:
+
+```matlab
+addpath scripts
+P = params(10);            % short-circuit ratio 10
+P.tIsland = 0.5;           % open the grid breaker at 0.5 s
+P.load.P = 18.4e3; P.load.QL = P.load.P; P.load.QC = P.load.P;   % matched RLC load, Qf = 1
+run_model(1.0, P, 'island_matched');
 ```
 
 ## Requirements
