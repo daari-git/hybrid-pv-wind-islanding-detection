@@ -13,6 +13,8 @@ load_system(fullfile(root, [mdl '.slx']));
 in = Simulink.SimulationInput(mdl);
 in = in.setVariable('P', P, 'Workspace', mdl);
 in = in.setModelParameter('StopTime', num2str(stopTime));
+sc = [find_system(mdl, 'BlockType', 'Scope'); find_system(mdl, 'BlockType', 'Display')];
+for k = 1:numel(sc), in = in.setBlockParameter(sc{k}, 'Commented', 'on'); end   % scopes off for this run only
 t0 = tic; out = sim(in);
 fprintf('Simulated %.2f s in %.0f s of wall time\n', stopTime, toc(t0));
 
@@ -45,23 +47,12 @@ row('Id (A)',   at(S.ID), '%8.1f');
 row('Iq (A)',   at(S.IQ), '%8.1f');
 row('trip',     at(S.trip), '%8.0f');
 
-win = t >= tend - T;
-[thd, I1, h] = harmonics(S.Igrid.Data(win,1), t(win), f1, 50);
-fprintf('\nLast 10 cycles: grid current %.2f A peak, THD %.2f %% (to 50th)\n', I1, thd);
-fprintf('Harmonics 2..7 (%% of fundamental): %s\n', mat2str(round(h(2:7)', 2)));
-v = S.VDC.Data(S.VDC.Time >= tend - T);
+M = signal_metrics(S, tend - T, tend + 1e-9);
+fprintf('\nLast 10 cycles: grid current %.2f A peak, THD %.2f %% (to 50th)\n', M.I1, M.thd);
+fprintf('Harmonics 2..7 (%% of fundamental): %s\n', mat2str(round(M.h2to7, 2)));
 fprintf('DC link: peak %.0f V over the run, final mean %.1f V, ripple %.1f V p-p\n', ...
-    max(S.VDC.Data), mean(v), max(v)-min(v));
+    max(S.VDC.Data), M.Vdc, M.VdcRipple);
 tr = double(S.trip.Data(:));
 if any(tr > 0.5), fprintf('Protection tripped at t = %.4f s\n', S.trip.Time(find(tr > 0.5, 1)));
 else, fprintf('Protection did not trip\n'); end
-end
-
-function [thd, A1, hpct] = harmonics(x, t, f1, nmax)
-% Fourier coefficients by direct projection over an integer number of cycles.
-x = x(:); t = t(:) - t(1); A = zeros(nmax, 1);
-for n = 1:nmax
-    A(n) = hypot(2*mean(x.*cos(2*pi*n*f1*t)), 2*mean(x.*sin(2*pi*n*f1*t)));
-end
-A1 = A(1); hpct = 100*A/A1; thd = 100*sqrt(sum(A(2:end).^2))/A1;
 end

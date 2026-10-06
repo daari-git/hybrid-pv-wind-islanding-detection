@@ -2,7 +2,7 @@
 
 Ride-through-compatible islanding detection for a grid-connected hybrid solar PV–wind system, using a machine-learning classifier on top of an H-infinity current controller. MATLAB/Simulink.
 
-> **Status:** work in progress. The baseline Simulink models exist; phases 1–7 below are planned and have no results yet.
+> **Status:** work in progress. Phases 1 and 2 are done (results below); phases 3 to 8 are planned and have no results yet.
 
 ## Problem
 
@@ -46,6 +46,59 @@ Ratings will be fixed and documented in phase 1 (the current model and the thesi
 | Passive protection: voltage, frequency and rate of change of frequency | [passive_protection.png](docs/passive_protection.png) |
 
 Regenerate the pictures with `export_diagrams` after any model change.
+
+## Results so far
+
+All figures below come from `hybrid_pv_wind_islanding.slx` with PI control and the passive detector.
+
+### Phase 1: corrected test bed
+
+| Quantity | Original model | Corrected model |
+|---|---|---|
+| Steady state | None: irradiance followed a 24-hour day squeezed into 2.4 s | Reached within 0.3 s |
+| PV operating point | MPPT reference capped at 50 V for a 290 V array; voltage collapsed | 10.6 kW at about 290 V |
+| Wind | Torque computed from a fixed speed; power not physical | Optimal-torque MPPT; rotor speed follows wind steps |
+| Frequency signal | Climbed from 44 to 489 during the run | 50.00 Hz |
+| Protection | Latched at start-up and could never open the breaker | Opens the breaker and stops both boost converters |
+| DC link | 805 V, 43 V ripple | 800 V, 4 V ripple |
+| Grid current THD | Not measurable (no steady state) | 1.2% |
+| Simulation speed | 954 s per simulated second | 40 to 70 s per simulated second |
+
+Exported power is 18.5 kW from about 20.4 kW of generation.
+
+### Islanding with a matched load
+
+![Islanding event with a matched RLC load](docs/islanding_matched.png)
+
+The passive detector trips 10.7 ms after the grid breaker opens. It is fast because it has no time delays and a sensitive rate-of-change-of-frequency setting (2 Hz/s). The same setting false-trips 12 ms after an ordinary irradiance step from 1000 to 600 W/m². Separating islanding from ordinary disturbances is the problem the ML detector is meant to solve.
+
+### Phase 2: PI baseline against grid strength
+
+![Open-loop Bode plot of the PI current loop](docs/pi_loop_bode.png)
+
+Current-loop margins from the derived plant model (`scripts/plant_model.m`):
+
+| Case | Phase margin | Gain margin | Sensitivity peak |
+|---|---|---|---|
+| As simulated, no control delay, SCR 20 to 2 | 86° to 89° | unlimited | 1.0 |
+| With a digital delay of 1.5 switching periods | 50° to 66° | 7.8 to 8.7 dB | 1.8 to 1.9 |
+
+Simulation with the local load removed:
+
+| Short-circuit ratio | Result |
+|---|---|
+| 20, 10, 5 | Stable from a hard start; current THD 0.7 to 1.3%; PCC voltage up to 1.05 pu |
+| 3 and 2, hard start at full power | Loses synchronism within 50 ms |
+| 3 and 2, power ramped up after start | Stable at 17.8 kW; current THD 1.2 to 1.3%; voltage THD 2.9 to 3.6%; PCC voltage 1.07 to 1.08 pu |
+
+The PI baseline is stable in steady state down to a short-circuit ratio of 2. It degrades in start-up at full power, in PCC voltage rise and in frequency ripple, so the case for the H-infinity controller (phase 3) rests on those and on the reduced margins once a control delay is included.
+
+### Known limitations
+
+- The controller in the model has no sampling or computation delay.
+- PI and PLL gains are a first pass, not optimised.
+- PV current readings are unreliable when the PV voltage is far above its operating point, including after a trip.
+- Generator stator inductance (3 mH) and rotor inertia (10 kg m²) were changed from the original so the machine can deliver 10 kW through a diode rectifier.
 
 ## Workflow
 
@@ -134,7 +187,15 @@ scripts/build_model.m          Rebuilds the corrected model from the original, c
 scripts/run_model.m            Runs the model and reports power, DC link, frequency, distortion, trip
 scripts/run_baseline.m         Runs the original model for the before/after comparison
 scripts/export_diagrams.m      Saves the model diagrams to docs/
-docs/                          Model diagrams
+scripts/plant_model.m          Current-loop plant: inverter, LCL filter, grid and voltage feedforward
+scripts/loop_margins.m         Stability margins of the current loop
+scripts/analyze_pi.m           Margins of the PI baseline at each grid strength
+scripts/sweep_scr.m            Simulates the PI baseline at each grid strength
+scripts/softstart_scr.m        Weak-grid test with power ramped up after start
+scripts/signal_metrics.m       Power, distortion, DC-link and frequency figures from a run
+scripts/plot_pi_bode.m         Draws docs/pi_loop_bode.png
+scripts/plot_islanding.m       Draws docs/islanding_matched.png
+docs/                          Model diagrams and result figures
 results/                       Simulation outputs, not tracked in git
 data/, ml/, paper/             Planned
 report/, archive/              Kept locally, not tracked

@@ -34,7 +34,8 @@ P.pv.T     = 25;           % cell temperature (deg C)
 P.pv.Tmppt = 10e-3;        % P&O period (s)
 P.pv.dD    = 0.003;        % P&O duty step
 P.pv.D0    = 1 - P.pv.Vmp/P.Vdc;   % starting duty
-P.pv.Dmin  = 0.45;  P.pv.Dmax = 0.80;
+P.pv.Dmin  = 1 - 330/P.Vdc;      % keeps the PV voltage below about 330 V (open circuit is 363 V)
+P.pv.Dmax  = 1 - 230/P.Vdc;      % and above about 230 V
 
 % ---- Wind turbine and PMSG ----
 P.wind.R      = 2.7072;    % blade radius (m)
