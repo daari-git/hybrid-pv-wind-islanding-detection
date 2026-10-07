@@ -2,7 +2,7 @@
 
 Ride-through-compatible islanding detection for a grid-connected hybrid solar PV–wind system, using a machine-learning classifier on top of an H-infinity current controller. MATLAB/Simulink.
 
-> **Status:** work in progress. Phases 1 and 2 are done (results below); phases 3 to 8 are planned and have no results yet.
+> **Status:** work in progress. Phases 1 to 3 are done (results below); phases 4 to 8 are planned and have no results yet.
 
 ## Problem
 
@@ -93,9 +93,36 @@ Simulation with the local load removed:
 
 The PI baseline is stable in steady state down to a short-circuit ratio of 2. It degrades in start-up at full power, in PCC voltage rise and in frequency ripple, so the case for the H-infinity controller (phase 3) rests on those and on the reduced margins once a control delay is included.
 
+### Phase 3: H-infinity current controller
+
+The current control is now sampled at the switching frequency with a one-sample computation delay, for both controllers. `P.ctrl.useHinf` selects PI or H-infinity in the same model.
+
+The controller is a structured H-infinity design (`scripts/design_hinf.m`): one order-4 controller tuned against five plants at once, at short-circuit ratios 20, 10, 5, 3 and 2.
+
+![Sensitivity of the current loop, PI against H-infinity](docs/controller_sensitivity.png)
+
+| Design figure (with the control delay) | PI | H-infinity |
+|---|---|---|
+| Gain margin | 7.9 to 8.7 dB | 11.3 to 12.4 dB |
+| Phase margin | 50° to 66° | 58° to 67° |
+| Sensitivity peak | 1.76 to 1.93 | 1.40 to 1.49 |
+
+Simulation with the local load removed (`scripts/compare_controllers.m`):
+
+| Test | PI | H-infinity |
+|---|---|---|
+| Hard start, SCR 20 | Stable; current THD 1.7%, voltage THD 1.7% | Stable; 1.7%, 1.3% |
+| Hard start, SCR 10 | Stable; 1.0%, 1.6% | Stable; 1.4%, 1.9% |
+| Hard start, SCR 5 | Stable; 0.8%, 1.4% | Stable; 1.4%, 2.9% |
+| Hard start, SCR 3 | Loses synchronism | Loses synchronism |
+| Power ramp, SCR 3 | Stable; 1.3%, 2.7% | Stable; 1.2%, 2.5% |
+| Power ramp, SCR 2 | Stable; 1.3%, 3.4% | Stable; 1.2%, 2.9% |
+| DC-link deviation after the power step | 17.8 V | 17.7 V |
+
+The H-infinity controller has better stability margins, but it gives no practical advantage in these tests. The synthesis converged close to a lower-gain PI, which trades low-frequency disturbance rejection for robustness: distortion is slightly lower at short-circuit ratios 3 and 2 and higher at 10 and 5. Neither controller survives a hard start at a ratio of 3, which points to the PLL and not the current loop. PI therefore stays the default controller for the islanding study.
+
 ### Known limitations
 
-- The controller in the model has no sampling or computation delay.
 - PI and PLL gains are a first pass, not optimised.
 - PV current readings are unreliable when the PV voltage is far above its operating point, including after a trip.
 - Generator stator inductance (3 mH) and rotor inertia (10 kg m²) were changed from the original so the machine can deliver 10 kW through a diode rectifier.
@@ -195,6 +222,10 @@ scripts/softstart_scr.m        Weak-grid test with power ramped up after start
 scripts/signal_metrics.m       Power, distortion, DC-link and frequency figures from a run
 scripts/plot_pi_bode.m         Draws docs/pi_loop_bode.png
 scripts/plot_islanding.m       Draws docs/islanding_matched.png
+scripts/design_hinf.m          Structured H-infinity current controller design
+scripts/hinf_controller.mat    The designed controller, read by params.m
+scripts/compare_controllers.m  PI against H-infinity in simulation
+scripts/plot_controller_sensitivity.m  Draws docs/controller_sensitivity.png
 docs/                          Model diagrams and result figures
 results/                       Simulation outputs, not tracked in git
 data/, ml/, paper/             Planned

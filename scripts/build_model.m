@@ -122,6 +122,15 @@ replace_block(ic, 'SearchDepth', 1, 'Name', 'Integrator', ...
     'simulink/Discrete/Discrete-Time Integrator', 'noprompt');
 set_param(pid('Integrator'), 'SampleTime', '-1');
 
+% Current control is sampled at the switching frequency, in step with the PWM
+% carrier, and its output is applied one sample later, as in a real digital
+% controller. Each axis has a PI and an H-infinity controller in parallel;
+% P.ctrl.useHinf selects which one drives the inverter.
+set_param(pid('PID Controller2'), 'SampleTime', 'P.Tc');
+set_param(pid('PID Controller3'), 'SampleTime', 'P.Tc');
+add_hinf(ic, 'PID Controller2', 'd');
+add_hinf(ic, 'PID Controller3', 'q');
+
 % Frequency measured from the PLL. The old signal was the PLL angle times pi/2.
 p0 = get_param(pid('PID Controller'), 'Position');
 add_block('simulink/Math Operations/Gain', pid('rad_s to Hz'), 'Gain', '1/(2*pi)', ...
@@ -352,6 +361,39 @@ while again
         lh = get_param(bl{k}, 'LineHandles');
         h = [lh.Inport(:); lh.Outport(:)];
         if all(h == -1), delete_block(bl{k}); again = true; end
+    end
+end
+end
+
+function add_hinf(ic, pidName, ax)
+% Put an H-infinity controller beside one PI current controller, with a
+% selector and a one-sample computation delay on the chosen output.
+pidb = [ic '/' pidName];
+lh  = get_param(pidb, 'LineHandles');
+src = get_param(lh.Inport(1), 'SrcPortHandle');
+dst = get_param(lh.Outport(1), 'DstPortHandle');
+delete_line(lh.Outport(1));
+p = get_param(pidb, 'Position'); y = p(2) - 70;
+n = @(s) sprintf('%s/%s %s', ic, s, ax);
+add_block('simulink/Discrete/Discrete State-Space', n('Hinf'), 'A', 'P.hinf.A', 'B', 'P.hinf.B', ...
+    'C', 'P.hinf.C', 'D', 'P.hinf.D', 'SampleTime', 'P.Tc', 'Position', [p(1) y p(3) y+40]);
+add_block('simulink/Discontinuities/Saturation', n('Hinf limit'), 'UpperLimit', '400', 'LowerLimit', '-400', ...
+    'Position', [p(3)+20 y+5 p(3)+50 y+35]);
+add_block('simulink/Sources/Constant', n('Use Hinf'), 'Value', 'P.ctrl.useHinf', ...
+    'Position', [p(3)+20 y+55 p(3)+50 y+75]);
+add_block('simulink/Signal Routing/Switch', n('Controller select'), 'Criteria', 'u2 >= Threshold', ...
+    'Threshold', '0.5', 'Position', [p(3)+80 y+40 p(3)+110 y+100]);
+add_block('simulink/Discrete/Unit Delay', n('Computation delay'), 'SampleTime', 'P.Tc', ...
+    'Position', [p(3)+130 y+55 p(3)+160 y+85]);
+add_line(ic, src, get_ph(n('Hinf'), 'Inport', 1), 'autorouting', 'on');
+add_line(ic, get_ph(n('Hinf'), 'Outport', 1), get_ph(n('Hinf limit'), 'Inport', 1));
+add_line(ic, get_ph(n('Hinf limit'), 'Outport', 1), get_ph(n('Controller select'), 'Inport', 1), 'autorouting', 'on');
+add_line(ic, get_ph(n('Use Hinf'), 'Outport', 1), get_ph(n('Controller select'), 'Inport', 2), 'autorouting', 'on');
+add_line(ic, get_ph(pidb, 'Outport', 1), get_ph(n('Controller select'), 'Inport', 3), 'autorouting', 'on');
+add_line(ic, get_ph(n('Controller select'), 'Outport', 1), get_ph(n('Computation delay'), 'Inport', 1));
+for k = 1:numel(dst)
+    if dst(k) ~= -1
+        add_line(ic, get_ph(n('Computation delay'), 'Outport', 1), dst(k), 'autorouting', 'on');
     end
 end
 end

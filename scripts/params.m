@@ -78,6 +78,17 @@ P.pll.Tf = 1/(2*pi*20);                                % frequency measurement f
 P.ctrl.KpI  = 6;    P.ctrl.KiI = 1000;                 % current loop
 P.ctrl.KpV  = 0.5;  P.ctrl.KiV = 10;                   % DC-link voltage loop
 P.ctrl.Ilim = 1.5*P.Ipk;                               % current reference limit (A)
+P.Tc = 1/P.fsw;                                        % current-control sampling period (s)
+P.ctrl.useHinf = 0;                                    % 0 = PI current control, 1 = H-infinity
+
+% ---- H-infinity current controller (from design_hinf.m), discrete at P.Tc ----
+kf = fullfile(fileparts(mfilename('fullpath')), 'hinf_controller.mat');
+if exist(kf, 'file')
+    K = load(kf);
+    P.hinf = struct('A', K.A, 'B', K.B, 'C', K.C, 'D', K.D);
+else
+    P.hinf = struct('A', 0, 'B', 0, 'C', 0, 'D', 0);   % placeholder until the design is run
+end
 
 % ---- Passive protection: baseline islanding detector ----
 P.prot.uv = 0.88;  P.prot.ov = 1.10;                   % voltage limits (pu)
