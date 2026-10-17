@@ -43,7 +43,7 @@ end
 function P = base(scr, mode)
 P = params(scr);
 P.ctrl.mode = mode;
-P.prot.tBlank = 1e6;
+P.prot.tArm = 1e6;
 P.load.P = 200; P.load.QL = 200; P.load.QC = 200;
 end
 

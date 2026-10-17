@@ -10,7 +10,7 @@ root = fileparts(fileparts(mfilename('fullpath')));
 T = table();
 for scr = scrs
     P = params(scr);
-    P.prot.tBlank = 1e6;
+    P.prot.tArm = 1e6;
     if ~isempty(loadP), P.load.P = loadP; P.load.QL = loadP; P.load.QC = loadP; end
     fprintf('\n##### SCR = %g  (Rg = %.3f ohm, Lg = %.2f mH)\n', scr, P.grid.R, 1e3*P.grid.L);
     S = run_model(stopTime, P, sprintf('%s_%g', tag, scr));

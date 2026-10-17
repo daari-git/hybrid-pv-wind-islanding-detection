@@ -2,7 +2,7 @@ function S = run_model(stopTime, P, tag)
 % RUN_MODEL  Simulate hybrid_pv_wind_islanding and report key metrics.
 %   S = RUN_MODEL(STOPTIME, P, TAG) runs the model for STOPTIME seconds with
 %   the parameter struct P (default PARAMS()) and saves the logged signals to
-%   results/TAG.mat. The model file itself is not changed.
+%   results/TAG.mat (TAG = '' skips saving). The model file itself is not changed.
 if nargin < 1 || isempty(stopTime), stopTime = 1.0; end
 if nargin < 2 || isempty(P), P = params(); end
 if nargin < 3, tag = 'run'; end
@@ -15,6 +15,15 @@ in = in.setVariable('P', P, 'Workspace', mdl);
 in = in.setModelParameter('StopTime', num2str(stopTime));
 sc = [find_system(mdl, 'BlockType', 'Scope'); find_system(mdl, 'BlockType', 'Display')];
 for k = 1:numel(sc), in = in.setBlockParameter(sc{k}, 'Commented', 'on'); end   % scopes off for this run only
+if ~strcmp(P.event.entity, 'None')                     % grid disturbance on the programmable source
+    gv = [mdl '/Grid voltage'];
+    in = in.setBlockParameter(gv, 'VariationEntity', P.event.entity);
+    if strcmp(P.event.entity, 'Amplitude')
+        in = in.setBlockParameter(gv, 'VariationType', P.event.type);
+    else
+        in = in.setBlockParameter(gv, 'VariationTypeAlt', P.event.type);
+    end
+end
 t0 = tic; out = sim(in);
 fprintf('Simulated %.2f s in %.0f s of wall time\n', stopTime, toc(t0));
 
@@ -22,8 +31,8 @@ tags = {'Vabc','Igrid','Iabc','VDC','ID','IQ','freq','Vpcc_rms','VPV','IPV','tri
 S = struct('P', P);
 for k = 1:numel(tags), S.(tags{k}) = out.get(['log_' tags{k}]); end
 if ~exist(fullfile(root, 'results'), 'dir'), mkdir(fullfile(root, 'results')); end
-save(fullfile(root, 'results', [tag '.mat']), '-struct', 'S');
-report(S);
+if ~isempty(tag), save(fullfile(root, 'results', [tag '.mat']), '-struct', 'S'); end   % empty tag: do not save
+if nargout == 0 || ~isempty(tag), report(S); end
 end
 
 function report(S)

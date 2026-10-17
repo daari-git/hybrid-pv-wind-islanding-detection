@@ -2,7 +2,7 @@
 
 Ride-through-compatible islanding detection for a grid-connected hybrid solar PV–wind system, using a machine-learning classifier on top of an H-infinity current controller. MATLAB/Simulink.
 
-> **Status:** work in progress. Phases 1 to 3 are done (results below); phases 4 to 8 are planned and have no results yet.
+> **Status:** work in progress. Phases 1 to 4 are done (results below); phases 5 to 8 are planned and have no results yet.
 
 ## Problem
 
@@ -66,11 +66,11 @@ All figures below come from `hybrid_pv_wind_islanding.slx` with PI control and t
 
 Exported power is 18.5 kW from about 20.4 kW of generation.
 
-### Islanding with a matched load
+### First islanding check (4.4% reactive mismatch)
 
-![Islanding event with a matched RLC load](docs/islanding_matched.png)
+![Islanding event, 4.4% reactive mismatch](docs/islanding_matched.png)
 
-The passive detector trips 10.7 ms after the grid breaker opens. It is fast because it has no time delays and a sensitive rate-of-change-of-frequency setting (2 Hz/s). The same setting false-trips 12 ms after an ordinary irradiance step from 1000 to 600 W/m². Separating islanding from ordinary disturbances is the problem the ML detector is meant to solve.
+The fast passive detector trips 10.6 ms after the grid breaker opens. **Correction:** this case was first reported as a matched load, but the load was sized with Q_L = Q_C and ignored the inverter's own 813 var output, so it is really a 4.4% reactive mismatch. A properly matched island is not detected by either passive setting; see Phase 4.
 
 ### Phase 2: PI baseline against grid strength
 
@@ -168,6 +168,50 @@ Reading the results:
 - **PID behaves like PI**, as the margin analysis predicts; the derivative term can only be small on this plant.
 - **No controller survives a hard start at SCR 3.** The failure is in synchronisation (PLL), not the current loop.
 - **Distortion figures come from single runs** and vary by a few tenths of a percent with the MPPT's perturbation, so differences below about 0.3% should not be read as significant.
+
+### Phase 4: islanding test bench and baseline detectors
+
+Three baseline detectors, all evaluated offline on the same logged PCC voltage and frequency (`detect_islanding.m`):
+
+| Detector | Settings |
+|---|---|
+| Fast passive | Instantaneous trip: under 0.88 pu, over 1.10 pu, under 49.3 Hz, over 50.5 Hz, rate of change of frequency over 2 Hz/s |
+| IEEE passive | IEEE 1547-2018 Category II default trip settings, frequencies scaled to 50 Hz: UV 0.70 pu / 10 s and 0.45 pu / 0.16 s; OV 1.10 pu / 2 s and 1.20 pu / 0.16 s; UF 48.75 Hz / 300 s and 47.08 Hz / 0.16 s; OF 51.0 Hz / 300 s and 51.67 Hz / 0.16 s |
+| IEEE + AFD | The IEEE settings with active frequency drift: q-axis current reference = bias + K·(f − 50 Hz), K = −4.1 A/Hz, bias −0.41 A, limit ±12.2 A |
+
+The sign of the drift gain matters: with K > 0 a matched island holds at 49.95 Hz and is never detected; with K < 0 its frequency runs away (`afd_sign_test.m`).
+
+**Non-detection zones.** The grid breaker opens at 0.4 s with an RLC load (Q_f = 1) sized relative to the inverter's measured output (18.57 kW, 813 var), and each detector gets the 2 s IEEE 1547-2018 allows (`ndz_sweep.m`, `island_case.m`, 70 runs):
+
+![Detection time over the mismatch plane](docs/ndz_maps.png)
+
+**False trips.** Eleven ordinary disturbances with the grid connected; every trip is false (`false_trip_test.m`). The grid events use a programmable source; the load and capacitor are switched in at the PCC.
+
+| Event | Fast passive | IEEE passive | IEEE + AFD |
+|---|---|---|---|
+| Irradiance 1000 to 600 W/m² | trips (12 ms) | no trip | no trip |
+| Irradiance 600 to 1000 W/m² | trips (13 ms) | no trip | no trip |
+| Wind 12 to 9 m/s | no trip | no trip | no trip |
+| Load switched on (+6 kW) | trips (6 ms) | no trip | no trip |
+| Capacitor switched on (5 kvar) | trips (4 ms) | no trip | no trip |
+| Voltage sag to 0.7 pu, 0.5 s | trips (3 ms) | no trip | no trip |
+| Voltage sag to 0.5 pu, 0.2 s | trips (3 ms) | no trip | no trip |
+| Voltage swell to 1.15 pu, 0.5 s | trips (4 ms) | no trip | no trip |
+| Frequency ramp −2 Hz/s for 0.5 s | trips (51 ms) | no trip | no trip |
+| Frequency ramp +2 Hz/s for 0.5 s | trips (76 ms) | no trip | no trip |
+| Phase jump 20° | trips (2 ms) | no trip | no trip |
+
+| Detector | Islands detected (35) | Detection time | False trips (11) |
+|---|---|---|---|
+| Fast passive | 34 | 7 to 52 ms | 10 |
+| IEEE passive | 0 | none within 2 s | 0 |
+| IEEE + AFD | 35 | 160 to 275 ms | 0 |
+
+Reading the results:
+
+- **The trade-off the paper rests on is real.** Settings fast enough to catch islands trip on almost every ordinary disturbance; ride-through-compliant settings trip on nothing, including real islands.
+- **Active frequency drift solves both in this test bed**, at SCR 10 with Q_f = 1: every island detected in under 0.3 s and no false trips. Its cost is small here: grid-connected current THD 2.08% with and without it, and about 100 var of extra reactive exchange.
+- **So the case for an ML detector is not made yet.** It has to come from conditions where active drift is known to struggle, which Phase 5 must include: weak grids (SCR 2 to 3), higher quality-factor loads (Q_f = 2.5), several inverters whose drift can cancel, and its slower detection (160 to 275 ms against tens of ms for a passive method).
 
 ### Known limitations
 
@@ -280,6 +324,12 @@ scripts/discrete_plant.m       Current-loop plant as the digital controller sees
 scripts/margins_all.m          Margins of all four controllers at each grid strength
 scripts/plot_controller_comparison.m  Draws docs/controllers_sensitivity.png and docs/controllers_step.png
 scripts/demo_hinf.m            Walk-through of the H-infinity controller for a demonstration
+scripts/detect_islanding.m     Replays logged voltage and frequency through a set of relay settings
+scripts/island_case.m          Sizes the RLC load for a given active/reactive mismatch
+scripts/afd_sign_test.m        Matched island with no drift and with drift of each sign
+scripts/ndz_sweep.m            Non-detection-zone sweep (70 runs); evaluate_ndz.m scores it
+scripts/false_trip_test.m      Eleven non-islanding disturbances through every detector
+scripts/plot_ndz.m            Draws docs/ndz_maps.png
 docs/                          Model diagrams and result figures
 results/                       Simulation outputs, not tracked in git
 data/, ml/, paper/             Planned

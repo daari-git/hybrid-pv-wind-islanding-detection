@@ -39,7 +39,7 @@ for k = 1:4
     end
 end
 xlabel(ax, 'Time (ms)');
-title(tl, 'Islanding with a matched RLC load (Q_f = 1), passive detector, SCR 10', 'FontSize', 12);
+title(tl, 'Islanding with an 18.5 kW RLC load, Q_L = Q_C (4.4% reactive mismatch), fast passive detector, SCR 10', 'FontSize', 12);
 root = fileparts(fileparts(mfilename('fullpath')));
 exportgraphics(fig, fullfile(root, 'docs', 'islanding_matched.png'), 'Resolution', 150);
 close(fig);

@@ -9,7 +9,7 @@ root = fileparts(fileparts(mfilename('fullpath')));
 T = table();
 for scr = scrs
     P = params(scr);
-    P.prot.tBlank = 1e6;
+    P.prot.tArm = 1e6;
     P.load.P = 200; P.load.QL = 200; P.load.QC = 200;
     P.pv.G0 = 200;  P.pv.G1 = 1000; P.pv.tStep = 0.5;
     P.wind.v0 = 6;  P.wind.v1 = 12; P.wind.tStep = 0.5;

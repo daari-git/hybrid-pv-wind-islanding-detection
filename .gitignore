@@ -19,3 +19,4 @@ MATLAB_R2018a/IEEE_1547_2018_Inverter.slx
 # Simulation outputs
 results/*.mat
 results/*.txt
+results/ndz/

@@ -131,6 +131,34 @@ set_param(pid('PID Controller3'), 'SampleTime', 'P.Tc');
 add_current_controller(ic, 'PID Controller2', 'd');
 add_current_controller(ic, 'PID Controller3', 'q');
 
+% Active frequency drift: the q-axis current reference was a constant 0.
+q0 = [ic '/Constant5'];
+lh = get_param(q0, 'LineHandles'); dstq = get_param(lh.Outport(1), 'DstPortHandle');
+pq = get_param(q0, 'Position'); delete_line(lh.Outport(1)); delete_block(q0);
+aq = [ic '/Active frequency drift'];
+add_block('built-in/Subsystem', aq, 'Position', [pq(1)-60 pq(2)-15 pq(3)+20 pq(4)+15], 'BackgroundColor', 'cyan');
+m = @(s) [aq '/' s];
+add_block('simulink/Signal Routing/From', m('From freq'), 'GotoTag', 'freq', 'Position', [20 40 80 60]);
+add_block('simulink/Sources/Constant', m('fg'), 'Value', 'P.fg', 'Position', [20 80 60 100]);
+add_block('simulink/Math Operations/Sum', m('Frequency error'), 'Inputs', '+-', 'Position', [110 45 130 85]);
+add_block('simulink/Math Operations/Gain', m('K'), 'Gain', 'P.afd.K', 'Position', [160 50 200 80]);
+add_block('simulink/Sources/Constant', m('bias'), 'Value', 'P.afd.bias', 'Position', [160 110 210 130]);
+add_block('simulink/Math Operations/Sum', m('Add bias'), 'Inputs', '++', 'Position', [240 55 260 95]);
+add_block('simulink/Discontinuities/Saturation', m('Limit'), 'UpperLimit', 'P.afd.lim', 'LowerLimit', '-P.afd.lim', ...
+    'Position', [290 60 320 90]);
+add_block('simulink/Sources/Step', m('Armed'), 'Time', 'P.prot.tBlank', 'Before', '0', 'After', 'P.afd.on', ...
+    'SampleTime', 'P.Tc', 'Position', [290 120 320 150]);
+add_block('simulink/Math Operations/Product', m('Enable'), 'Position', [360 65 390 125]);
+add_block('simulink/Sinks/Out1', m('Iq ref'), 'Position', [430 88 460 102]);
+add_line(aq, 'From freq/1', 'Frequency error/1');  add_line(aq, 'fg/1', 'Frequency error/2', 'autorouting', 'on');
+add_line(aq, 'Frequency error/1', 'K/1');  add_line(aq, 'K/1', 'Add bias/1');
+add_line(aq, 'bias/1', 'Add bias/2', 'autorouting', 'on');  add_line(aq, 'Add bias/1', 'Limit/1');
+add_line(aq, 'Limit/1', 'Enable/1', 'autorouting', 'on');  add_line(aq, 'Armed/1', 'Enable/2', 'autorouting', 'on');
+add_line(aq, 'Enable/1', 'Iq ref/1');
+for k = 1:numel(dstq)
+    if dstq(k) ~= -1, add_line(ic, get_ph(aq, 'Outport', 1), dstq(k), 'autorouting', 'on'); end
+end
+
 % Frequency measured from the PLL. The old signal was the PLL angle times pi/2.
 p0 = get_param(pid('PID Controller'), 'Position');
 add_block('simulink/Math Operations/Gain', pid('rad_s to Hz'), 'Gain', '1/(2*pi)', ...
@@ -191,7 +219,7 @@ add_line(pr, 'ROCOF/1', 'Abs/1', 'autorouting', 'on');
 
 % start-up blanking, then latch; the breaker stays closed until a trip
 pf = get_param(ff, 'Position');
-add_block('simulink/Sources/Step', [pr '/Blanking'], 'Time', 'P.prot.tBlank', 'Before', '0', ...
+add_block('simulink/Sources/Step', [pr '/Blanking'], 'Time', 'P.prot.tArm', 'Before', '0', ...
     'After', '1', 'SampleTime', 'P.Ts', 'Position', [pf(1)-150 pf(2)+60 pf(1)-120 pf(2)+90]);
 add_block('simulink/Logic and Bit Operations/Logical Operator', [pr '/Armed'], 'Operator', 'AND', ...
     'Position', [pf(1)-80 pf(2) pf(1)-50 pf(2)+40]);
@@ -277,9 +305,60 @@ for k = 1:3
     add_line(mdl, lph.LConn(k), bph.LConn(k), 'autorouting', 'on');   % inverter side of the breaker
 end
 
+%% 7b. Programmable grid and switched equipment for disturbance tests -------
+% The fixed grid source becomes a programmable voltage source (sags, swells,
+% frequency ramps, phase jumps) behind the same impedance. A switched load
+% and a switched capacitor bank sit at the PCC for load-switching events.
+for L = {'spsThreePhaseProgrammableVoltageSourceLib', 'spsThreePhaseSeriesRLCBranchLib', 'spsGroundLib', ...
+         'spsThreePhaseBreakerLib', 'spsThreePhaseParallelRLCLoadLib'}
+    load_system(L{1});
+end
+gs = [mdl '/Three-Phase Source'];
+ps = get_param(gs, 'Position');
+gph = get_param(gs, 'PortHandles');
+for k = 1:3
+    l = get_param(gph.RConn(k), 'Line'); if l ~= -1, delete_line(l); end
+end
+delete_block(gs);
+ibh = get_param(ib, 'PortHandles');
+gv = [mdl '/Grid voltage']; gz = [mdl '/Grid impedance']; gn = [mdl '/Grid neutral'];
+add_block(libblock('spsThreePhaseProgrammableVoltageSourceLib'), gv, 'Position', ps);
+set_param(gv, 'PositiveSequence', '[P.Vll 0 P.fg]', 'VariationEntity', 'None', ...
+    'Amplitudes', 'P.event.amp', 'TimeValues', 'P.event.time', 'VariationStep', 'P.event.step', ...
+    'VariationRate', 'P.event.rate', 'VariationTiming', 'P.event.timing');
+add_block(libblock('spsThreePhaseSeriesRLCBranchLib'), gz, 'BranchType', 'RL', ...
+    'Resistance', 'P.grid.R', 'Inductance', 'P.grid.L', 'Position', ps + [-140 0 -140 0]);
+add_block(libblock('spsGroundLib'), gn, 'Position', [ps(3)+30 ps(4)+20 ps(3)+60 ps(4)+50]);
+gvh = get_param(gv, 'PortHandles'); gzh = get_param(gz, 'PortHandles'); gnh = get_param(gn, 'PortHandles');
+for k = 1:3
+    add_line(mdl, ibh.RConn(k), gzh.LConn(k), 'autorouting', 'on');
+    add_line(mdl, gzh.RConn(k), gvh.RConn(k), 'autorouting', 'on');
+end
+add_line(mdl, gvh.LConn(1), gnh.LConn(1), 'autorouting', 'on');
+
+% switched load and switched capacitor bank at the PCC (inverter side of the grid breaker)
+pl = get_param([mdl '/Local load'], 'Position');
+sw = {'Switched load', 'P.event.loadP', '0', 'P.event.loadT'; ...
+      'Switched capacitor', '1', 'P.event.capQ', 'P.event.capT'};
+for k = 1:2
+    br = [mdl '/' sw{k,1} ' breaker']; ld = [mdl '/' sw{k,1}];
+    x = pl(1) + 140*k;
+    add_block(libblock('spsThreePhaseBreakerLib'), br, 'InitialState', 'open', 'SwitchA', 'on', ...
+        'SwitchB', 'on', 'SwitchC', 'on', 'External', 'off', 'SwitchTimes', ['[' sw{k,4} ']'], ...
+        'Position', [x pl(2)-120 x+50 pl(2)-60]);
+    add_block(libblock('spsThreePhaseParallelRLCLoadLib'), ld, 'Configuration', 'Y (grounded)', ...
+        'NominalVoltage', 'P.Vll', 'NominalFrequency', 'P.fg', 'ActivePower', sw{k,2}, ...
+        'InductivePower', '0', 'CapacitivePower', sw{k,3}, 'Position', [x pl(2)-220 x+50 pl(2)-150]);
+    bh = get_param(br, 'PortHandles'); lh2 = get_param(ld, 'PortHandles');
+    for j = 1:3
+        add_line(mdl, bh.LConn(j), ibh.LConn(j), 'autorouting', 'on');
+        add_line(mdl, bh.RConn(j), lh2.LConn(j), 'autorouting', 'on');
+    end
+end
+
 %% 8. Logging -------------------------------------------------------------
 lg = [mdl '/Data logging'];
-sp = get_param([mdl '/Three-Phase Source'], 'Position');
+sp = get_param([mdl '/Grid voltage'], 'Position');
 add_block('built-in/Subsystem', lg, 'Position', [sp(1) sp(2)-150 sp(1)+110 sp(2)-90]);
 tags = {'Vabc','Igrid','Iabc','VDC','ID','IQ','freq','Vpcc_rms','VPV','IPV','trip','wm_wind'};
 for k = 1:numel(tags)
@@ -441,6 +520,13 @@ for k = 1:numel(dst)
         add_line(ic, get_ph(sub, 'Outport', 1), dst(k), 'autorouting', 'on');
     end
 end
+end
+
+function b = libblock(L)
+% The single block in a Specialized Power Systems block library.
+load_system(L);
+c = find_system(L, 'SearchDepth', 1, 'Type', 'Block');
+b = c{1};
 end
 
 function h = get_ph(block, kind, idx)

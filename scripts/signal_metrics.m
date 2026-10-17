@@ -8,6 +8,7 @@ ig = S.Igrid.Data(w, :); vg = S.Vabc.Data(w, :);
 [M.thd, M.I1, h] = harmonics(ig(:,1), t(w), f1, 50);
 M.h2to7 = h(2:7)';
 M.P     = -mean(sum(vg.*ig, 2));                     % W, positive = exported
+M.Q     = -mean((vg(:,2)-vg(:,3)).*ig(:,1) + (vg(:,3)-vg(:,1)).*ig(:,2) + (vg(:,1)-vg(:,2)).*ig(:,3))/sqrt(3);   % var, same sign as P
 M.Ipk   = max(abs(ig(:)));                           % largest instantaneous current (A)
 M.Vrms  = mean(S.Vpcc_rms.Data(S.Vpcc_rms.Time >= t1 & S.Vpcc_rms.Time < t2));
 [M.thdV, M.V1] = harmonics(vg(:,1), t(w), f1, 50);

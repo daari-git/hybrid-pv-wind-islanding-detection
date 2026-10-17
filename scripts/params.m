@@ -106,6 +106,32 @@ P.prot.uf = 49.3;  P.prot.of = 50.5;                   % frequency limits (Hz)
 P.prot.rocof  = 2.0;                                   % rate-of-change-of-frequency limit (Hz/s)
 P.prot.Trocof = 1e-3;                                  % ROCOF sampling period (s)
 P.prot.tBlank = 0.30;                                  % start-up blanking time (s)
+P.prot.tArm   = P.prot.tBlank;                         % time the model's protection is armed (set 1e6 to leave it unarmed)
+
+% Relay settings used by detect_islanding.m. Each row: [threshold, clearing time (s)].
+% 'fast'  : the model's own passive detector, instantaneous.
+% 'ieee'  : IEEE 1547-2018 Category II default trip settings, frequencies
+%           scaled from 60 Hz to 50 Hz. These are ride-through compatible.
+P.relay.fast.uv = [0.88 0];     P.relay.fast.ov = [1.10 0];
+P.relay.fast.uf = [49.3 0];     P.relay.fast.of = [50.5 0];
+P.relay.fast.rocof = [2.0 0];
+P.relay.ieee.uv = [0.70 10; 0.45 0.16];          % UV1, UV2 (pu, s)
+P.relay.ieee.ov = [1.10 2.0; 1.20 0.16];         % OV1, OV2
+P.relay.ieee.uf = [58.5 300; 56.5 0.16]*50/60;   % UF1, UF2 (Hz, s)
+P.relay.ieee.of = [61.2 300; 62.0 0.16]*50/60;   % OF1, OF2
+P.relay.ieee.rocof = [Inf 0];                    % no ROCOF trip by default
+P.relay.tMax = 2.0;                              % islanding must be cleared within 2 s (IEEE 1547-2018)
+
+% ---- Active frequency drift (AFD): q-axis current reference ----
+% Iq* = on * clamp(bias + K*(f - fg), +/-lim), armed after the start-up blanking.
+% In an island the injected reactive current shifts the load's resonance, so
+% the frequency drifts further: positive feedback that pushes it out of the
+% relay window. Connected to a stiff grid the frequency hardly moves, so the
+% injection stays near the small bias.
+P.afd.on   = 0;
+P.afd.K    = -0.10*P.Ipk;                        % A per Hz; negative sign = positive feedback in an island (afd_sign_test.m)
+P.afd.bias = -0.01*P.Ipk;                        % A, breaks the symmetry at exactly 50 Hz
+P.afd.lim  = 0.30*P.Ipk;                         % A
 
 % ---- Local load and islanding event (IEEE 1547.1 style RLC load) ----
 P.load.Qf = 1.0;                                       % load quality factor
@@ -113,6 +139,17 @@ P.load.P  = 20e3;                                      % load active power (W)
 P.load.QL = P.load.Qf*P.load.P;                        % inductive reactive power (var)
 P.load.QC = P.load.Qf*P.load.P;                        % capacitive reactive power (var)
 P.tIsland = 1e6;                                       % grid breaker opening time (s); 1e6 = never
+P.island.Pinv = 18570;  P.island.Qinv = 813;          % inverter output at the PCC, SCR 10, grid connected (W, var)
+
+% ---- Non-islanding disturbances (programmable grid source, switched equipment) ----
+% P.event.entity: 'None', 'Amplitude', 'Frequency' or 'Phase'; P.event.type: 'Step',
+% 'Ramp' or 'Table of time-amplitude pairs'. run_model sets these on the source.
+P.event.entity = 'None';  P.event.type = 'Step';
+P.event.amp    = [1 1];   P.event.time = [0 1e6];        % amplitude table (pu, s)
+P.event.step   = 0;       P.event.rate = 0;              % step size (Hz or deg), ramp rate (Hz/s)
+P.event.timing = [1e6 1e6];                              % start and end of a step or ramp (s)
+P.event.loadP  = 0.3*P.Sn;  P.event.loadT = 1e6;         % switched load (W) and closing time (s)
+P.event.capQ   = 0.25*P.Sn; P.event.capT  = 1e6;         % switched capacitor bank (var) and closing time (s)
 
 % ---- Design checks ----
 P.check.Cf_pct_of_Cb   = 100*P.lcl.Cf/P.Cb;                       % want <= 5

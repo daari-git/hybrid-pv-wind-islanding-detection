@@ -43,7 +43,7 @@ names = {'PI', 'H-infinity'}; S = cell(1, 2); thd = zeros(1, 2);
 for c = 1:2
     P = params(5);
     P.ctrl.mode = 2*c - 1;                                 % 1 = PI, 3 = H-infinity
-    P.prot.tBlank = 1e6;                                   % protection unarmed for this test
+    P.prot.tArm = 1e6;                                   % protection unarmed for this test
     P.load.P = 200; P.load.QL = 200; P.load.QC = 200;
     P.pv.G1 = 600; P.pv.tStep = 0.4;
     S{c} = run_model(0.7, P, sprintf('demo_%d', c));
