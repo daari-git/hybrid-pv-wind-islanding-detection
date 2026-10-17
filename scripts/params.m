@@ -79,15 +79,25 @@ P.ctrl.KpI  = 6;    P.ctrl.KiI = 1000;                 % current loop
 P.ctrl.KpV  = 0.5;  P.ctrl.KiV = 10;                   % DC-link voltage loop
 P.ctrl.Ilim = 1.5*P.Ipk;                               % current reference limit (A)
 P.Tc = 1/P.fsw;                                        % current-control sampling period (s)
-P.ctrl.useHinf = 0;                                    % 0 = PI current control, 1 = H-infinity
+P.ctrl.mode = 1;                                       % current controller: 1 PI, 2 PID, 3 H-infinity, 4 fuzzy PI
+P.ctrl.names = {'PI', 'PID', 'H-infinity', 'Fuzzy PI'};
 
-% ---- H-infinity current controller (from design_hinf.m), discrete at P.Tc ----
-kf = fullfile(fileparts(mfilename('fullpath')), 'hinf_controller.mat');
-if exist(kf, 'file')
-    K = load(kf);
+% ---- Alternative current controllers, all discrete at P.Tc ----
+here = fileparts(mfilename('fullpath'));
+P.hinf = struct('A', 0, 'B', 0, 'C', 0, 'D', 0);       % placeholders until the designs are run
+P.pid  = struct('Kp', P.ctrl.KpI, 'Ki', P.ctrl.KiI, 'Kd', 0, 'N', 1e4);
+P.flc  = struct('fis', [], 'Ke', 1, 'Kde', 1, 'Ku', 0);
+if exist(fullfile(here, 'hinf_controller.mat'), 'file')        % design_hinf.m
+    K = load(fullfile(here, 'hinf_controller.mat'));
     P.hinf = struct('A', K.A, 'B', K.B, 'C', K.C, 'D', K.D);
-else
-    P.hinf = struct('A', 0, 'B', 0, 'C', 0, 'D', 0);   % placeholder until the design is run
+end
+if exist(fullfile(here, 'pid_controller.mat'), 'file')         % design_pid.m
+    K = load(fullfile(here, 'pid_controller.mat'));
+    P.pid = struct('Kp', K.Kp, 'Ki', K.Ki, 'Kd', K.Kd, 'N', K.N);
+end
+if exist(fullfile(here, 'flc_controller.mat'), 'file')         % design_flc.m
+    K = load(fullfile(here, 'flc_controller.mat'));
+    P.flc = struct('fis', K.fis, 'Ke', K.Ke, 'Kde', K.Kde, 'Ku', K.Ku);
 end
 
 % ---- Passive protection: baseline islanding detector ----

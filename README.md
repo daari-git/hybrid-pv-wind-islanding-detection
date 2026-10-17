@@ -95,7 +95,7 @@ The PI baseline is stable in steady state down to a short-circuit ratio of 2. It
 
 ### Phase 3: H-infinity current controller
 
-The current control is now sampled at the switching frequency with a one-sample computation delay, for both controllers. `P.ctrl.useHinf` selects PI or H-infinity in the same model.
+The current control is now sampled at the switching frequency with a one-sample computation delay, for both controllers. `P.ctrl.mode` selects the current controller in the same model (1 PI, 2 PID, 3 H-infinity, 4 fuzzy PI).
 
 The controller is a structured H-infinity design (`scripts/design_hinf.m`): one order-4 controller tuned against five plants at once, at short-circuit ratios 20, 10, 5, 3 and 2.
 
@@ -120,6 +120,54 @@ Simulation with the local load removed (`scripts/compare_controllers.m`):
 | DC-link deviation after the power step | 17.8 V | 17.7 V |
 
 The H-infinity controller has better stability margins, but it gives no practical advantage in these tests. The synthesis converged close to a lower-gain PI, which trades low-frequency disturbance rejection for robustness: distortion is slightly lower at short-circuit ratios 3 and 2 and higher at 10 and 5. Neither controller survives a hard start at a ratio of 3, which points to the PLL and not the current loop. PI therefore stays the default controller for the islanding study.
+
+### Four current controllers compared: PI, PID, H-infinity, fuzzy PI
+
+All four sit in the same block, "Current controller d" and "Current controller q", fed by the same error and followed by the same one-sample computation delay. `P.ctrl.mode` picks one.
+
+| Controller | Design | Script |
+|---|---|---|
+| PI | Baseline gains Kp = 6, Ki = 1000 | `params.m` |
+| PID | Baseline PI plus a filtered derivative, Kd = 1.26e-4, filter 100 us | `design_pid.m` |
+| H-infinity | Structured synthesis on five grid strengths, order 4 | `design_hinf.m` |
+| Fuzzy PI | Incremental fuzzy PI, 7 sets per input, 49 rules, scaled to equal the PI for small signals | `design_flc.m` |
+
+`pidtune` never adds derivative action on this plant: with the 1.5-sample loop delay, every increase in derivative gain raises the worst-case sensitivity peak, and Kd = 2e-3 is unstable. The PID therefore uses the largest derivative that costs no more than 5% of the PI's robustness.
+
+Stability margins on the discrete plant with the control delay (`margins_all.m`; the fuzzy PI by its small-signal equivalent):
+
+| Controller | Gain margin | Phase margin | Sensitivity peak |
+|---|---|---|---|
+| PI | 7.5 to 8.4 dB | 50° to 66° | 1.78 to 1.96 |
+| PID | 6.9 to 7.8 dB | 51° to 69° | 1.82 to 2.04 |
+| H-infinity | 10.7 to 11.9 dB | 58° to 68° | 1.41 to 1.51 |
+| Fuzzy PI | 9.8 to 10.7 dB | 59° to 70° | 1.53 to 1.63 |
+
+![Sensitivity of the four controllers](docs/controllers_sensitivity.png)
+
+Simulation (`compare_controllers.m`, local load removed, protection unarmed). Each cell is current THD / voltage THD:
+
+| Test | PI | PID | H-infinity | Fuzzy PI |
+|---|---|---|---|---|
+| Hard start, SCR 20 | 1.7% / 1.7% | 1.7% / 1.7% | 1.7% / 1.3% | 1.4% / 1.8% |
+| Hard start, SCR 10 | 1.0% / 1.6% | 1.0% / 1.7% | 1.4% / 1.9% | 1.0% / 1.7% |
+| Hard start, SCR 5 | 0.8% / 1.4% | 0.9% / 1.7% | 1.4% / 3.0% | 0.9% / 2.0% |
+| Hard start, SCR 3 | loses synchronism | loses synchronism | loses synchronism | loses synchronism |
+| Power ramp, SCR 3 | 1.3% / 2.7% | 1.3% / 3.0% | 1.2% / 2.5% | **0.8% / 1.9%** |
+| Power ramp, SCR 2 | 1.3% / 3.4% | 1.0% / 2.5% | 1.2% / 2.9% | **0.7% / 1.9%** |
+| Irradiance step, SCR 5 | 1.7% / 2.4% | 1.0% / 1.5% | 1.4% / 1.8% | 1.0% / 1.8% |
+| DC-link dip after the irradiance step | 12.9 V | 13.5 V | 13.4 V | 13.4 V |
+| DC-link settling (within 2 V) | 142 ms | 142 ms | 195 ms | **135 ms** |
+
+![Irradiance-step response of the four controllers](docs/controllers_step.png)
+
+Reading the results:
+
+- **Fuzzy PI is the best all-round performer.** It has the lowest distortion on the weak grids (current THD 0.7 to 0.8% against 1.0 to 1.3%, voltage THD 1.9% against 2.5 to 3.4%), the fastest DC-link recovery, and the second-best margins.
+- **H-infinity is the most robust on paper** but gives the highest distortion at SCR 5 and 10 and the slowest DC-link recovery.
+- **PID behaves like PI**, as the margin analysis predicts; the derivative term can only be small on this plant.
+- **No controller survives a hard start at SCR 3.** The failure is in synchronisation (PLL), not the current loop.
+- **Distortion figures come from single runs** and vary by a few tenths of a percent with the MPPT's perturbation, so differences below about 0.3% should not be read as significant.
 
 ### Known limitations
 
@@ -224,8 +272,14 @@ scripts/plot_pi_bode.m         Draws docs/pi_loop_bode.png
 scripts/plot_islanding.m       Draws docs/islanding_matched.png
 scripts/design_hinf.m          Structured H-infinity current controller design
 scripts/hinf_controller.mat    The designed controller, read by params.m
-scripts/compare_controllers.m  PI against H-infinity in simulation
+scripts/compare_controllers.m  All four current controllers on the same test suite
 scripts/plot_controller_sensitivity.m  Draws docs/controller_sensitivity.png
+scripts/design_pid.m           PID current controller (baseline PI plus filtered derivative)
+scripts/design_flc.m           Fuzzy PI current controller
+scripts/discrete_plant.m       Current-loop plant as the digital controller sees it
+scripts/margins_all.m          Margins of all four controllers at each grid strength
+scripts/plot_controller_comparison.m  Draws docs/controllers_sensitivity.png and docs/controllers_step.png
+scripts/demo_hinf.m            Walk-through of the H-infinity controller for a demonstration
 docs/                          Model diagrams and result figures
 results/                       Simulation outputs, not tracked in git
 data/, ml/, paper/             Planned

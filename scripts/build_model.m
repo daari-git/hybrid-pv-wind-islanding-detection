@@ -124,12 +124,12 @@ set_param(pid('Integrator'), 'SampleTime', '-1');
 
 % Current control is sampled at the switching frequency, in step with the PWM
 % carrier, and its output is applied one sample later, as in a real digital
-% controller. Each axis has a PI and an H-infinity controller in parallel;
-% P.ctrl.useHinf selects which one drives the inverter.
+% controller. Each axis has four controllers in parallel (PI, PID, H-infinity,
+% fuzzy PI); P.ctrl.mode selects which one drives the inverter.
 set_param(pid('PID Controller2'), 'SampleTime', 'P.Tc');
 set_param(pid('PID Controller3'), 'SampleTime', 'P.Tc');
-add_hinf(ic, 'PID Controller2', 'd');
-add_hinf(ic, 'PID Controller3', 'q');
+add_current_controller(ic, 'PID Controller2', 'd');
+add_current_controller(ic, 'PID Controller3', 'q');
 
 % Frequency measured from the PLL. The old signal was the PLL angle times pi/2.
 p0 = get_param(pid('PID Controller'), 'Position');
@@ -365,35 +365,80 @@ while again
 end
 end
 
-function add_hinf(ic, pidName, ax)
-% Put an H-infinity controller beside one PI current controller, with a
-% selector and a one-sample computation delay on the chosen output.
+function add_current_controller(ic, pidName, ax)
+% Replace one PI current controller with a block, "Current controller d" or
+% "Current controller q", holding four controllers fed by the same error:
+% 1 PI (the original), 2 PID, 3 H-infinity, 4 fuzzy PI. A selector driven by
+% P.ctrl.mode picks one, and a one-sample computation delay follows it.
 pidb = [ic '/' pidName];
 lh  = get_param(pidb, 'LineHandles');
 src = get_param(lh.Inport(1), 'SrcPortHandle');
 dst = get_param(lh.Outport(1), 'DstPortHandle');
-delete_line(lh.Outport(1));
-p = get_param(pidb, 'Position'); y = p(2) - 70;
-n = @(s) sprintf('%s/%s %s', ic, s, ax);
-add_block('simulink/Discrete/Discrete State-Space', n('Hinf'), 'A', 'P.hinf.A', 'B', 'P.hinf.B', ...
-    'C', 'P.hinf.C', 'D', 'P.hinf.D', 'SampleTime', 'P.Tc', 'Position', [p(1) y p(3) y+40]);
-add_block('simulink/Discontinuities/Saturation', n('Hinf limit'), 'UpperLimit', '400', 'LowerLimit', '-400', ...
-    'Position', [p(3)+20 y+5 p(3)+50 y+35]);
-add_block('simulink/Sources/Constant', n('Use Hinf'), 'Value', 'P.ctrl.useHinf', ...
-    'Position', [p(3)+20 y+55 p(3)+50 y+75]);
-add_block('simulink/Signal Routing/Switch', n('Controller select'), 'Criteria', 'u2 >= Threshold', ...
-    'Threshold', '0.5', 'Position', [p(3)+80 y+40 p(3)+110 y+100]);
+p0  = get_param(pidb, 'Position');
+sub = sprintf('%s/Current controller %s', ic, ax);
+n   = @(s) sprintf('%s/%s', sub, s);
+add_block('built-in/Subsystem', sub);
+add_block('simulink/Sources/In1', n('error'), 'Position', [30 228 60 242]);
+% 1: PI, same settings as the original block
+add_block(pidb, n('PI'), 'Position', [200 40 270 80]);
+% 2: PID with a filtered derivative
+add_block('simulink/Discrete/Discrete PID Controller', n('PID'), 'Controller', 'PID', ...
+    'P', 'P.pid.Kp', 'I', 'P.pid.Ki', 'D', 'P.pid.Kd', 'N', 'P.pid.N', 'SampleTime', 'P.Tc', ...
+    'IntegratorMethod', 'Forward Euler', 'FilterMethod', 'Backward Euler', ...
+    'LimitOutput', 'on', 'UpperSaturationLimit', '400', 'LowerSaturationLimit', '-400', ...
+    'AntiWindupMode', 'clamping', 'Position', [200 120 270 160]);
+% 3: H-infinity
+add_block('simulink/Discrete/Discrete State-Space', n('H-infinity'), 'A', 'P.hinf.A', 'B', 'P.hinf.B', ...
+    'C', 'P.hinf.C', 'D', 'P.hinf.D', 'SampleTime', 'P.Tc', 'BackgroundColor', 'orange', ...
+    'Position', [200 200 270 240]);
+add_block('simulink/Discontinuities/Saturation', n('H-infinity limit'), 'UpperLimit', '400', ...
+    'LowerLimit', '-400', 'Position', [300 205 330 235]);
+% 4: fuzzy PI in incremental form, u(k) = u(k-1) + Ku*FLC(e/Ke, de/Kde)
+add_block('simulink/Discrete/Unit Delay', n('Previous error'), 'SampleTime', 'P.Tc', 'Position', [100 330 130 360]);
+add_block('simulink/Math Operations/Sum', n('Error change'), 'Inputs', '+-', 'Position', [160 325 180 365]);
+add_block('simulink/Math Operations/Gain', n('Scale e'), 'Gain', '1/P.flc.Ke', 'Position', [200 285 240 315]);
+add_block('simulink/Math Operations/Gain', n('Scale de'), 'Gain', '1/P.flc.Kde', 'Position', [200 330 240 360]);
+add_block('simulink/Discontinuities/Saturation', n('Limit e'), 'UpperLimit', '1', 'LowerLimit', '-1', 'Position', [260 285 290 315]);
+add_block('simulink/Discontinuities/Saturation', n('Limit de'), 'UpperLimit', '1', 'LowerLimit', '-1', 'Position', [260 330 290 360]);
+add_block('simulink/Signal Routing/Mux', n('Mux'), 'Inputs', '2', 'Position', [310 290 315 355]);
+load_system('fuzblock');                                  % library block name contains a line break
+fl = find_system('fuzblock', 'SearchDepth', 1, 'Regexp', 'on', 'Name', '^Fuzzy Logic\s+Controller$');
+add_block(fl{1}, n('Fuzzy logic'), 'BackgroundColor', 'cyan', ...
+    'Position', [340 300 420 345]);
+set_param(n('Fuzzy logic'), 'FIS', 'P.flc.fis', 'SimulateUsing', 'Code generation');   % interpreted mode is far too slow at 10 kHz
+add_block('simulink/Math Operations/Gain', n('Ku'), 'Gain', 'P.flc.Ku', 'Position', [440 307 480 337]);
+add_block('simulink/Discrete/Discrete-Time Integrator', n('Accumulate'), ...
+    'IntegratorMethod', 'Integration: Backward Euler', 'gainval', '1/P.Tc', 'SampleTime', 'P.Tc', ...
+    'LimitOutput', 'on', 'UpperSaturationLimit', '400', 'LowerSaturationLimit', '-400', ...
+    'Position', [500 305 540 340]);
+% selector and computation delay
+add_block('simulink/Sources/Constant', n('Controller mode'), 'Value', 'P.ctrl.mode', ...
+    'Position', [530 100 610 130]);
+add_block('simulink/Signal Routing/Multiport Switch', n('Controller select'), 'Inputs', '4', ...
+    'DataPortOrder', 'One-based contiguous', 'Position', [650 80 690 280]);
 add_block('simulink/Discrete/Unit Delay', n('Computation delay'), 'SampleTime', 'P.Tc', ...
-    'Position', [p(3)+130 y+55 p(3)+160 y+85]);
-add_line(ic, src, get_ph(n('Hinf'), 'Inport', 1), 'autorouting', 'on');
-add_line(ic, get_ph(n('Hinf'), 'Outport', 1), get_ph(n('Hinf limit'), 'Inport', 1));
-add_line(ic, get_ph(n('Hinf limit'), 'Outport', 1), get_ph(n('Controller select'), 'Inport', 1), 'autorouting', 'on');
-add_line(ic, get_ph(n('Use Hinf'), 'Outport', 1), get_ph(n('Controller select'), 'Inport', 2), 'autorouting', 'on');
-add_line(ic, get_ph(pidb, 'Outport', 1), get_ph(n('Controller select'), 'Inport', 3), 'autorouting', 'on');
-add_line(ic, get_ph(n('Controller select'), 'Outport', 1), get_ph(n('Computation delay'), 'Inport', 1));
+    'Position', [740 165 775 195]);
+add_block('simulink/Sinks/Out1', n('u'), 'Position', [830 173 860 187]);
+L = @(a, b) add_line(sub, a, b, 'autorouting', 'on');
+L('error/1', 'PI/1');  L('error/1', 'PID/1');  L('error/1', 'H-infinity/1');
+L('error/1', 'Previous error/1');  L('error/1', 'Error change/1');  L('error/1', 'Scale e/1');
+L('Previous error/1', 'Error change/2');  L('Error change/1', 'Scale de/1');
+L('Scale e/1', 'Limit e/1');  L('Scale de/1', 'Limit de/1');
+L('Limit e/1', 'Mux/1');  L('Limit de/1', 'Mux/2');  L('Mux/1', 'Fuzzy logic/1');
+L('Fuzzy logic/1', 'Ku/1');  L('Ku/1', 'Accumulate/1');
+L('H-infinity/1', 'H-infinity limit/1');
+L('Controller mode/1', 'Controller select/1');
+L('PI/1', 'Controller select/2');  L('PID/1', 'Controller select/3');
+L('H-infinity limit/1', 'Controller select/4');  L('Accumulate/1', 'Controller select/5');
+L('Controller select/1', 'Computation delay/1');  L('Computation delay/1', 'u/1');
+% swap it in for the original PI
+delete_line(lh.Inport(1)); delete_line(lh.Outport(1));
+delete_block(pidb);
+set_param(sub, 'Position', [p0(1) p0(2)-10 p0(3)+25 p0(4)+10], 'BackgroundColor', 'orange');
+add_line(ic, src, get_ph(sub, 'Inport', 1), 'autorouting', 'on');
 for k = 1:numel(dst)
     if dst(k) ~= -1
-        add_line(ic, get_ph(n('Computation delay'), 'Outport', 1), dst(k), 'autorouting', 'on');
+        add_line(ic, get_ph(sub, 'Outport', 1), dst(k), 'autorouting', 'on');
     end
 end
 end

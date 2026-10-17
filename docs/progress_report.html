@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Progress report: hybrid PV–wind islanding test bed</title>
+<style>
+  @page { size: A4; margin: 18mm 17mm 18mm 17mm; }
+  body { font-family: "Segoe UI", Arial, sans-serif; font-size: 10.5pt; line-height: 1.45; color: #1b1b1b; }
+  h1 { font-size: 20pt; margin: 0 0 4pt 0; line-height: 1.2; }
+  h2 { font-size: 14pt; margin: 20pt 0 6pt 0; padding-bottom: 3pt; border-bottom: 1.2pt solid #1f5f99; color: #17456f; break-after: avoid; }
+  h3 { font-size: 11.5pt; margin: 13pt 0 4pt 0; color: #17456f; break-after: avoid; }
+  p { margin: 5pt 0; }
+  ul, ol { margin: 4pt 0 6pt 0; padding-left: 18pt; }
+  li { margin: 2pt 0; }
+  .sub { color: #555; font-size: 10.5pt; margin-bottom: 12pt; }
+  .box { background: #eef4fa; border-left: 3pt solid #1f5f99; padding: 7pt 10pt; margin: 9pt 0; break-inside: avoid; }
+  .warn { background: #fdf3e7; border-left: 3pt solid #c7690a; padding: 7pt 10pt; margin: 9pt 0; break-inside: avoid; }
+  table { border-collapse: collapse; width: 100%; margin: 7pt 0 9pt 0; font-size: 9.6pt; break-inside: avoid; }
+  th { background: #17456f; color: #fff; text-align: left; padding: 4pt 6pt; font-weight: 600; }
+  td { padding: 4pt 6pt; border-bottom: 0.6pt solid #cfd8e0; vertical-align: top; }
+  tr:nth-child(even) td { background: #f6f9fc; }
+  td.n, th.n { text-align: right; white-space: nowrap; }
+  figure { margin: 9pt 0 11pt 0; break-inside: avoid; text-align: center; }
+  figure img { max-width: 100%; border: 0.6pt solid #cfd8e0; }
+  figure.narrow img { max-width: 78%; }
+  figcaption { font-size: 9.2pt; color: #444; margin-top: 3pt; text-align: left; }
+  code, pre { font-family: Consolas, "Courier New", monospace; font-size: 9.3pt; }
+  pre { background: #f3f4f6; padding: 6pt 9pt; border-radius: 3pt; margin: 6pt 0; break-inside: avoid; white-space: pre-wrap; }
+  .eq { font-family: "Cambria Math", Cambria, serif; font-size: 11pt; margin: 6pt 0 6pt 16pt; }
+  .pb { break-before: page; }
+</style>
+</head>
+<body>
+
+<h1>Grid-connected hybrid PV–wind system: islanding test bed and H-infinity current control</h1>
+<div class="sub">Progress report covering Phases 1 to 3 of the workflow &nbsp;·&nbsp; 7 October 2026 &nbsp;·&nbsp; MATLAB/Simulink R2024b</div>
+
+<div class="box">
+<b>Summary.</b>
+The original final-year model was repaired into a working 20 kVA test bed that reaches steady state, tracks maximum power on both sources, and disconnects on islanding.
+A PI current-control baseline was analysed and simulated from a strong grid down to a short-circuit ratio of 2.
+A structured H-infinity current controller was then designed and built into the same model.
+It gives about 3.5 dB more gain margin than PI and a lower sensitivity peak, but no clear improvement in simulated behaviour.
+</div>
+
+<h2>1. Aim and plan</h2>
+<p>The target is a journal paper on islanding detection for a grid-connected hybrid solar PV–wind system. IEEE 1547-2018 asks an inverter to ride through voltage and frequency disturbances yet still detect a real island within 2 seconds, and passive detectors struggle to tell the two apart.</p>
+<table>
+<tr><th style="width:9%">Phase</th><th style="width:36%">Work</th><th>Status</th></tr>
+<tr><td>1</td><td>Clean up the baseline model</td><td>Done</td></tr>
+<tr><td>2</td><td>Plant model and PI baseline</td><td>Done</td></tr>
+<tr><td>3</td><td>H-infinity current controller</td><td>Done</td></tr>
+<tr><td>4</td><td>Islanding test bench and baseline detectors</td><td>Partly built (load, breaker, passive detector); study not started</td></tr>
+<tr><td>5–7</td><td>Dataset, ML classifier, closed-loop validation</td><td>Not started</td></tr>
+<tr><td>8</td><td>Paper</td><td>Not started</td></tr>
+</table>
+
+<h2>2. Phase 1: from the original model to a working test bed</h2>
+<h3>What was wrong with the original</h3>
+<p>The original model (<code>MATLAB_R2018a/pv_and_wind_completed.slx</code>) ran, but a recorded baseline run showed that three subsystems did not do what the report described.</p>
+<table>
+<tr><th style="width:24%">Item</th><th style="width:38%">Original model</th><th>Corrected model</th></tr>
+<tr><td>Steady state</td><td>None: irradiance followed a 24-hour day squeezed into 2.4 s</td><td>Reached within 0.3 s; irradiance is constant or stepped</td></tr>
+<tr><td>Ratings</td><td>Report said 10 kW PV; array in the model was 85 kW</td><td>20 kVA inverter, 10.7 kW PV, 10 kW wind</td></tr>
+<tr><td>PV MPPT</td><td>Voltage reference capped at 50 V for a 290 V array; PV voltage collapsed</td><td>Perturb-and-observe on duty cycle; 10.6 kW at about 290 V</td></tr>
+<tr><td>Wind turbine</td><td>Torque from a fixed rotor speed, applied as a motor load; fixed boost duty</td><td>Uses the generator's speed, drives it as a generator, optimal-torque MPPT</td></tr>
+<tr><td>Frequency signal</td><td>PLL angle multiplied by π/2; climbed from 44 to 489</td><td>Taken from the PLL, averaged over one cycle; 50.00 Hz</td></tr>
+<tr><td>Protection</td><td>Latched at start-up and could never open the breaker</td><td>Opens the breaker after a blanking time and stops both boost converters</td></tr>
+<tr><td>LCL filter</td><td>100 µF with 0.001 Ω damping</td><td>1.6 mH, 0.8 mH, 15 µF, 2 Ω damping; resonance 1.78 kHz</td></tr>
+<tr><td>Grid</td><td>Near-ideal source</td><td>Impedance set by short-circuit ratio (SCR), X/R = 3</td></tr>
+<tr><td>Simulation speed</td><td class="">954 s per simulated second</td><td>40 to 70 s per simulated second</td></tr>
+</table>
+<p>The active power filter and an unconnected spare wind block were removed. A local RLC load (quality factor 1) and a timed grid breaker were added so that islanding can be tested.</p>
+
+<figure>
+<img src="model_top.png" alt="Top level of the corrected model">
+<figcaption><b>Figure 1.</b> Top level of the corrected model, <code>hybrid_pv_wind_islanding.slx</code>. PV array and boost converter at the left, wind subsystem above, three-phase inverter, LCL filter, local load, islanding breaker and grid at the right.</figcaption>
+</figure>
+
+<h3>Checks that close Phase 1</h3>
+<table>
+<tr><th style="width:38%">Test</th><th>Result</th></tr>
+<tr><td>Normal operation, SCR 10</td><td>18.5 kW exported from about 20.4 kW generated; DC link 800 V with 4 V ripple; no false trip</td></tr>
+<tr><td>Wind step, 12 to 9 m/s</td><td>Rotor speed settles at 26.2 rad/s against an optimum of 26.4</td></tr>
+<tr><td>Irradiance step, 1000 to 600 W/m²</td><td>PV settles at 6.47 kW, the expected 60% of rating</td></tr>
+<tr><td>Islanding, 12 kW load</td><td>Protection trips 4.5 ms after the grid breaker opens</td></tr>
+<tr><td>Islanding, load matched to generation</td><td>Protection trips 10.7 ms after the grid breaker opens</td></tr>
+</table>
+
+<figure class="narrow">
+<img src="islanding_matched.png" alt="Islanding event with matched load">
+<figcaption><b>Figure 2.</b> Islanding with a matched RLC load. The dashed line marks the grid breaker opening and the solid line the protection trip.</figcaption>
+</figure>
+
+<div class="warn">
+<b>Finding for the islanding study.</b> The passive detector is fast because it has no time delays and a 2 Hz/s rate-of-change-of-frequency setting. With the same settings it false-tripped 12 ms after the ordinary irradiance step. Separating islanding from ordinary disturbances is the problem the ML detector is meant to solve.
+</div>
+
+<h2 class="pb">3. Phase 2: plant model and PI baseline</h2>
+<h3>Plant model</h3>
+<p>The current controller measures the inverter-side inductor current <i>i</i><sub>1</sub>, and the model adds the measured PCC voltage to the controller output (voltage feedforward). With that path closed, the per-phase plant from controller output <i>u</i> to <i>i</i><sub>1</sub> is</p>
+<div class="eq">G(s) = 1 / ( Z<sub>1</sub> + Z<sub>c</sub>·Z<sub>2</sub> / (Z<sub>c</sub> + Z<sub>2</sub> + Z<sub>g</sub>) )</div>
+<p>with Z<sub>1</sub> = sL<sub>1</sub> + R<sub>1</sub>, Z<sub>c</sub> = R<sub>d</sub> + 1/(sC<sub>f</sub>), Z<sub>2</sub> = sL<sub>2</sub> + R<sub>2</sub> and the grid impedance Z<sub>g</sub> = sL<sub>g</sub> + R<sub>g</sub> set by the short-circuit ratio. This is <code>scripts/plant_model.m</code>.</p>
+
+<h3>Stability margins of the PI current loop (K<sub>p</sub> = 6, K<sub>i</sub> = 1000)</h3>
+<table>
+<tr><th style="width:46%">Case</th><th>Phase margin</th><th>Gain margin</th><th>Sensitivity peak</th></tr>
+<tr><td>No control delay, SCR 20 to 2</td><td>86° to 89°</td><td>unlimited</td><td>1.0</td></tr>
+<tr><td>Digital delay of 1.5 switching periods, SCR 20 to 2</td><td>50° to 66°</td><td>7.9 to 8.7 dB</td><td>1.76 to 1.93</td></tr>
+</table>
+<p>The DC-link voltage loop crosses over at 15 Hz with 78° phase margin, and the PLL at 47 Hz with 66°.</p>
+
+<figure class="narrow">
+<img src="pi_loop_bode.png" alt="Open-loop Bode plot of the PI current loop">
+<figcaption><b>Figure 3.</b> Open-loop response of the PI current loop with the control delay, at five grid strengths. The resonance moves to lower frequency as the grid weakens.</figcaption>
+</figure>
+
+<h3>Simulation against grid strength (local load removed)</h3>
+<table>
+<tr><th style="width:38%">Short-circuit ratio and test</th><th>Result</th></tr>
+<tr><td>20, 10, 5, start at full power</td><td>Stable; current THD 0.7 to 1.3%; PCC voltage up to 1.05 pu</td></tr>
+<tr><td>3 and 2, start at full power</td><td>Loses synchronism within 50 ms and does not recover</td></tr>
+<tr><td>3 and 2, power ramped up after start</td><td>Stable at 17.8 kW; current THD 1.2 to 1.3%; voltage THD 2.9 to 3.6%; PCC voltage 1.07 to 1.08 pu</td></tr>
+</table>
+<p><b>Conclusion of Phase 2.</b> The PI baseline is stable in steady state down to a short-circuit ratio of 2. It degrades in three ways as the grid weakens: it cannot start at full power below a ratio of about 5, the PCC voltage approaches the 1.10 pu trip limit, and frequency ripple grows from 0.007 to 0.125 Hz.</p>
+
+<h2 class="pb">4. Phase 3: H-infinity current controller</h2>
+<h3>Why a robust design, and which method</h3>
+<p>The grid inductance is the uncertain quantity: between a short-circuit ratio of 20 and 2 it changes from 1.2 mH to 12.1 mH and moves the plant resonance. Three synthesis routes were tried.</p>
+<table>
+<tr><th style="width:34%">Method</th><th>Outcome</th></tr>
+<tr><td>Mixed-sensitivity (<code>mixsyn</code>) at one design point</td><td>Good at the design point (sensitivity peak 1.31) but unstable at other grid strengths, because it cancels the plant resonance</td></tr>
+<tr><td>µ-synthesis (<code>musyn</code>) with uncertain inductance</td><td>Very high-order scalings, did not finish in ten minutes, robust performance still above 2 after four iterations</td></tr>
+<tr><td><b>Structured H-infinity (<code>hinfstruct</code>) on five plants at once</b></td><td><b>Adopted.</b> One fixed-order controller tuned against SCR 20, 10, 5, 3 and 2 simultaneously; no order reduction needed</td></tr>
+</table>
+
+<h3>Design</h3>
+<p>The synthesis minimises the worst case, over the five plants, of the stacked weighted closed-loop functions:</p>
+<div class="eq">min<sub>K</sub> max<sub>plants</sub> ‖ [ W<sub>1</sub>S ;&nbsp; W<sub>2</sub>KS ;&nbsp; W<sub>3</sub>T ] ‖<sub>∞</sub></div>
+<table>
+<tr><th style="width:24%">Weight</th><th style="width:36%">Purpose</th><th>Setting</th></tr>
+<tr><td>W<sub>1</sub> on sensitivity S</td><td>Tracking and disturbance rejection</td><td>Peak ≤ 1.5, bandwidth 220 Hz, near-integral action at low frequency</td></tr>
+<tr><td>W<sub>2</sub> on control effort KS</td><td>Limit high-frequency controller gain</td><td>1/40 at low frequency, rising above 800 Hz</td></tr>
+<tr><td>W<sub>3</sub> on complementary sensitivity T</td><td>Roll-off and robustness</td><td>Peak ≤ 1.3, roll-off above 1.5 kHz</td></tr>
+</table>
+<p>Each plant includes a 1.5-sample delay (computation plus PWM). The controller structure is a PI stage in series with a second-order section and a low-pass, order 4 in total, with every parameter bounded so the filter cannot cancel the integrator. An unconstrained third-order filter did exactly that in an earlier attempt.</p>
+<table>
+<tr><th>Tuned value</th><th class="n">Result</th><th>Tuned value</th><th class="n">Result</th></tr>
+<tr><td>Proportional gain</td><td class="n">4.00</td><td>Section numerator damping</td><td class="n">0.61</td></tr>
+<tr><td>Integral gain</td><td class="n">500 (lower bound)</td><td>Section denominator damping</td><td class="n">0.72</td></tr>
+<tr><td>Second-order section frequency</td><td class="n">794 Hz</td><td>Low-pass corner</td><td class="n">8 kHz (upper bound)</td></tr>
+</table>
+<p>The worst-case weighted norm is 1.27, so the targets are almost but not fully met. The controller is discretised with the Tustin method at 10 kHz and stored in <code>scripts/hinf_controller.mat</code>.</p>
+
+<h3>Implementation in Simulink</h3>
+<p>The current control of both axes is now sampled at the switching frequency, in step with the PWM carrier, and its output is applied one sample later. Each axis has one block holding the PI controller, the H-infinity controller, a selector and the computation delay. The parameter <code>P.ctrl.useHinf</code> selects PI (0) or H-infinity (1), so both controllers are tested in the same model.</p>
+<figure class="narrow">
+<img src="current_controller.png" alt="Current controller block">
+<figcaption><b>Figure 4.</b> Inside "Current controller d" (the q axis is identical). The orange block is the H-infinity controller as a discrete state-space block.</figcaption>
+</figure>
+
+<h3>Result 1: stability margins</h3>
+<table>
+<tr><th rowspan="2" style="width:12%">SCR</th><th colspan="3">PI</th><th colspan="3">H-infinity</th></tr>
+<tr><th class="n">Gain margin</th><th class="n">Phase margin</th><th class="n">Sens. peak</th><th class="n">Gain margin</th><th class="n">Phase margin</th><th class="n">Sens. peak</th></tr>
+<tr><td>20</td><td class="n">7.9 dB</td><td class="n">66°</td><td class="n">1.93</td><td class="n">11.3 dB</td><td class="n">67°</td><td class="n">1.49</td></tr>
+<tr><td>10</td><td class="n">8.2 dB</td><td class="n">52°</td><td class="n">1.89</td><td class="n">11.8 dB</td><td class="n">67°</td><td class="n">1.47</td></tr>
+<tr><td>5</td><td class="n">8.5 dB</td><td class="n">50°</td><td class="n">1.82</td><td class="n">12.2 dB</td><td class="n">68°</td><td class="n">1.44</td></tr>
+<tr><td>3</td><td class="n">8.7 dB</td><td class="n">50°</td><td class="n">1.78</td><td class="n">12.3 dB</td><td class="n">61°</td><td class="n">1.41</td></tr>
+<tr><td>2</td><td class="n">8.7 dB</td><td class="n">52°</td><td class="n">1.76</td><td class="n">12.4 dB</td><td class="n">58°</td><td class="n">1.40</td></tr>
+</table>
+<p>On the linear model at SCR 10, the closed-loop step response has 12% overshoot with H-infinity against 22% with PI, and a bandwidth of 359 Hz against 487 Hz.</p>
+
+<figure>
+<img src="controller_sensitivity.png" alt="Sensitivity of the current loop">
+<figcaption><b>Figure 5.</b> Sensitivity of the current loop at the strongest and weakest grid. H-infinity has the lower peak (more robust) but the higher curve below about 300 Hz (weaker rejection of low-order harmonics).</figcaption>
+</figure>
+
+<h3>Result 2: simulation comparison (local load removed, protection unarmed)</h3>
+<table>
+<tr><th style="width:36%">Test</th><th>PI</th><th>H-infinity</th></tr>
+<tr><td>Start at full power, SCR 20</td><td>Stable; current THD 1.7%, voltage THD 1.7%</td><td>Stable; 1.7%, 1.3%</td></tr>
+<tr><td>Start at full power, SCR 10</td><td>Stable; 1.0%, 1.6%</td><td>Stable; 1.4%, 1.9%</td></tr>
+<tr><td>Start at full power, SCR 5</td><td>Stable; 0.8%, 1.4%</td><td>Stable; 1.4%, 2.9%</td></tr>
+<tr><td>Start at full power, SCR 3</td><td>Loses synchronism</td><td>Loses synchronism</td></tr>
+<tr><td>Power ramp, SCR 3</td><td>Stable; 1.3%, 2.7%</td><td>Stable; 1.2%, 2.5%</td></tr>
+<tr><td>Power ramp, SCR 2</td><td>Stable; 1.3%, 3.4%</td><td>Stable; 1.2%, 2.9%</td></tr>
+<tr><td>DC-link deviation after the power step</td><td>17.8 V</td><td>17.7 V</td></tr>
+</table>
+
+<figure class="narrow">
+<img src="hinf_demo.png" alt="PI against H-infinity for an irradiance step">
+<figcaption><b>Figure 6.</b> Output of the demonstration script: the same irradiance step (1000 to 600 W/m² at 400 ms, SCR 5) with each controller. The two responses overlap.</figcaption>
+</figure>
+
+<div class="warn">
+<b>Reading of the Phase 3 result.</b>
+<ul>
+<li>The H-infinity controller is more robust on paper: about 3.5 dB more gain margin and a sensitivity peak of 1.4 to 1.5 against 1.8 to 1.9.</li>
+<li>In simulation the behaviour is nearly the same. Distortion is slightly lower with H-infinity at SCR 3 and 2 and higher at SCR 10 and 5; the DC-link response is identical.</li>
+<li>The synthesis converged close to a lower-gain PI (gain 4 against 6, with an almost flat filter). A PI retuned to that gain would perform about the same.</li>
+<li>Neither controller survives a start at full power at SCR 3. That points to the PLL, not the current loop.</li>
+</ul>
+PI therefore remains the default controller in the model. Whether the H-infinity design belongs in the paper as a contribution is an open decision.
+</div>
+
+<h2 class="pb">5. The demonstration script, <code>demo_hinf</code></h2>
+<p>Run from the project folder in MATLAB:</p>
+<pre>cd 'D:\Junior paper'
+bdclose all
+addpath scripts
+demo_hinf</pre>
+<table>
+<tr><th style="width:11%">Step</th><th style="width:42%">What the script does</th><th>What appears</th></tr>
+<tr><td>1</td><td>Opens the model at "Current controller d" and highlights the H-infinity block</td><td>The Simulink diagram of Figure 4</td></tr>
+<tr><td>2</td><td>Loads the saved controller, rebuilds the plant at five grid strengths and computes margins for PI and H-infinity</td><td>The tuned values and the margins table of Result 1, in the Command Window</td></tr>
+<tr><td>3</td><td>Runs the irradiance-step test twice (PI, then H-infinity) at SCR 5 with the local load removed</td><td>Two run summaries in the Command Window, then Figure 6, saved as <code>docs/hinf_demo.png</code></td></tr>
+</table>
+<p>The two run summaries list power, DC-link voltage, PV voltage and power, rotor speed, frequency, PCC voltage, d- and q-axis current and the trip flag at several times. The first belongs to PI and the second to H-infinity. The last line reports current THD after the step: 1.66% for PI and 1.38% for H-infinity in this case.</p>
+
+<h2>6. Limitations</h2>
+<ul>
+<li>All results are simulation only; there is no hardware or hardware-in-the-loop validation.</li>
+<li>PI and PLL gains are a first pass and were not optimised, so the comparison is against a reasonable PI, not the best possible one.</li>
+<li>The plant model treats each axis as a single loop and does not include the PLL, which is where the weak-grid start-up failure appears to come from.</li>
+<li>Generator stator inductance (3 mH) and rotor inertia (10 kg·m²) were changed from the original so the machine can deliver 10 kW through a diode rectifier.</li>
+<li>PV current readings are not reliable when the PV voltage is far above its operating point, including after a trip. This has not been explained.</li>
+<li>About 10% of generated power does not reach the grid; the losses have not been broken down.</li>
+<li>The passive detector's settings are not tuned and it has no time delays.</li>
+</ul>
+
+<h2>7. Next steps</h2>
+<ol>
+<li>Decide whether the H-infinity controller stays in the paper, is reduced to a short note, or is dropped.</li>
+<li>Phase 4: map the non-detection zone of the passive detector over active and reactive power mismatch, give it realistic time delays, and add one active detection method as a second baseline.</li>
+<li>Phase 5: generate the labelled dataset of islanding and non-islanding events, with scopes switched off for speed.</li>
+<li>Phases 6 and 7: train the classifier and validate it in closed loop against both baselines.</li>
+</ol>
+
+<h2>8. Files</h2>
+<table>
+<tr><th style="width:40%">File</th><th>Purpose</th></tr>
+<tr><td><code>hybrid_pv_wind_islanding.slx</code></td><td>Corrected test-bed model</td></tr>
+<tr><td><code>MATLAB_R2018a/</code></td><td>Original models, unchanged</td></tr>
+<tr><td><code>scripts/params.m</code></td><td>Every rating, gain and test setting in one place</td></tr>
+<tr><td><code>scripts/build_model.m</code></td><td>Rebuilds the corrected model from the original, change by change</td></tr>
+<tr><td><code>scripts/run_model.m</code>, <code>signal_metrics.m</code></td><td>Run a case and report power, distortion, DC link, frequency, trip</td></tr>
+<tr><td><code>scripts/plant_model.m</code>, <code>loop_margins.m</code>, <code>analyze_pi.m</code></td><td>Plant model and PI margins</td></tr>
+<tr><td><code>scripts/sweep_scr.m</code>, <code>softstart_scr.m</code></td><td>PI baseline against grid strength</td></tr>
+<tr><td><code>scripts/design_hinf.m</code>, <code>hinf_controller.mat</code></td><td>H-infinity design and the saved controller</td></tr>
+<tr><td><code>scripts/compare_controllers.m</code></td><td>PI against H-infinity in simulation</td></tr>
+<tr><td><code>scripts/demo_hinf.m</code></td><td>The demonstration described in section 5</td></tr>
+<tr><td><code>docs/</code>, <code>results/</code></td><td>Figures and result tables</td></tr>
+</table>
+
+</body>
+</html>
