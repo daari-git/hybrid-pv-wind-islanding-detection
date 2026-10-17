@@ -2,7 +2,7 @@
 
 Ride-through-compatible islanding detection for a grid-connected hybrid solar PV–wind system, using a machine-learning classifier on top of an H-infinity current controller. MATLAB/Simulink.
 
-> **Status:** work in progress. Phases 1 to 4 are done (results below); phases 5 to 8 are planned and have no results yet.
+> **Status:** work in progress. Phases 1 to 5 are done (results below); phases 6 to 8 are planned and have no results yet.
 
 ## Problem
 
@@ -38,12 +38,25 @@ Ratings will be fixed and documented in phase 1 (the current model and the thesi
 
 ![Top level of the model](docs/model_top.png)
 
-| Subsystem | Diagram |
-|---|---|
-| Wind turbine, PMSG, rectifier, boost and optimal-torque MPPT | [wind_subsystem.png](docs/wind_subsystem.png) |
-| PV boost converter with perturb-and-observe MPPT | [pv_boost_mppt.png](docs/pv_boost_mppt.png) |
-| Inverter control: PLL, DC-link and current loops | [inverter_control.png](docs/inverter_control.png) |
-| Passive protection: voltage, frequency and rate of change of frequency | [passive_protection.png](docs/passive_protection.png) |
+**Wind turbine, PMSG, rectifier, boost and optimal-torque MPPT**
+
+![Wind turbine subsystem](docs/wind_subsystem.png)
+
+**PV boost converter with perturb-and-observe MPPT**
+
+![PV boost converter and MPPT](docs/pv_boost_mppt.png)
+
+**Inverter control: PLL, DC-link and current loops**
+
+![Inverter control](docs/inverter_control.png)
+
+**Passive protection: voltage, frequency and rate of change of frequency**
+
+![Passive protection](docs/passive_protection.png)
+
+**Second inverter (Phase 5 multi-inverter cases): constant-power current references from the PCC voltage, with optional reactive drift**
+
+![Second inverter control](docs/second_inverter.png)
 
 Regenerate the pictures with `export_diagrams` after any model change.
 
@@ -221,13 +234,55 @@ Reading the results:
 
 - **The trade-off the paper rests on is real.** Settings fast enough to catch islands trip on almost every ordinary disturbance; ride-through-compliant settings trip on nothing, including real islands.
 - **Active frequency drift solves both in this test bed**, at SCR 10 with Q_f = 1: every island detected in under 0.3 s and no false trips. Its cost is small here: grid-connected current THD 2.08% with and without it, and about 100 var of extra reactive exchange.
-- **So the case for an ML detector is not made yet.** It has to come from conditions where active drift is known to struggle, which Phase 5 must include: weak grids (SCR 2 to 3), higher quality-factor loads (Q_f = 2.5), several inverters whose drift can cancel, and its slower detection (160 to 275 ms against tens of ms for a passive method).
+- **So the case for an ML detector was not made by Phase 4 alone.** It has to come from conditions where active drift is known to struggle: weak grids, higher quality-factor loads, and several inverters whose drift can cancel. Phase 5 tests exactly these.
+
+### Phase 5: where active frequency drift fails, and the dataset
+
+**Stress tests of active frequency drift** (`afd_stress.m`, 23 runs, IEEE 1547-2018 settings, 2 s allowed). Two additions to the model make them possible: a second 10 kW inverter at the PCC (an averaged constant-power source whose reactive power can drift with frequency), and a weak-grid start in which the PV is held at 200 W/m² until 0.3 s (at full power from t = 0 the inverter does not synchronise on SCR 3 or 2).
+
+| Condition | Result |
+|---|---|
+| Load quality factor 2.5, SCR 10, five mismatches | All detected, but slower: 225 to 488 ms (160 to 275 ms at Q_f = 1) |
+| Matched island on a weak grid: SCR 3, SCR 2 (Q_f 1); SCR 3 (Q_f 2.5) | Detected in 187 ms, 185 ms and 301 ms |
+| Drift running on a weak grid, five ordinary events each at SCR 3 and SCR 2 | No false trip on 9 of 10. **A 0.7 pu sag at SCR 2 goes unstable**: frequency swings 43 Hz, voltage falls to 0.33 pu, false trip at 150 ms |
+| The same sag at SCR 2 without drift | Rides through: frequency within 2.9 Hz, voltage 0.73 pu, no trip |
+| A second inverter with no drift | Detected, slower: 221 ms |
+| A second inverter drifting the same way (1 and 2 kvar/Hz) | Detected in 197 and 188 ms |
+| **A second inverter drifting the opposite way (2 kvar/Hz)** | **Not detected**: the island holds within 0.19 Hz of 50 Hz for the full 2 s |
+
+![Active frequency drift under stress](docs/afd_stress.png)
+
+Reading the results:
+
+- **Two inverters can cancel each other's drift completely.** The main inverter's drift is equivalent to about 2 kvar/Hz; a neighbouring unit with the same slope and the opposite sign removes it, and a matched island is again invisible. This is the multi-inverter failure reported in the literature, reproduced here.
+- **On a weak grid the drift breaks fault ride-through.** With the grid present, the drift's positive feedback is normally held down by the grid; at SCR 2 during a deep sag it is not, and the inverter trips on an event IEEE 1547-2018 requires it to ride through. Without drift the same sag is ridden through.
+- Drift still copes with a higher load quality factor, but takes up to two and a half times as long (488 ms against 191 ms for the matched island at Q_f = 1).
+- Together these give the ML detector its purpose: a passive detector, with no injection, that does not depend on what neighbouring inverters do and does not destabilise a weak grid.
+
+**Dataset** (`make_dataset.m`, `operating_conditions.m`). Sixteen operating conditions, four grid strengths (SCR 20, 10, 5, 3) by four PV/wind mixes (18.6, 10.6, 11.2 and 6.8 kW at the PCC, `results/operating_points.csv`), each with 25 cases, all with frequency drift off:
+
+- **14 islands**: Q_f 1 and 2.5, each at seven mismatches (ΔP, ΔQ) = (0, 0), (±5%, 0), (0, ±2.5%), (+15%, +5%), (−15%, −5%), with the load sized from that condition's own inverter output.
+- **11 ordinary events**: the disturbances of Phase 4, scaled to each condition's irradiance and wind speed, with the same local load in place.
+- Event times are spread over one 20 ms cycle so the point on the wave varies.
+- Each case keeps 0.1 s before to 0.35 s after the event: PCC voltage and inverter current waveforms at 10 kHz, and frequency, RMS voltage, DC-link voltage and d/q currents at 1 kHz. 400 cases, 224 islands and 176 ordinary events; about 42 MB in `data/raw/` (not in git; index in `results/dataset_index.csv`).
+
+![Dataset overview](docs/dataset_overview.png)
+
+The passive relays on the dataset's own windows (`dataset_baselines.m`; within 0.35 s only the IEEE elements with 0.16 s clearing can act):
+
+| Detector | Islands detected (224) | Median detection time | Ordinary events tripped (176) |
+|---|---|---|---|
+| Fast passive | 186 | 14 ms | 154 |
+| IEEE passive | 0 | none within 0.35 s | 0 |
+
+The fast relay misses 38 islands, all of them matched or nearly matched (ΔP ±5% with ΔQ = 0, and at Q_f 2.5 also ΔQ ±2.5%), and still trips on 154 of the 176 ordinary events: every load and capacitor switching, sag, swell, frequency ramp and phase jump, and most irradiance steps. Within 0.35 s the IEEE settings act on nothing. The classifier of Phase 6 has to work exactly where both relay families fail: the matched and small-mismatch islands, and the disturbances a ride-through relay must ignore.
 
 ### Known limitations
 
 - PI and PLL gains are a first pass, not optimised.
 - PV current readings are unreliable when the PV voltage is far above its operating point, including after a trip.
 - Generator stator inductance (3 mH) and rotor inertia (10 kg m²) were changed from the original so the machine can deliver 10 kW through a diode rectifier.
+- The second inverter is an averaged current source with ideal current control, not a switching model; it represents a neighbouring unit's power and reactive drift, not its control dynamics.
 
 ## Workflow
 
@@ -280,11 +335,12 @@ flowchart TD
 - Sweep active and reactive power mismatch and map the non-detection zone of each baseline.
 - Output: non-detection-zone maps and detection times for the baselines.
 
-### Phase 5 — Dataset generation
-- Islanding cases: the mismatch sweep, at several PV/wind power shares and SCR values.
-- Non-islanding cases: sags, swells, faults, load switching, capacitor switching, irradiance steps, wind steps, frequency excursions.
-- Automate with a batch script (`parsim`), logging voltage and current at the point of common coupling with a label and event time.
-- Output: labelled raw signals in `data/raw/`.
+### Phase 5 — Dataset generation (done)
+- Islanding cases: seven mismatches at Q_f 1 and 2.5, four PV/wind mixes and four grid strengths.
+- Non-islanding cases: irradiance and wind steps, load and capacitor switching, sags, a swell, frequency ramps and a phase jump.
+- Stress tests of the active-drift baseline: quality factor, weak grid, a second inverter.
+- Run sequentially by `run_phase5.m` (one simulation process fits in memory, so `parsim` was not used); finished cases are skipped on restart.
+- Output: 400 labelled cases in `data/raw/`, `results/dataset_index.csv`, `results/afd_stress.csv`.
 
 ### Phase 6 — Features and classifier
 - Extract features over a short sliding window: voltage magnitude, frequency, rate of change of frequency, phase jump, rate of change of power, current and voltage distortion, negative-sequence voltage.
@@ -343,9 +399,18 @@ scripts/plot_ndz.m            Draws docs/ndz_maps.png
 scripts/plot_phase4.m          Draws the island, ROCOF and detector-summary figures
 scripts/disturbance_events.m   The eleven ordinary disturbances used for false-trip tests
 scripts/relay_signals.m        Voltage, frequency and ROCOF as a relay sees them
+scripts/run_phase5.m           Runs every Phase 5 stage in order
+scripts/operating_conditions.m The sixteen operating conditions; condition_params.m sets one up
+scripts/operating_points.m     Inverter output at each condition, used to size islanding loads
+scripts/afd_stress.m           Active frequency drift under high Q_f, weak grid and a second inverter
+scripts/make_dataset.m         The 400-case labelled dataset in data/raw/
+scripts/dataset_baselines.m    The passive relays on the dataset's windows
+scripts/reduce_run.m           Keeps a run's 1 ms signals for detector replay
+scripts/plot_phase5.m          Draws docs/afd_stress.png and docs/dataset_overview.png
 docs/                          Model diagrams and result figures
-results/                       Simulation outputs, not tracked in git
-data/, ml/, paper/             Planned
+results/                       Result tables (.csv); simulation runs (.mat) are not tracked
+data/raw/                      Phase 5 dataset, generated, not tracked
+ml/, paper/                    Planned
 report/, archive/              Kept locally, not tracked
 ```
 

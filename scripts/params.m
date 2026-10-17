@@ -30,6 +30,7 @@ P.pv.Npar  = 5;            % 50 modules = 10.66 kW at STC
 P.pv.Vmp   = 290;
 P.pv.Pstc  = P.pv.Nser*P.pv.Npar*213.15;
 P.pv.G0    = 1000;  P.pv.G1 = 1000;  P.pv.tStep = 1e6;   % irradiance step (W/m^2, s)
+P.pv.Gstart = 1e4;  P.pv.tStart = 0;                   % irradiance held below Gstart until tStart (weak-grid start)
 P.pv.T     = 25;           % cell temperature (deg C)
 P.pv.Tmppt = 10e-3;        % P&O period (s)
 P.pv.dD    = 0.003;        % P&O duty step
@@ -140,6 +141,19 @@ P.load.QL = P.load.Qf*P.load.P;                        % inductive reactive powe
 P.load.QC = P.load.Qf*P.load.P;                        % capacitive reactive power (var)
 P.tIsland = 1e6;                                       % grid breaker opening time (s); 1e6 = never
 P.island.Pinv = 18570;  P.island.Qinv = 813;          % inverter output at the PCC, SCR 10, grid connected (W, var)
+
+% ---- Second inverter at the PCC (Phase 5 multi-inverter cases) ----
+% An averaged constant-power source with ideal current control:
+%   i = (P*v - Q*v90)/sum(v.^2), with v90 the voltage lagging by 90 degrees,
+%   Q = Q0 + clamp(Kq*(f - fg), +/-Qlim) once armed (after P.prot.tBlank).
+% Measured in afd_stress.m: Kq > 0 drifts the same way as the main inverter's
+% AFD, Kq < 0 against it; Kq = -2000 var/Hz cancels the main inverter's drift.
+P.der2.on   = 0;
+P.der2.P    = 10e3;  P.der2.Q = 0;                     % injected power (W, var)
+P.der2.Kq   = 0;                                       % var per Hz
+P.der2.Qlim = 0.3*P.der2.P;                            % var
+P.der2.Ts   = 1e-5;                                    % reference update period (s)
+P.der2.tOn  = 0.02;                                    % start time (s)
 
 % ---- Non-islanding disturbances (programmable grid source, switched equipment) ----
 % P.event.entity: 'None', 'Amplitude', 'Frequency' or 'Phase'; P.event.type: 'Step',

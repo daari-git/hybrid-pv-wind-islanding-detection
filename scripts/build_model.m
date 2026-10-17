@@ -54,7 +54,15 @@ add_block('simulink/Sources/Step', [mdl '/Irradiance'], 'Time', 'P.pv.tStep', ..
     'Position', [pos(1)-140 pos(2) pos(1)-100 pos(2)+30]);
 add_block('simulink/Sources/Constant', [mdl '/Cell temperature'], 'Value', 'P.pv.T', ...
     'Position', [pos(1)-140 pos(2)+60 pos(1)-100 pos(2)+90]);
-add_line(mdl, 'Irradiance/1', 'PV Array/1', 'autorouting', 'on');
+% a start-up limit on irradiance lets weak-grid runs start at low PV power
+add_block('simulink/Sources/Step', [mdl '/Irradiance start limit'], 'Time', 'P.pv.tStart', ...
+    'Before', 'P.pv.Gstart', 'After', '1e4', 'SampleTime', '0', ...
+    'Position', [pos(1)-140 pos(2)-60 pos(1)-100 pos(2)-30]);
+add_block('simulink/Math Operations/MinMax', [mdl '/Irradiance limit'], 'Function', 'min', 'Inputs', '2', ...
+    'Position', [pos(1)-70 pos(2)-20 pos(1)-40 pos(2)+20]);
+add_line(mdl, 'Irradiance/1', 'Irradiance limit/2', 'autorouting', 'on');
+add_line(mdl, 'Irradiance start limit/1', 'Irradiance limit/1', 'autorouting', 'on');
+add_line(mdl, 'Irradiance limit/1', 'PV Array/1', 'autorouting', 'on');
 add_line(mdl, 'Cell temperature/1', 'PV Array/2', 'autorouting', 'on');
 
 bc = byname(mdl, '^DC-DC Boost Converter with MPPT$');
@@ -354,6 +362,56 @@ for k = 1:2
         add_line(mdl, bh.LConn(j), ibh.LConn(j), 'autorouting', 'on');
         add_line(mdl, bh.RConn(j), lh2.LConn(j), 'autorouting', 'on');
     end
+end
+
+%% 7c. Second inverter at the PCC (multi-inverter islanding cases) -------
+% An averaged constant-power source: three controlled current sources whose
+% references follow the PCC voltage, i = (P*v - Q*v90)/sum(v.^2). Its reactive
+% power can drift with the measured frequency (P.der2.Kq). Off unless P.der2.on.
+dc = [mdl '/Second inverter control'];
+add_block('built-in/Subsystem', dc, 'Position', [pl(1)+420 pl(2)-320 pl(1)+540 pl(2)-260], 'BackgroundColor', 'cyan');
+m = @(s) [dc '/' s];
+add_block('simulink/Signal Routing/From', m('From Vabc'), 'GotoTag', 'Vabc', 'Position', [20 30 80 50]);
+add_block('simulink/Discrete/Zero-Order Hold', m('Sample'), 'SampleTime', 'P.der2.Ts', 'Position', [110 25 150 55]);
+add_block('simulink/Signal Routing/From', m('From freq'), 'GotoTag', 'freq', 'Position', [20 80 80 100]);
+add_block('simulink/Sources/Step', m('Enable'), 'Time', 'P.der2.tOn', 'Before', '0', 'After', 'P.der2.on', ...
+    'SampleTime', 'P.der2.Ts', 'Position', [110 120 150 150]);
+add_block('simulink/Sources/Step', m('Armed'), 'Time', 'P.prot.tBlank', 'Before', '0', 'After', '1', ...
+    'SampleTime', 'P.der2.Ts', 'Position', [110 170 150 200]);
+add_block('simulink/Sources/Constant', m('Settings'), 'Value', ...
+    '[P.der2.P P.der2.Q P.der2.Kq P.der2.Qlim P.fg 1.5*(0.5*P.Vll*sqrt(2/3))^2]', 'Position', [60 220 150 250]);
+add_block('simulink/User-Defined Functions/MATLAB Function', m('Current reference'), 'Position', [210 40 330 240]);
+ch = find(sfroot, '-isa', 'Stateflow.EMChart', 'Path', m('Current reference'));
+ch.Script = sprintf([ ...
+    'function i = DER2(v, f, en, armed, prm)\n' ...
+    '%% Constant-power current references from the PCC voltage.\n' ...
+    'Pd = prm(1);\n' ...
+    'Q = prm(2) + armed*min(max(prm(3)*(f - prm(5)), -prm(4)), prm(4));\n' ...
+    'v90 = [v(2) - v(3); v(3) - v(1); v(1) - v(2)]/sqrt(3);   %% lags v by 90 degrees\n' ...
+    's = max(v(1)^2 + v(2)^2 + v(3)^2, prm(6));\n' ...
+    'i = en*(Pd*v(:) - Q*v90)/s;\n']);
+add_block('simulink/Discrete/Unit Delay', m('Delay'), 'SampleTime', 'P.der2.Ts', 'Position', [370 125 400 155]);
+add_block('simulink/Sinks/Out1', m('Iabc ref'), 'Position', [440 133 470 147]);
+add_line(dc, 'From Vabc/1', 'Sample/1');  add_line(dc, 'Sample/1', 'Current reference/1', 'autorouting', 'on');
+add_line(dc, 'From freq/1', 'Current reference/2', 'autorouting', 'on');
+add_line(dc, 'Enable/1', 'Current reference/3', 'autorouting', 'on');
+add_line(dc, 'Armed/1', 'Current reference/4', 'autorouting', 'on');
+add_line(dc, 'Settings/1', 'Current reference/5', 'autorouting', 'on');
+add_line(dc, 'Current reference/1', 'Delay/1');  add_line(dc, 'Delay/1', 'Iabc ref/1');
+dm = [mdl '/Second inverter phases'];
+add_block('simulink/Signal Routing/Demux', dm, 'Outputs', '3', 'ShowName', 'off', 'Position', [pl(1)+600 pl(2)-320 pl(1)+605 pl(2)-260]);
+add_line(mdl, get_ph(dc, 'Outport', 1), get_ph(dm, 'Inport', 1));
+for j = 1:3
+    cs = sprintf('%s/Second inverter %c', mdl, 'a' + j - 1);
+    x = pl(1) + 600 + 130*j;
+    add_block('powerlib/Electrical Sources/Controlled Current Source', cs, 'Initialize', 'off', ...
+        'Position', [x pl(2)-310 x+30 pl(2)-250]);
+    gd = sprintf('%s/Second inverter ground %c', mdl, 'a' + j - 1);
+    add_block(libblock('spsGroundLib'), gd, 'Position', [x pl(2)-230 x+30 pl(2)-200]);
+    ch3 = get_param(cs, 'PortHandles'); gh = get_param(gd, 'PortHandles');
+    add_line(mdl, get_ph(dm, 'Outport', j), ch3.Inport(1), 'autorouting', 'on');
+    add_line(mdl, ch3.RConn(1), ibh.LConn(j), 'autorouting', 'on');   % current flows out of this terminal into the PCC
+    add_line(mdl, ch3.LConn(1), gh.LConn(1), 'autorouting', 'on');
 end
 
 %% 8. Logging -------------------------------------------------------------

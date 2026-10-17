@@ -8,8 +8,11 @@ function P = island_case(P, dP, dQ, tIsland)
 %   where Q_load = QL - QC is the load's net reactive absorption at 50 Hz.
 %   DP = DQ = 0 is the IEEE 1547.1 worst case. The quality factor is P.load.Qf.
 %   The protection is left unarmed so the detectors can be evaluated offline.
-PL = P.island.Pinv*(1 + dP);
-Qnet = P.island.Qinv + dQ*P.island.Pinv;
+%   With the second inverter on, P_inv and Q_inv include its output.
+Pinv = P.island.Pinv + P.der2.on*P.der2.P;
+Qinv = P.island.Qinv + P.der2.on*P.der2.Q;
+PL = Pinv*(1 + dP);
+Qnet = Qinv + dQ*Pinv;
 P.load.P  = PL;
 P.load.QC = P.load.Qf*PL;
 P.load.QL = P.load.QC + Qnet;

@@ -1,0 +1,801 @@
+case,cond,scr,label,event,detector,trip,t_ms,element
+scr10_full_event01,scr10_full,10,0,"Irradiance 1000 to 600 W/m2",Fast passive,1,12,rocof
+scr10_full_event01,scr10_full,10,0,"Irradiance 1000 to 600 W/m2",IEEE passive,0,Inf,
+scr10_full_event02,scr10_full,10,0,"Irradiance 600 to 1000 W/m2",Fast passive,1,14,rocof
+scr10_full_event02,scr10_full,10,0,"Irradiance 600 to 1000 W/m2",IEEE passive,0,Inf,
+scr10_full_event03,scr10_full,10,0,"Wind 12 to 9 m/s",Fast passive,0,Inf,
+scr10_full_event03,scr10_full,10,0,"Wind 12 to 9 m/s",IEEE passive,0,Inf,
+scr10_full_event04,scr10_full,10,0,"Load switched on (+6 kW)",Fast passive,1,8.00000000000001,rocof
+scr10_full_event04,scr10_full,10,0,"Load switched on (+6 kW)",IEEE passive,0,Inf,
+scr10_full_event05,scr10_full,10,0,"Capacitor switched on (5 kvar)",Fast passive,1,2.99999999999995,rocof
+scr10_full_event05,scr10_full,10,0,"Capacitor switched on (5 kvar)",IEEE passive,0,Inf,
+scr10_full_event06,scr10_full,10,0,"Voltage sag to 0.7 pu, 0.5 s",Fast passive,1,3.99999999999995,rocof
+scr10_full_event06,scr10_full,10,0,"Voltage sag to 0.7 pu, 0.5 s",IEEE passive,0,Inf,
+scr10_full_event07,scr10_full,10,0,"Voltage sag to 0.5 pu, 0.2 s",Fast passive,1,2.99999999999995,rocof
+scr10_full_event07,scr10_full,10,0,"Voltage sag to 0.5 pu, 0.2 s",IEEE passive,0,Inf,
+scr10_full_event08,scr10_full,10,0,"Voltage swell to 1.15 pu, 0.5 s",Fast passive,1,4,rocof
+scr10_full_event08,scr10_full,10,0,"Voltage swell to 1.15 pu, 0.5 s",IEEE passive,0,Inf,
+scr10_full_event09,scr10_full,10,0,"Frequency ramp -2 Hz/s for 0.5 s",Fast passive,1,88.0000000000001,rocof
+scr10_full_event09,scr10_full,10,0,"Frequency ramp -2 Hz/s for 0.5 s",IEEE passive,0,Inf,
+scr10_full_event10,scr10_full,10,0,"Frequency ramp +2 Hz/s for 0.5 s",Fast passive,1,69.0000000000001,rocof
+scr10_full_event10,scr10_full,10,0,"Frequency ramp +2 Hz/s for 0.5 s",IEEE passive,0,Inf,
+scr10_full_event11,scr10_full,10,0,"Phase jump 20 deg",Fast passive,1,1.99999999999995,rocof
+scr10_full_event11,scr10_full,10,0,"Phase jump 20 deg",IEEE passive,0,Inf,
+scr10_full_island_qf1_dP+00_dQ+0.0,scr10_full,10,1,"Island",Fast passive,0,Inf,
+scr10_full_island_qf1_dP+00_dQ+0.0,scr10_full,10,1,"Island",IEEE passive,0,Inf,
+scr10_full_island_qf1_dP+00_dQ+2.5,scr10_full,10,1,"Island",Fast passive,1,9.99999999999995,rocof
+scr10_full_island_qf1_dP+00_dQ+2.5,scr10_full,10,1,"Island",IEEE passive,0,Inf,
+scr10_full_island_qf1_dP+00_dQ-2.5,scr10_full,10,1,"Island",Fast passive,1,13,rocof
+scr10_full_island_qf1_dP+00_dQ-2.5,scr10_full,10,1,"Island",IEEE passive,0,Inf,
+scr10_full_island_qf1_dP+05_dQ+0.0,scr10_full,10,1,"Island",Fast passive,1,50,rocof
+scr10_full_island_qf1_dP+05_dQ+0.0,scr10_full,10,1,"Island",IEEE passive,0,Inf,
+scr10_full_island_qf1_dP+15_dQ+5.0,scr10_full,10,1,"Island",Fast passive,1,12,rocof
+scr10_full_island_qf1_dP+15_dQ+5.0,scr10_full,10,1,"Island",IEEE passive,0,Inf,
+scr10_full_island_qf1_dP-05_dQ+0.0,scr10_full,10,1,"Island",Fast passive,1,16,rocof
+scr10_full_island_qf1_dP-05_dQ+0.0,scr10_full,10,1,"Island",IEEE passive,0,Inf,
+scr10_full_island_qf1_dP-15_dQ-5.0,scr10_full,10,1,"Island",Fast passive,1,12,rocof
+scr10_full_island_qf1_dP-15_dQ-5.0,scr10_full,10,1,"Island",IEEE passive,0,Inf,
+scr10_full_island_qf2.5_dP+00_dQ+0.0,scr10_full,10,1,"Island",Fast passive,0,Inf,
+scr10_full_island_qf2.5_dP+00_dQ+0.0,scr10_full,10,1,"Island",IEEE passive,0,Inf,
+scr10_full_island_qf2.5_dP+00_dQ+2.5,scr10_full,10,1,"Island",Fast passive,1,14,rocof
+scr10_full_island_qf2.5_dP+00_dQ+2.5,scr10_full,10,1,"Island",IEEE passive,0,Inf,
+scr10_full_island_qf2.5_dP+00_dQ-2.5,scr10_full,10,1,"Island",Fast passive,1,17,rocof
+scr10_full_island_qf2.5_dP+00_dQ-2.5,scr10_full,10,1,"Island",IEEE passive,0,Inf,
+scr10_full_island_qf2.5_dP+05_dQ+0.0,scr10_full,10,1,"Island",Fast passive,0,Inf,
+scr10_full_island_qf2.5_dP+05_dQ+0.0,scr10_full,10,1,"Island",IEEE passive,0,Inf,
+scr10_full_island_qf2.5_dP+15_dQ+5.0,scr10_full,10,1,"Island",Fast passive,1,13,rocof
+scr10_full_island_qf2.5_dP+15_dQ+5.0,scr10_full,10,1,"Island",IEEE passive,0,Inf,
+scr10_full_island_qf2.5_dP-05_dQ+0.0,scr10_full,10,1,"Island",Fast passive,1,31,rocof
+scr10_full_island_qf2.5_dP-05_dQ+0.0,scr10_full,10,1,"Island",IEEE passive,0,Inf,
+scr10_full_island_qf2.5_dP-15_dQ-5.0,scr10_full,10,1,"Island",Fast passive,1,13,rocof
+scr10_full_island_qf2.5_dP-15_dQ-5.0,scr10_full,10,1,"Island",IEEE passive,0,Inf,
+scr10_low_event01,scr10_low,10,0,"Irradiance 500 to 300 W/m2",Fast passive,1,18,rocof
+scr10_low_event01,scr10_low,10,0,"Irradiance 500 to 300 W/m2",IEEE passive,0,Inf,
+scr10_low_event02,scr10_low,10,0,"Irradiance 300 to 500 W/m2",Fast passive,0,Inf,
+scr10_low_event02,scr10_low,10,0,"Irradiance 300 to 500 W/m2",IEEE passive,0,Inf,
+scr10_low_event03,scr10_low,10,0,"Wind 8 to 6 m/s",Fast passive,0,Inf,
+scr10_low_event03,scr10_low,10,0,"Wind 8 to 6 m/s",IEEE passive,0,Inf,
+scr10_low_event04,scr10_low,10,0,"Load switched on (+6 kW)",Fast passive,1,5,rocof
+scr10_low_event04,scr10_low,10,0,"Load switched on (+6 kW)",IEEE passive,0,Inf,
+scr10_low_event05,scr10_low,10,0,"Capacitor switched on (5 kvar)",Fast passive,1,3,rocof
+scr10_low_event05,scr10_low,10,0,"Capacitor switched on (5 kvar)",IEEE passive,0,Inf,
+scr10_low_event06,scr10_low,10,0,"Voltage sag to 0.7 pu, 0.5 s",Fast passive,1,3,rocof
+scr10_low_event06,scr10_low,10,0,"Voltage sag to 0.7 pu, 0.5 s",IEEE passive,0,Inf,
+scr10_low_event07,scr10_low,10,0,"Voltage sag to 0.5 pu, 0.2 s",Fast passive,1,3,rocof
+scr10_low_event07,scr10_low,10,0,"Voltage sag to 0.5 pu, 0.2 s",IEEE passive,0,Inf,
+scr10_low_event08,scr10_low,10,0,"Voltage swell to 1.15 pu, 0.5 s",Fast passive,1,4,rocof
+scr10_low_event08,scr10_low,10,0,"Voltage swell to 1.15 pu, 0.5 s",IEEE passive,0,Inf,
+scr10_low_event09,scr10_low,10,0,"Frequency ramp -2 Hz/s for 0.5 s",Fast passive,1,58,rocof
+scr10_low_event09,scr10_low,10,0,"Frequency ramp -2 Hz/s for 0.5 s",IEEE passive,0,Inf,
+scr10_low_event10,scr10_low,10,0,"Frequency ramp +2 Hz/s for 0.5 s",Fast passive,1,41,rocof
+scr10_low_event10,scr10_low,10,0,"Frequency ramp +2 Hz/s for 0.5 s",IEEE passive,0,Inf,
+scr10_low_event11,scr10_low,10,0,"Phase jump 20 deg",Fast passive,1,2,rocof
+scr10_low_event11,scr10_low,10,0,"Phase jump 20 deg",IEEE passive,0,Inf,
+scr10_low_island_qf1_dP+00_dQ+0.0,scr10_low,10,1,"Island",Fast passive,1,9.99999999999995,rocof
+scr10_low_island_qf1_dP+00_dQ+0.0,scr10_low,10,1,"Island",IEEE passive,0,Inf,
+scr10_low_island_qf1_dP+00_dQ+2.5,scr10_low,10,1,"Island",Fast passive,1,5,rocof
+scr10_low_island_qf1_dP+00_dQ+2.5,scr10_low,10,1,"Island",IEEE passive,0,Inf,
+scr10_low_island_qf1_dP+00_dQ-2.5,scr10_low,10,1,"Island",Fast passive,1,6.00000000000001,rocof
+scr10_low_island_qf1_dP+00_dQ-2.5,scr10_low,10,1,"Island",IEEE passive,0,Inf,
+scr10_low_island_qf1_dP+05_dQ+0.0,scr10_low,10,1,"Island",Fast passive,1,12,rocof
+scr10_low_island_qf1_dP+05_dQ+0.0,scr10_low,10,1,"Island",IEEE passive,0,Inf,
+scr10_low_island_qf1_dP+15_dQ+5.0,scr10_low,10,1,"Island",Fast passive,1,12,rocof
+scr10_low_island_qf1_dP+15_dQ+5.0,scr10_low,10,1,"Island",IEEE passive,0,Inf,
+scr10_low_island_qf1_dP-05_dQ+0.0,scr10_low,10,1,"Island",Fast passive,1,17,rocof
+scr10_low_island_qf1_dP-05_dQ+0.0,scr10_low,10,1,"Island",IEEE passive,0,Inf,
+scr10_low_island_qf1_dP-15_dQ-5.0,scr10_low,10,1,"Island",Fast passive,1,12,rocof
+scr10_low_island_qf1_dP-15_dQ-5.0,scr10_low,10,1,"Island",IEEE passive,0,Inf,
+scr10_low_island_qf2.5_dP+00_dQ+0.0,scr10_low,10,1,"Island",Fast passive,0,Inf,
+scr10_low_island_qf2.5_dP+00_dQ+0.0,scr10_low,10,1,"Island",IEEE passive,0,Inf,
+scr10_low_island_qf2.5_dP+00_dQ+2.5,scr10_low,10,1,"Island",Fast passive,1,15,rocof
+scr10_low_island_qf2.5_dP+00_dQ+2.5,scr10_low,10,1,"Island",IEEE passive,0,Inf,
+scr10_low_island_qf2.5_dP+00_dQ-2.5,scr10_low,10,1,"Island",Fast passive,1,11,rocof
+scr10_low_island_qf2.5_dP+00_dQ-2.5,scr10_low,10,1,"Island",IEEE passive,0,Inf,
+scr10_low_island_qf2.5_dP+05_dQ+0.0,scr10_low,10,1,"Island",Fast passive,0,Inf,
+scr10_low_island_qf2.5_dP+05_dQ+0.0,scr10_low,10,1,"Island",IEEE passive,0,Inf,
+scr10_low_island_qf2.5_dP+15_dQ+5.0,scr10_low,10,1,"Island",Fast passive,1,13,rocof
+scr10_low_island_qf2.5_dP+15_dQ+5.0,scr10_low,10,1,"Island",IEEE passive,0,Inf,
+scr10_low_island_qf2.5_dP-05_dQ+0.0,scr10_low,10,1,"Island",Fast passive,1,13,rocof
+scr10_low_island_qf2.5_dP-05_dQ+0.0,scr10_low,10,1,"Island",IEEE passive,0,Inf,
+scr10_low_island_qf2.5_dP-15_dQ-5.0,scr10_low,10,1,"Island",Fast passive,1,14,rocof
+scr10_low_island_qf2.5_dP-15_dQ-5.0,scr10_low,10,1,"Island",IEEE passive,0,Inf,
+scr10_pv_event01,scr10_pv,10,0,"Irradiance 1000 to 600 W/m2",Fast passive,1,12,rocof
+scr10_pv_event01,scr10_pv,10,0,"Irradiance 1000 to 600 W/m2",IEEE passive,0,Inf,
+scr10_pv_event02,scr10_pv,10,0,"Irradiance 600 to 1000 W/m2",Fast passive,1,13,rocof
+scr10_pv_event02,scr10_pv,10,0,"Irradiance 600 to 1000 W/m2",IEEE passive,0,Inf,
+scr10_pv_event03,scr10_pv,10,0,"Wind 6 to 4.5 m/s",Fast passive,0,Inf,
+scr10_pv_event03,scr10_pv,10,0,"Wind 6 to 4.5 m/s",IEEE passive,0,Inf,
+scr10_pv_event04,scr10_pv,10,0,"Load switched on (+6 kW)",Fast passive,1,6.00000000000001,rocof
+scr10_pv_event04,scr10_pv,10,0,"Load switched on (+6 kW)",IEEE passive,0,Inf,
+scr10_pv_event05,scr10_pv,10,0,"Capacitor switched on (5 kvar)",Fast passive,1,3,rocof
+scr10_pv_event05,scr10_pv,10,0,"Capacitor switched on (5 kvar)",IEEE passive,0,Inf,
+scr10_pv_event06,scr10_pv,10,0,"Voltage sag to 0.7 pu, 0.5 s",Fast passive,1,3,rocof
+scr10_pv_event06,scr10_pv,10,0,"Voltage sag to 0.7 pu, 0.5 s",IEEE passive,0,Inf,
+scr10_pv_event07,scr10_pv,10,0,"Voltage sag to 0.5 pu, 0.2 s",Fast passive,1,2.99999999999995,rocof
+scr10_pv_event07,scr10_pv,10,0,"Voltage sag to 0.5 pu, 0.2 s",IEEE passive,0,Inf,
+scr10_pv_event08,scr10_pv,10,0,"Voltage swell to 1.15 pu, 0.5 s",Fast passive,1,3.99999999999995,rocof
+scr10_pv_event08,scr10_pv,10,0,"Voltage swell to 1.15 pu, 0.5 s",IEEE passive,0,Inf,
+scr10_pv_event09,scr10_pv,10,0,"Frequency ramp -2 Hz/s for 0.5 s",Fast passive,1,58,rocof
+scr10_pv_event09,scr10_pv,10,0,"Frequency ramp -2 Hz/s for 0.5 s",IEEE passive,0,Inf,
+scr10_pv_event10,scr10_pv,10,0,"Frequency ramp +2 Hz/s for 0.5 s",Fast passive,1,48,rocof
+scr10_pv_event10,scr10_pv,10,0,"Frequency ramp +2 Hz/s for 0.5 s",IEEE passive,0,Inf,
+scr10_pv_event11,scr10_pv,10,0,"Phase jump 20 deg",Fast passive,1,2,rocof
+scr10_pv_event11,scr10_pv,10,0,"Phase jump 20 deg",IEEE passive,0,Inf,
+scr10_pv_island_qf1_dP+00_dQ+0.0,scr10_pv,10,1,"Island",Fast passive,1,23,rocof
+scr10_pv_island_qf1_dP+00_dQ+0.0,scr10_pv,10,1,"Island",IEEE passive,0,Inf,
+scr10_pv_island_qf1_dP+00_dQ+2.5,scr10_pv,10,1,"Island",Fast passive,1,9.00000000000001,rocof
+scr10_pv_island_qf1_dP+00_dQ+2.5,scr10_pv,10,1,"Island",IEEE passive,0,Inf,
+scr10_pv_island_qf1_dP+00_dQ-2.5,scr10_pv,10,1,"Island",Fast passive,1,11,rocof
+scr10_pv_island_qf1_dP+00_dQ-2.5,scr10_pv,10,1,"Island",IEEE passive,0,Inf,
+scr10_pv_island_qf1_dP+05_dQ+0.0,scr10_pv,10,1,"Island",Fast passive,1,10,rocof
+scr10_pv_island_qf1_dP+05_dQ+0.0,scr10_pv,10,1,"Island",IEEE passive,0,Inf,
+scr10_pv_island_qf1_dP+15_dQ+5.0,scr10_pv,10,1,"Island",Fast passive,1,13,rocof
+scr10_pv_island_qf1_dP+15_dQ+5.0,scr10_pv,10,1,"Island",IEEE passive,0,Inf,
+scr10_pv_island_qf1_dP-05_dQ+0.0,scr10_pv,10,1,"Island",Fast passive,1,16,rocof
+scr10_pv_island_qf1_dP-05_dQ+0.0,scr10_pv,10,1,"Island",IEEE passive,0,Inf,
+scr10_pv_island_qf1_dP-15_dQ-5.0,scr10_pv,10,1,"Island",Fast passive,1,14,rocof
+scr10_pv_island_qf1_dP-15_dQ-5.0,scr10_pv,10,1,"Island",IEEE passive,0,Inf,
+scr10_pv_island_qf2.5_dP+00_dQ+0.0,scr10_pv,10,1,"Island",Fast passive,0,Inf,
+scr10_pv_island_qf2.5_dP+00_dQ+0.0,scr10_pv,10,1,"Island",IEEE passive,0,Inf,
+scr10_pv_island_qf2.5_dP+00_dQ+2.5,scr10_pv,10,1,"Island",Fast passive,1,16,rocof
+scr10_pv_island_qf2.5_dP+00_dQ+2.5,scr10_pv,10,1,"Island",IEEE passive,0,Inf,
+scr10_pv_island_qf2.5_dP+00_dQ-2.5,scr10_pv,10,1,"Island",Fast passive,1,18,rocof
+scr10_pv_island_qf2.5_dP+00_dQ-2.5,scr10_pv,10,1,"Island",IEEE passive,0,Inf,
+scr10_pv_island_qf2.5_dP+05_dQ+0.0,scr10_pv,10,1,"Island",Fast passive,0,Inf,
+scr10_pv_island_qf2.5_dP+05_dQ+0.0,scr10_pv,10,1,"Island",IEEE passive,0,Inf,
+scr10_pv_island_qf2.5_dP+15_dQ+5.0,scr10_pv,10,1,"Island",Fast passive,1,11,rocof
+scr10_pv_island_qf2.5_dP+15_dQ+5.0,scr10_pv,10,1,"Island",IEEE passive,0,Inf,
+scr10_pv_island_qf2.5_dP-05_dQ+0.0,scr10_pv,10,1,"Island",Fast passive,0,Inf,
+scr10_pv_island_qf2.5_dP-05_dQ+0.0,scr10_pv,10,1,"Island",IEEE passive,0,Inf,
+scr10_pv_island_qf2.5_dP-15_dQ-5.0,scr10_pv,10,1,"Island",Fast passive,1,12,rocof
+scr10_pv_island_qf2.5_dP-15_dQ-5.0,scr10_pv,10,1,"Island",IEEE passive,0,Inf,
+scr10_wind_event01,scr10_wind,10,0,"Irradiance 300 to 180 W/m2",Fast passive,0,Inf,
+scr10_wind_event01,scr10_wind,10,0,"Irradiance 300 to 180 W/m2",IEEE passive,0,Inf,
+scr10_wind_event02,scr10_wind,10,0,"Irradiance 180 to 300 W/m2",Fast passive,0,Inf,
+scr10_wind_event02,scr10_wind,10,0,"Irradiance 180 to 300 W/m2",IEEE passive,0,Inf,
+scr10_wind_event03,scr10_wind,10,0,"Wind 12 to 9 m/s",Fast passive,0,Inf,
+scr10_wind_event03,scr10_wind,10,0,"Wind 12 to 9 m/s",IEEE passive,0,Inf,
+scr10_wind_event04,scr10_wind,10,0,"Load switched on (+6 kW)",Fast passive,1,5.99999999999995,rocof
+scr10_wind_event04,scr10_wind,10,0,"Load switched on (+6 kW)",IEEE passive,0,Inf,
+scr10_wind_event05,scr10_wind,10,0,"Capacitor switched on (5 kvar)",Fast passive,1,3,rocof
+scr10_wind_event05,scr10_wind,10,0,"Capacitor switched on (5 kvar)",IEEE passive,0,Inf,
+scr10_wind_event06,scr10_wind,10,0,"Voltage sag to 0.7 pu, 0.5 s",Fast passive,1,3,rocof
+scr10_wind_event06,scr10_wind,10,0,"Voltage sag to 0.7 pu, 0.5 s",IEEE passive,0,Inf,
+scr10_wind_event07,scr10_wind,10,0,"Voltage sag to 0.5 pu, 0.2 s",Fast passive,1,2.99999999999995,rocof
+scr10_wind_event07,scr10_wind,10,0,"Voltage sag to 0.5 pu, 0.2 s",IEEE passive,0,Inf,
+scr10_wind_event08,scr10_wind,10,0,"Voltage swell to 1.15 pu, 0.5 s",Fast passive,1,3.99999999999995,rocof
+scr10_wind_event08,scr10_wind,10,0,"Voltage swell to 1.15 pu, 0.5 s",IEEE passive,0,Inf,
+scr10_wind_event09,scr10_wind,10,0,"Frequency ramp -2 Hz/s for 0.5 s",Fast passive,1,61,rocof
+scr10_wind_event09,scr10_wind,10,0,"Frequency ramp -2 Hz/s for 0.5 s",IEEE passive,0,Inf,
+scr10_wind_event10,scr10_wind,10,0,"Frequency ramp +2 Hz/s for 0.5 s",Fast passive,1,68.0000000000001,rocof
+scr10_wind_event10,scr10_wind,10,0,"Frequency ramp +2 Hz/s for 0.5 s",IEEE passive,0,Inf,
+scr10_wind_event11,scr10_wind,10,0,"Phase jump 20 deg",Fast passive,1,2,rocof
+scr10_wind_event11,scr10_wind,10,0,"Phase jump 20 deg",IEEE passive,0,Inf,
+scr10_wind_island_qf1_dP+00_dQ+0.0,scr10_wind,10,1,"Island",Fast passive,0,Inf,
+scr10_wind_island_qf1_dP+00_dQ+0.0,scr10_wind,10,1,"Island",IEEE passive,0,Inf,
+scr10_wind_island_qf1_dP+00_dQ+2.5,scr10_wind,10,1,"Island",Fast passive,1,10,rocof
+scr10_wind_island_qf1_dP+00_dQ+2.5,scr10_wind,10,1,"Island",IEEE passive,0,Inf,
+scr10_wind_island_qf1_dP+00_dQ-2.5,scr10_wind,10,1,"Island",Fast passive,1,11,rocof
+scr10_wind_island_qf1_dP+00_dQ-2.5,scr10_wind,10,1,"Island",IEEE passive,0,Inf,
+scr10_wind_island_qf1_dP+05_dQ+0.0,scr10_wind,10,1,"Island",Fast passive,0,Inf,
+scr10_wind_island_qf1_dP+05_dQ+0.0,scr10_wind,10,1,"Island",IEEE passive,0,Inf,
+scr10_wind_island_qf1_dP+15_dQ+5.0,scr10_wind,10,1,"Island",Fast passive,1,9.99999999999995,rocof
+scr10_wind_island_qf1_dP+15_dQ+5.0,scr10_wind,10,1,"Island",IEEE passive,0,Inf,
+scr10_wind_island_qf1_dP-05_dQ+0.0,scr10_wind,10,1,"Island",Fast passive,1,20,rocof
+scr10_wind_island_qf1_dP-05_dQ+0.0,scr10_wind,10,1,"Island",IEEE passive,0,Inf,
+scr10_wind_island_qf1_dP-15_dQ-5.0,scr10_wind,10,1,"Island",Fast passive,1,11,rocof
+scr10_wind_island_qf1_dP-15_dQ-5.0,scr10_wind,10,1,"Island",IEEE passive,0,Inf,
+scr10_wind_island_qf2.5_dP+00_dQ+0.0,scr10_wind,10,1,"Island",Fast passive,0,Inf,
+scr10_wind_island_qf2.5_dP+00_dQ+0.0,scr10_wind,10,1,"Island",IEEE passive,0,Inf,
+scr10_wind_island_qf2.5_dP+00_dQ+2.5,scr10_wind,10,1,"Island",Fast passive,1,15,rocof
+scr10_wind_island_qf2.5_dP+00_dQ+2.5,scr10_wind,10,1,"Island",IEEE passive,0,Inf,
+scr10_wind_island_qf2.5_dP+00_dQ-2.5,scr10_wind,10,1,"Island",Fast passive,1,15,rocof
+scr10_wind_island_qf2.5_dP+00_dQ-2.5,scr10_wind,10,1,"Island",IEEE passive,0,Inf,
+scr10_wind_island_qf2.5_dP+05_dQ+0.0,scr10_wind,10,1,"Island",Fast passive,0,Inf,
+scr10_wind_island_qf2.5_dP+05_dQ+0.0,scr10_wind,10,1,"Island",IEEE passive,0,Inf,
+scr10_wind_island_qf2.5_dP+15_dQ+5.0,scr10_wind,10,1,"Island",Fast passive,1,12,rocof
+scr10_wind_island_qf2.5_dP+15_dQ+5.0,scr10_wind,10,1,"Island",IEEE passive,0,Inf,
+scr10_wind_island_qf2.5_dP-05_dQ+0.0,scr10_wind,10,1,"Island",Fast passive,1,34,rocof
+scr10_wind_island_qf2.5_dP-05_dQ+0.0,scr10_wind,10,1,"Island",IEEE passive,0,Inf,
+scr10_wind_island_qf2.5_dP-15_dQ-5.0,scr10_wind,10,1,"Island",Fast passive,1,12,rocof
+scr10_wind_island_qf2.5_dP-15_dQ-5.0,scr10_wind,10,1,"Island",IEEE passive,0,Inf,
+scr20_full_event01,scr20_full,20,0,"Irradiance 1000 to 600 W/m2",Fast passive,1,19,rocof
+scr20_full_event01,scr20_full,20,0,"Irradiance 1000 to 600 W/m2",IEEE passive,0,Inf,
+scr20_full_event02,scr20_full,20,0,"Irradiance 600 to 1000 W/m2",Fast passive,1,20,rocof
+scr20_full_event02,scr20_full,20,0,"Irradiance 600 to 1000 W/m2",IEEE passive,0,Inf,
+scr20_full_event03,scr20_full,20,0,"Wind 12 to 9 m/s",Fast passive,0,Inf,
+scr20_full_event03,scr20_full,20,0,"Wind 12 to 9 m/s",IEEE passive,0,Inf,
+scr20_full_event04,scr20_full,20,0,"Load switched on (+6 kW)",Fast passive,1,6.99999999999995,rocof
+scr20_full_event04,scr20_full,20,0,"Load switched on (+6 kW)",IEEE passive,0,Inf,
+scr20_full_event05,scr20_full,20,0,"Capacitor switched on (5 kvar)",Fast passive,1,2.99999999999995,rocof
+scr20_full_event05,scr20_full,20,0,"Capacitor switched on (5 kvar)",IEEE passive,0,Inf,
+scr20_full_event06,scr20_full,20,0,"Voltage sag to 0.7 pu, 0.5 s",Fast passive,1,3,rocof
+scr20_full_event06,scr20_full,20,0,"Voltage sag to 0.7 pu, 0.5 s",IEEE passive,0,Inf,
+scr20_full_event07,scr20_full,20,0,"Voltage sag to 0.5 pu, 0.2 s",Fast passive,1,2.99999999999995,rocof
+scr20_full_event07,scr20_full,20,0,"Voltage sag to 0.5 pu, 0.2 s",IEEE passive,0,Inf,
+scr20_full_event08,scr20_full,20,0,"Voltage swell to 1.15 pu, 0.5 s",Fast passive,1,4,rocof
+scr20_full_event08,scr20_full,20,0,"Voltage swell to 1.15 pu, 0.5 s",IEEE passive,0,Inf,
+scr20_full_event09,scr20_full,20,0,"Frequency ramp -2 Hz/s for 0.5 s",Fast passive,1,60,rocof
+scr20_full_event09,scr20_full,20,0,"Frequency ramp -2 Hz/s for 0.5 s",IEEE passive,0,Inf,
+scr20_full_event10,scr20_full,20,0,"Frequency ramp +2 Hz/s for 0.5 s",Fast passive,1,65,rocof
+scr20_full_event10,scr20_full,20,0,"Frequency ramp +2 Hz/s for 0.5 s",IEEE passive,0,Inf,
+scr20_full_event11,scr20_full,20,0,"Phase jump 20 deg",Fast passive,1,2,rocof
+scr20_full_event11,scr20_full,20,0,"Phase jump 20 deg",IEEE passive,0,Inf,
+scr20_full_island_qf1_dP+00_dQ+0.0,scr20_full,20,1,"Island",Fast passive,0,Inf,
+scr20_full_island_qf1_dP+00_dQ+0.0,scr20_full,20,1,"Island",IEEE passive,0,Inf,
+scr20_full_island_qf1_dP+00_dQ+2.5,scr20_full,20,1,"Island",Fast passive,1,7.99999999999995,rocof
+scr20_full_island_qf1_dP+00_dQ+2.5,scr20_full,20,1,"Island",IEEE passive,0,Inf,
+scr20_full_island_qf1_dP+00_dQ-2.5,scr20_full,20,1,"Island",Fast passive,1,11,rocof
+scr20_full_island_qf1_dP+00_dQ-2.5,scr20_full,20,1,"Island",IEEE passive,0,Inf,
+scr20_full_island_qf1_dP+05_dQ+0.0,scr20_full,20,1,"Island",Fast passive,0,Inf,
+scr20_full_island_qf1_dP+05_dQ+0.0,scr20_full,20,1,"Island",IEEE passive,0,Inf,
+scr20_full_island_qf1_dP+15_dQ+5.0,scr20_full,20,1,"Island",Fast passive,1,12,rocof
+scr20_full_island_qf1_dP+15_dQ+5.0,scr20_full,20,1,"Island",IEEE passive,0,Inf,
+scr20_full_island_qf1_dP-05_dQ+0.0,scr20_full,20,1,"Island",Fast passive,1,30,rocof
+scr20_full_island_qf1_dP-05_dQ+0.0,scr20_full,20,1,"Island",IEEE passive,0,Inf,
+scr20_full_island_qf1_dP-15_dQ-5.0,scr20_full,20,1,"Island",Fast passive,1,11,rocof
+scr20_full_island_qf1_dP-15_dQ-5.0,scr20_full,20,1,"Island",IEEE passive,0,Inf,
+scr20_full_island_qf2.5_dP+00_dQ+0.0,scr20_full,20,1,"Island",Fast passive,0,Inf,
+scr20_full_island_qf2.5_dP+00_dQ+0.0,scr20_full,20,1,"Island",IEEE passive,0,Inf,
+scr20_full_island_qf2.5_dP+00_dQ+2.5,scr20_full,20,1,"Island",Fast passive,1,18,rocof
+scr20_full_island_qf2.5_dP+00_dQ+2.5,scr20_full,20,1,"Island",IEEE passive,0,Inf,
+scr20_full_island_qf2.5_dP+00_dQ-2.5,scr20_full,20,1,"Island",Fast passive,1,16,rocof
+scr20_full_island_qf2.5_dP+00_dQ-2.5,scr20_full,20,1,"Island",IEEE passive,0,Inf,
+scr20_full_island_qf2.5_dP+05_dQ+0.0,scr20_full,20,1,"Island",Fast passive,0,Inf,
+scr20_full_island_qf2.5_dP+05_dQ+0.0,scr20_full,20,1,"Island",IEEE passive,0,Inf,
+scr20_full_island_qf2.5_dP+15_dQ+5.0,scr20_full,20,1,"Island",Fast passive,1,13,rocof
+scr20_full_island_qf2.5_dP+15_dQ+5.0,scr20_full,20,1,"Island",IEEE passive,0,Inf,
+scr20_full_island_qf2.5_dP-05_dQ+0.0,scr20_full,20,1,"Island",Fast passive,0,Inf,
+scr20_full_island_qf2.5_dP-05_dQ+0.0,scr20_full,20,1,"Island",IEEE passive,0,Inf,
+scr20_full_island_qf2.5_dP-15_dQ-5.0,scr20_full,20,1,"Island",Fast passive,1,13,rocof
+scr20_full_island_qf2.5_dP-15_dQ-5.0,scr20_full,20,1,"Island",IEEE passive,0,Inf,
+scr20_low_event01,scr20_low,20,0,"Irradiance 500 to 300 W/m2",Fast passive,0,Inf,
+scr20_low_event01,scr20_low,20,0,"Irradiance 500 to 300 W/m2",IEEE passive,0,Inf,
+scr20_low_event02,scr20_low,20,0,"Irradiance 300 to 500 W/m2",Fast passive,0,Inf,
+scr20_low_event02,scr20_low,20,0,"Irradiance 300 to 500 W/m2",IEEE passive,0,Inf,
+scr20_low_event03,scr20_low,20,0,"Wind 8 to 6 m/s",Fast passive,0,Inf,
+scr20_low_event03,scr20_low,20,0,"Wind 8 to 6 m/s",IEEE passive,0,Inf,
+scr20_low_event04,scr20_low,20,0,"Load switched on (+6 kW)",Fast passive,1,5.99999999999995,rocof
+scr20_low_event04,scr20_low,20,0,"Load switched on (+6 kW)",IEEE passive,0,Inf,
+scr20_low_event05,scr20_low,20,0,"Capacitor switched on (5 kvar)",Fast passive,1,2.99999999999995,rocof
+scr20_low_event05,scr20_low,20,0,"Capacitor switched on (5 kvar)",IEEE passive,0,Inf,
+scr20_low_event06,scr20_low,20,0,"Voltage sag to 0.7 pu, 0.5 s",Fast passive,1,2.99999999999995,rocof
+scr20_low_event06,scr20_low,20,0,"Voltage sag to 0.7 pu, 0.5 s",IEEE passive,0,Inf,
+scr20_low_event07,scr20_low,20,0,"Voltage sag to 0.5 pu, 0.2 s",Fast passive,1,3,rocof
+scr20_low_event07,scr20_low,20,0,"Voltage sag to 0.5 pu, 0.2 s",IEEE passive,0,Inf,
+scr20_low_event08,scr20_low,20,0,"Voltage swell to 1.15 pu, 0.5 s",Fast passive,1,3.99999999999995,rocof
+scr20_low_event08,scr20_low,20,0,"Voltage swell to 1.15 pu, 0.5 s",IEEE passive,0,Inf,
+scr20_low_event09,scr20_low,20,0,"Frequency ramp -2 Hz/s for 0.5 s",Fast passive,1,76.0000000000001,rocof
+scr20_low_event09,scr20_low,20,0,"Frequency ramp -2 Hz/s for 0.5 s",IEEE passive,0,Inf,
+scr20_low_event10,scr20_low,20,0,"Frequency ramp +2 Hz/s for 0.5 s",Fast passive,1,92.9999999999999,rocof
+scr20_low_event10,scr20_low,20,0,"Frequency ramp +2 Hz/s for 0.5 s",IEEE passive,0,Inf,
+scr20_low_event11,scr20_low,20,0,"Phase jump 20 deg",Fast passive,1,1.99999999999995,rocof
+scr20_low_event11,scr20_low,20,0,"Phase jump 20 deg",IEEE passive,0,Inf,
+scr20_low_island_qf1_dP+00_dQ+0.0,scr20_low,20,1,"Island",Fast passive,1,58,rocof
+scr20_low_island_qf1_dP+00_dQ+0.0,scr20_low,20,1,"Island",IEEE passive,0,Inf,
+scr20_low_island_qf1_dP+00_dQ+2.5,scr20_low,20,1,"Island",Fast passive,1,11,rocof
+scr20_low_island_qf1_dP+00_dQ+2.5,scr20_low,20,1,"Island",IEEE passive,0,Inf,
+scr20_low_island_qf1_dP+00_dQ-2.5,scr20_low,20,1,"Island",Fast passive,1,14,rocof
+scr20_low_island_qf1_dP+00_dQ-2.5,scr20_low,20,1,"Island",IEEE passive,0,Inf,
+scr20_low_island_qf1_dP+05_dQ+0.0,scr20_low,20,1,"Island",Fast passive,1,136,rocof
+scr20_low_island_qf1_dP+05_dQ+0.0,scr20_low,20,1,"Island",IEEE passive,0,Inf,
+scr20_low_island_qf1_dP+15_dQ+5.0,scr20_low,20,1,"Island",Fast passive,1,11,rocof
+scr20_low_island_qf1_dP+15_dQ+5.0,scr20_low,20,1,"Island",IEEE passive,0,Inf,
+scr20_low_island_qf1_dP-05_dQ+0.0,scr20_low,20,1,"Island",Fast passive,1,17,rocof
+scr20_low_island_qf1_dP-05_dQ+0.0,scr20_low,20,1,"Island",IEEE passive,0,Inf,
+scr20_low_island_qf1_dP-15_dQ-5.0,scr20_low,20,1,"Island",Fast passive,1,6.99999999999995,rocof
+scr20_low_island_qf1_dP-15_dQ-5.0,scr20_low,20,1,"Island",IEEE passive,0,Inf,
+scr20_low_island_qf2.5_dP+00_dQ+0.0,scr20_low,20,1,"Island",Fast passive,1,14,rocof
+scr20_low_island_qf2.5_dP+00_dQ+0.0,scr20_low,20,1,"Island",IEEE passive,0,Inf,
+scr20_low_island_qf2.5_dP+00_dQ+2.5,scr20_low,20,1,"Island",Fast passive,1,11,rocof
+scr20_low_island_qf2.5_dP+00_dQ+2.5,scr20_low,20,1,"Island",IEEE passive,0,Inf,
+scr20_low_island_qf2.5_dP+00_dQ-2.5,scr20_low,20,1,"Island",Fast passive,1,12,rocof
+scr20_low_island_qf2.5_dP+00_dQ-2.5,scr20_low,20,1,"Island",IEEE passive,0,Inf,
+scr20_low_island_qf2.5_dP+05_dQ+0.0,scr20_low,20,1,"Island",Fast passive,1,41,rocof
+scr20_low_island_qf2.5_dP+05_dQ+0.0,scr20_low,20,1,"Island",IEEE passive,0,Inf,
+scr20_low_island_qf2.5_dP+15_dQ+5.0,scr20_low,20,1,"Island",Fast passive,1,7.99999999999995,rocof
+scr20_low_island_qf2.5_dP+15_dQ+5.0,scr20_low,20,1,"Island",IEEE passive,0,Inf,
+scr20_low_island_qf2.5_dP-05_dQ+0.0,scr20_low,20,1,"Island",Fast passive,1,15,rocof
+scr20_low_island_qf2.5_dP-05_dQ+0.0,scr20_low,20,1,"Island",IEEE passive,0,Inf,
+scr20_low_island_qf2.5_dP-15_dQ-5.0,scr20_low,20,1,"Island",Fast passive,1,12,rocof
+scr20_low_island_qf2.5_dP-15_dQ-5.0,scr20_low,20,1,"Island",IEEE passive,0,Inf,
+scr20_pv_event01,scr20_pv,20,0,"Irradiance 1000 to 600 W/m2",Fast passive,1,18,rocof
+scr20_pv_event01,scr20_pv,20,0,"Irradiance 1000 to 600 W/m2",IEEE passive,0,Inf,
+scr20_pv_event02,scr20_pv,20,0,"Irradiance 600 to 1000 W/m2",Fast passive,1,20,rocof
+scr20_pv_event02,scr20_pv,20,0,"Irradiance 600 to 1000 W/m2",IEEE passive,0,Inf,
+scr20_pv_event03,scr20_pv,20,0,"Wind 6 to 4.5 m/s",Fast passive,0,Inf,
+scr20_pv_event03,scr20_pv,20,0,"Wind 6 to 4.5 m/s",IEEE passive,0,Inf,
+scr20_pv_event04,scr20_pv,20,0,"Load switched on (+6 kW)",Fast passive,1,6.00000000000001,rocof
+scr20_pv_event04,scr20_pv,20,0,"Load switched on (+6 kW)",IEEE passive,0,Inf,
+scr20_pv_event05,scr20_pv,20,0,"Capacitor switched on (5 kvar)",Fast passive,1,3,rocof
+scr20_pv_event05,scr20_pv,20,0,"Capacitor switched on (5 kvar)",IEEE passive,0,Inf,
+scr20_pv_event06,scr20_pv,20,0,"Voltage sag to 0.7 pu, 0.5 s",Fast passive,1,2.99999999999995,rocof
+scr20_pv_event06,scr20_pv,20,0,"Voltage sag to 0.7 pu, 0.5 s",IEEE passive,0,Inf,
+scr20_pv_event07,scr20_pv,20,0,"Voltage sag to 0.5 pu, 0.2 s",Fast passive,1,3,rocof
+scr20_pv_event07,scr20_pv,20,0,"Voltage sag to 0.5 pu, 0.2 s",IEEE passive,0,Inf,
+scr20_pv_event08,scr20_pv,20,0,"Voltage swell to 1.15 pu, 0.5 s",Fast passive,1,3.99999999999995,rocof
+scr20_pv_event08,scr20_pv,20,0,"Voltage swell to 1.15 pu, 0.5 s",IEEE passive,0,Inf,
+scr20_pv_event09,scr20_pv,20,0,"Frequency ramp -2 Hz/s for 0.5 s",Fast passive,1,74.0000000000001,rocof
+scr20_pv_event09,scr20_pv,20,0,"Frequency ramp -2 Hz/s for 0.5 s",IEEE passive,0,Inf,
+scr20_pv_event10,scr20_pv,20,0,"Frequency ramp +2 Hz/s for 0.5 s",Fast passive,1,83.0000000000001,rocof
+scr20_pv_event10,scr20_pv,20,0,"Frequency ramp +2 Hz/s for 0.5 s",IEEE passive,0,Inf,
+scr20_pv_event11,scr20_pv,20,0,"Phase jump 20 deg",Fast passive,1,1.99999999999995,rocof
+scr20_pv_event11,scr20_pv,20,0,"Phase jump 20 deg",IEEE passive,0,Inf,
+scr20_pv_island_qf1_dP+00_dQ+0.0,scr20_pv,20,1,"Island",Fast passive,1,14,rocof
+scr20_pv_island_qf1_dP+00_dQ+0.0,scr20_pv,20,1,"Island",IEEE passive,0,Inf,
+scr20_pv_island_qf1_dP+00_dQ+2.5,scr20_pv,20,1,"Island",Fast passive,1,8.00000000000001,rocof
+scr20_pv_island_qf1_dP+00_dQ+2.5,scr20_pv,20,1,"Island",IEEE passive,0,Inf,
+scr20_pv_island_qf1_dP+00_dQ-2.5,scr20_pv,20,1,"Island",Fast passive,1,10,rocof
+scr20_pv_island_qf1_dP+00_dQ-2.5,scr20_pv,20,1,"Island",IEEE passive,0,Inf,
+scr20_pv_island_qf1_dP+05_dQ+0.0,scr20_pv,20,1,"Island",Fast passive,1,75.0000000000001,rocof
+scr20_pv_island_qf1_dP+05_dQ+0.0,scr20_pv,20,1,"Island",IEEE passive,0,Inf,
+scr20_pv_island_qf1_dP+15_dQ+5.0,scr20_pv,20,1,"Island",Fast passive,1,14,rocof
+scr20_pv_island_qf1_dP+15_dQ+5.0,scr20_pv,20,1,"Island",IEEE passive,0,Inf,
+scr20_pv_island_qf1_dP-05_dQ+0.0,scr20_pv,20,1,"Island",Fast passive,1,25,rocof
+scr20_pv_island_qf1_dP-05_dQ+0.0,scr20_pv,20,1,"Island",IEEE passive,0,Inf,
+scr20_pv_island_qf1_dP-15_dQ-5.0,scr20_pv,20,1,"Island",Fast passive,1,13,rocof
+scr20_pv_island_qf1_dP-15_dQ-5.0,scr20_pv,20,1,"Island",IEEE passive,0,Inf,
+scr20_pv_island_qf2.5_dP+00_dQ+0.0,scr20_pv,20,1,"Island",Fast passive,0,Inf,
+scr20_pv_island_qf2.5_dP+00_dQ+0.0,scr20_pv,20,1,"Island",IEEE passive,0,Inf,
+scr20_pv_island_qf2.5_dP+00_dQ+2.5,scr20_pv,20,1,"Island",Fast passive,1,16,rocof
+scr20_pv_island_qf2.5_dP+00_dQ+2.5,scr20_pv,20,1,"Island",IEEE passive,0,Inf,
+scr20_pv_island_qf2.5_dP+00_dQ-2.5,scr20_pv,20,1,"Island",Fast passive,1,16,rocof
+scr20_pv_island_qf2.5_dP+00_dQ-2.5,scr20_pv,20,1,"Island",IEEE passive,0,Inf,
+scr20_pv_island_qf2.5_dP+05_dQ+0.0,scr20_pv,20,1,"Island",Fast passive,0,Inf,
+scr20_pv_island_qf2.5_dP+05_dQ+0.0,scr20_pv,20,1,"Island",IEEE passive,0,Inf,
+scr20_pv_island_qf2.5_dP+15_dQ+5.0,scr20_pv,20,1,"Island",Fast passive,1,14,rocof
+scr20_pv_island_qf2.5_dP+15_dQ+5.0,scr20_pv,20,1,"Island",IEEE passive,0,Inf,
+scr20_pv_island_qf2.5_dP-05_dQ+0.0,scr20_pv,20,1,"Island",Fast passive,1,28,rocof
+scr20_pv_island_qf2.5_dP-05_dQ+0.0,scr20_pv,20,1,"Island",IEEE passive,0,Inf,
+scr20_pv_island_qf2.5_dP-15_dQ-5.0,scr20_pv,20,1,"Island",Fast passive,1,14,rocof
+scr20_pv_island_qf2.5_dP-15_dQ-5.0,scr20_pv,20,1,"Island",IEEE passive,0,Inf,
+scr20_wind_event01,scr20_wind,20,0,"Irradiance 300 to 180 W/m2",Fast passive,0,Inf,
+scr20_wind_event01,scr20_wind,20,0,"Irradiance 300 to 180 W/m2",IEEE passive,0,Inf,
+scr20_wind_event02,scr20_wind,20,0,"Irradiance 180 to 300 W/m2",Fast passive,0,Inf,
+scr20_wind_event02,scr20_wind,20,0,"Irradiance 180 to 300 W/m2",IEEE passive,0,Inf,
+scr20_wind_event03,scr20_wind,20,0,"Wind 12 to 9 m/s",Fast passive,0,Inf,
+scr20_wind_event03,scr20_wind,20,0,"Wind 12 to 9 m/s",IEEE passive,0,Inf,
+scr20_wind_event04,scr20_wind,20,0,"Load switched on (+6 kW)",Fast passive,1,6.00000000000001,rocof
+scr20_wind_event04,scr20_wind,20,0,"Load switched on (+6 kW)",IEEE passive,0,Inf,
+scr20_wind_event05,scr20_wind,20,0,"Capacitor switched on (5 kvar)",Fast passive,1,3,rocof
+scr20_wind_event05,scr20_wind,20,0,"Capacitor switched on (5 kvar)",IEEE passive,0,Inf,
+scr20_wind_event06,scr20_wind,20,0,"Voltage sag to 0.7 pu, 0.5 s",Fast passive,1,3,rocof
+scr20_wind_event06,scr20_wind,20,0,"Voltage sag to 0.7 pu, 0.5 s",IEEE passive,0,Inf,
+scr20_wind_event07,scr20_wind,20,0,"Voltage sag to 0.5 pu, 0.2 s",Fast passive,1,2.99999999999995,rocof
+scr20_wind_event07,scr20_wind,20,0,"Voltage sag to 0.5 pu, 0.2 s",IEEE passive,0,Inf,
+scr20_wind_event08,scr20_wind,20,0,"Voltage swell to 1.15 pu, 0.5 s",Fast passive,1,3.99999999999995,rocof
+scr20_wind_event08,scr20_wind,20,0,"Voltage swell to 1.15 pu, 0.5 s",IEEE passive,0,Inf,
+scr20_wind_event09,scr20_wind,20,0,"Frequency ramp -2 Hz/s for 0.5 s",Fast passive,1,64.0000000000001,rocof
+scr20_wind_event09,scr20_wind,20,0,"Frequency ramp -2 Hz/s for 0.5 s",IEEE passive,0,Inf,
+scr20_wind_event10,scr20_wind,20,0,"Frequency ramp +2 Hz/s for 0.5 s",Fast passive,1,83,rocof
+scr20_wind_event10,scr20_wind,20,0,"Frequency ramp +2 Hz/s for 0.5 s",IEEE passive,0,Inf,
+scr20_wind_event11,scr20_wind,20,0,"Phase jump 20 deg",Fast passive,1,2,rocof
+scr20_wind_event11,scr20_wind,20,0,"Phase jump 20 deg",IEEE passive,0,Inf,
+scr20_wind_island_qf1_dP+00_dQ+0.0,scr20_wind,20,1,"Island",Fast passive,0,Inf,
+scr20_wind_island_qf1_dP+00_dQ+0.0,scr20_wind,20,1,"Island",IEEE passive,0,Inf,
+scr20_wind_island_qf1_dP+00_dQ+2.5,scr20_wind,20,1,"Island",Fast passive,1,9.00000000000001,rocof
+scr20_wind_island_qf1_dP+00_dQ+2.5,scr20_wind,20,1,"Island",IEEE passive,0,Inf,
+scr20_wind_island_qf1_dP+00_dQ-2.5,scr20_wind,20,1,"Island",Fast passive,1,9.00000000000001,rocof
+scr20_wind_island_qf1_dP+00_dQ-2.5,scr20_wind,20,1,"Island",IEEE passive,0,Inf,
+scr20_wind_island_qf1_dP+05_dQ+0.0,scr20_wind,20,1,"Island",Fast passive,1,12,rocof
+scr20_wind_island_qf1_dP+05_dQ+0.0,scr20_wind,20,1,"Island",IEEE passive,0,Inf,
+scr20_wind_island_qf1_dP+15_dQ+5.0,scr20_wind,20,1,"Island",Fast passive,1,11,rocof
+scr20_wind_island_qf1_dP+15_dQ+5.0,scr20_wind,20,1,"Island",IEEE passive,0,Inf,
+scr20_wind_island_qf1_dP-05_dQ+0.0,scr20_wind,20,1,"Island",Fast passive,1,21,rocof
+scr20_wind_island_qf1_dP-05_dQ+0.0,scr20_wind,20,1,"Island",IEEE passive,0,Inf,
+scr20_wind_island_qf1_dP-15_dQ-5.0,scr20_wind,20,1,"Island",Fast passive,1,11,rocof
+scr20_wind_island_qf1_dP-15_dQ-5.0,scr20_wind,20,1,"Island",IEEE passive,0,Inf,
+scr20_wind_island_qf2.5_dP+00_dQ+0.0,scr20_wind,20,1,"Island",Fast passive,0,Inf,
+scr20_wind_island_qf2.5_dP+00_dQ+0.0,scr20_wind,20,1,"Island",IEEE passive,0,Inf,
+scr20_wind_island_qf2.5_dP+00_dQ+2.5,scr20_wind,20,1,"Island",Fast passive,1,16,rocof
+scr20_wind_island_qf2.5_dP+00_dQ+2.5,scr20_wind,20,1,"Island",IEEE passive,0,Inf,
+scr20_wind_island_qf2.5_dP+00_dQ-2.5,scr20_wind,20,1,"Island",Fast passive,1,14,rocof
+scr20_wind_island_qf2.5_dP+00_dQ-2.5,scr20_wind,20,1,"Island",IEEE passive,0,Inf,
+scr20_wind_island_qf2.5_dP+05_dQ+0.0,scr20_wind,20,1,"Island",Fast passive,0,Inf,
+scr20_wind_island_qf2.5_dP+05_dQ+0.0,scr20_wind,20,1,"Island",IEEE passive,0,Inf,
+scr20_wind_island_qf2.5_dP+15_dQ+5.0,scr20_wind,20,1,"Island",Fast passive,1,14,rocof
+scr20_wind_island_qf2.5_dP+15_dQ+5.0,scr20_wind,20,1,"Island",IEEE passive,0,Inf,
+scr20_wind_island_qf2.5_dP-05_dQ+0.0,scr20_wind,20,1,"Island",Fast passive,1,36,rocof
+scr20_wind_island_qf2.5_dP-05_dQ+0.0,scr20_wind,20,1,"Island",IEEE passive,0,Inf,
+scr20_wind_island_qf2.5_dP-15_dQ-5.0,scr20_wind,20,1,"Island",Fast passive,1,11,rocof
+scr20_wind_island_qf2.5_dP-15_dQ-5.0,scr20_wind,20,1,"Island",IEEE passive,0,Inf,
+scr3_full_event01,scr3_full,3,0,"Irradiance 1000 to 600 W/m2",Fast passive,1,12,rocof
+scr3_full_event01,scr3_full,3,0,"Irradiance 1000 to 600 W/m2",IEEE passive,0,Inf,
+scr3_full_event02,scr3_full,3,0,"Irradiance 600 to 1000 W/m2",Fast passive,0,Inf,
+scr3_full_event02,scr3_full,3,0,"Irradiance 600 to 1000 W/m2",IEEE passive,0,Inf,
+scr3_full_event03,scr3_full,3,0,"Wind 12 to 9 m/s",Fast passive,0,Inf,
+scr3_full_event03,scr3_full,3,0,"Wind 12 to 9 m/s",IEEE passive,0,Inf,
+scr3_full_event04,scr3_full,3,0,"Load switched on (+6 kW)",Fast passive,1,10,rocof
+scr3_full_event04,scr3_full,3,0,"Load switched on (+6 kW)",IEEE passive,0,Inf,
+scr3_full_event05,scr3_full,3,0,"Capacitor switched on (5 kvar)",Fast passive,1,3,rocof
+scr3_full_event05,scr3_full,3,0,"Capacitor switched on (5 kvar)",IEEE passive,0,Inf,
+scr3_full_event06,scr3_full,3,0,"Voltage sag to 0.7 pu, 0.5 s",Fast passive,1,4,rocof
+scr3_full_event06,scr3_full,3,0,"Voltage sag to 0.7 pu, 0.5 s",IEEE passive,0,Inf,
+scr3_full_event07,scr3_full,3,0,"Voltage sag to 0.5 pu, 0.2 s",Fast passive,1,4,rocof
+scr3_full_event07,scr3_full,3,0,"Voltage sag to 0.5 pu, 0.2 s",IEEE passive,0,Inf,
+scr3_full_event08,scr3_full,3,0,"Voltage swell to 1.15 pu, 0.5 s",Fast passive,1,5,rocof
+scr3_full_event08,scr3_full,3,0,"Voltage swell to 1.15 pu, 0.5 s",IEEE passive,0,Inf,
+scr3_full_event09,scr3_full,3,0,"Frequency ramp -2 Hz/s for 0.5 s",Fast passive,1,40,rocof
+scr3_full_event09,scr3_full,3,0,"Frequency ramp -2 Hz/s for 0.5 s",IEEE passive,0,Inf,
+scr3_full_event10,scr3_full,3,0,"Frequency ramp +2 Hz/s for 0.5 s",Fast passive,1,53,rocof
+scr3_full_event10,scr3_full,3,0,"Frequency ramp +2 Hz/s for 0.5 s",IEEE passive,0,Inf,
+scr3_full_event11,scr3_full,3,0,"Phase jump 20 deg",Fast passive,1,3,rocof
+scr3_full_event11,scr3_full,3,0,"Phase jump 20 deg",IEEE passive,0,Inf,
+scr3_full_island_qf1_dP+00_dQ+0.0,scr3_full,3,1,"Island",Fast passive,1,17,rocof
+scr3_full_island_qf1_dP+00_dQ+0.0,scr3_full,3,1,"Island",IEEE passive,0,Inf,
+scr3_full_island_qf1_dP+00_dQ+2.5,scr3_full,3,1,"Island",Fast passive,1,15,rocof
+scr3_full_island_qf1_dP+00_dQ+2.5,scr3_full,3,1,"Island",IEEE passive,0,Inf,
+scr3_full_island_qf1_dP+00_dQ-2.5,scr3_full,3,1,"Island",Fast passive,1,12,rocof
+scr3_full_island_qf1_dP+00_dQ-2.5,scr3_full,3,1,"Island",IEEE passive,0,Inf,
+scr3_full_island_qf1_dP+05_dQ+0.0,scr3_full,3,1,"Island",Fast passive,1,35,rocof
+scr3_full_island_qf1_dP+05_dQ+0.0,scr3_full,3,1,"Island",IEEE passive,0,Inf,
+scr3_full_island_qf1_dP+15_dQ+5.0,scr3_full,3,1,"Island",Fast passive,1,11,rocof
+scr3_full_island_qf1_dP+15_dQ+5.0,scr3_full,3,1,"Island",IEEE passive,0,Inf,
+scr3_full_island_qf1_dP-05_dQ+0.0,scr3_full,3,1,"Island",Fast passive,1,17,rocof
+scr3_full_island_qf1_dP-05_dQ+0.0,scr3_full,3,1,"Island",IEEE passive,0,Inf,
+scr3_full_island_qf1_dP-15_dQ-5.0,scr3_full,3,1,"Island",Fast passive,1,9.00000000000001,rocof
+scr3_full_island_qf1_dP-15_dQ-5.0,scr3_full,3,1,"Island",IEEE passive,0,Inf,
+scr3_full_island_qf2.5_dP+00_dQ+0.0,scr3_full,3,1,"Island",Fast passive,0,Inf,
+scr3_full_island_qf2.5_dP+00_dQ+0.0,scr3_full,3,1,"Island",IEEE passive,0,Inf,
+scr3_full_island_qf2.5_dP+00_dQ+2.5,scr3_full,3,1,"Island",Fast passive,1,15,rocof
+scr3_full_island_qf2.5_dP+00_dQ+2.5,scr3_full,3,1,"Island",IEEE passive,0,Inf,
+scr3_full_island_qf2.5_dP+00_dQ-2.5,scr3_full,3,1,"Island",Fast passive,1,12,rocof
+scr3_full_island_qf2.5_dP+00_dQ-2.5,scr3_full,3,1,"Island",IEEE passive,0,Inf,
+scr3_full_island_qf2.5_dP+05_dQ+0.0,scr3_full,3,1,"Island",Fast passive,0,Inf,
+scr3_full_island_qf2.5_dP+05_dQ+0.0,scr3_full,3,1,"Island",IEEE passive,0,Inf,
+scr3_full_island_qf2.5_dP+15_dQ+5.0,scr3_full,3,1,"Island",Fast passive,1,14,rocof
+scr3_full_island_qf2.5_dP+15_dQ+5.0,scr3_full,3,1,"Island",IEEE passive,0,Inf,
+scr3_full_island_qf2.5_dP-05_dQ+0.0,scr3_full,3,1,"Island",Fast passive,0,Inf,
+scr3_full_island_qf2.5_dP-05_dQ+0.0,scr3_full,3,1,"Island",IEEE passive,0,Inf,
+scr3_full_island_qf2.5_dP-15_dQ-5.0,scr3_full,3,1,"Island",Fast passive,1,9.00000000000001,rocof
+scr3_full_island_qf2.5_dP-15_dQ-5.0,scr3_full,3,1,"Island",IEEE passive,0,Inf,
+scr3_low_event01,scr3_low,3,0,"Irradiance 500 to 300 W/m2",Fast passive,1,12,rocof
+scr3_low_event01,scr3_low,3,0,"Irradiance 500 to 300 W/m2",IEEE passive,0,Inf,
+scr3_low_event02,scr3_low,3,0,"Irradiance 300 to 500 W/m2",Fast passive,1,17,rocof
+scr3_low_event02,scr3_low,3,0,"Irradiance 300 to 500 W/m2",IEEE passive,0,Inf,
+scr3_low_event03,scr3_low,3,0,"Wind 8 to 6 m/s",Fast passive,1,225,rocof
+scr3_low_event03,scr3_low,3,0,"Wind 8 to 6 m/s",IEEE passive,0,Inf,
+scr3_low_event04,scr3_low,3,0,"Load switched on (+6 kW)",Fast passive,1,18,uf1
+scr3_low_event04,scr3_low,3,0,"Load switched on (+6 kW)",IEEE passive,0,Inf,
+scr3_low_event05,scr3_low,3,0,"Capacitor switched on (5 kvar)",Fast passive,1,3,rocof
+scr3_low_event05,scr3_low,3,0,"Capacitor switched on (5 kvar)",IEEE passive,0,Inf,
+scr3_low_event06,scr3_low,3,0,"Voltage sag to 0.7 pu, 0.5 s",Fast passive,1,8.00000000000001,of1
+scr3_low_event06,scr3_low,3,0,"Voltage sag to 0.7 pu, 0.5 s",IEEE passive,0,Inf,
+scr3_low_event07,scr3_low,3,0,"Voltage sag to 0.5 pu, 0.2 s",Fast passive,1,3,rocof
+scr3_low_event07,scr3_low,3,0,"Voltage sag to 0.5 pu, 0.2 s",IEEE passive,0,Inf,
+scr3_low_event08,scr3_low,3,0,"Voltage swell to 1.15 pu, 0.5 s",Fast passive,1,18,ov1
+scr3_low_event08,scr3_low,3,0,"Voltage swell to 1.15 pu, 0.5 s",IEEE passive,0,Inf,
+scr3_low_event09,scr3_low,3,0,"Frequency ramp -2 Hz/s for 0.5 s",Fast passive,1,45,rocof
+scr3_low_event09,scr3_low,3,0,"Frequency ramp -2 Hz/s for 0.5 s",IEEE passive,0,Inf,
+scr3_low_event10,scr3_low,3,0,"Frequency ramp +2 Hz/s for 0.5 s",Fast passive,1,272,of1
+scr3_low_event10,scr3_low,3,0,"Frequency ramp +2 Hz/s for 0.5 s",IEEE passive,0,Inf,
+scr3_low_event11,scr3_low,3,0,"Phase jump 20 deg",Fast passive,1,3,rocof
+scr3_low_event11,scr3_low,3,0,"Phase jump 20 deg",IEEE passive,0,Inf,
+scr3_low_island_qf1_dP+00_dQ+0.0,scr3_low,3,1,"Island",Fast passive,1,9.00000000000001,rocof
+scr3_low_island_qf1_dP+00_dQ+0.0,scr3_low,3,1,"Island",IEEE passive,0,Inf,
+scr3_low_island_qf1_dP+00_dQ+2.5,scr3_low,3,1,"Island",Fast passive,1,11,rocof
+scr3_low_island_qf1_dP+00_dQ+2.5,scr3_low,3,1,"Island",IEEE passive,0,Inf,
+scr3_low_island_qf1_dP+00_dQ-2.5,scr3_low,3,1,"Island",Fast passive,1,3,rocof
+scr3_low_island_qf1_dP+00_dQ-2.5,scr3_low,3,1,"Island",IEEE passive,0,Inf,
+scr3_low_island_qf1_dP+05_dQ+0.0,scr3_low,3,1,"Island",Fast passive,1,0,rocof
+scr3_low_island_qf1_dP+05_dQ+0.0,scr3_low,3,1,"Island",IEEE passive,0,Inf,
+scr3_low_island_qf1_dP+15_dQ+5.0,scr3_low,3,1,"Island",Fast passive,1,29,of1
+scr3_low_island_qf1_dP+15_dQ+5.0,scr3_low,3,1,"Island",IEEE passive,0,Inf,
+scr3_low_island_qf1_dP-05_dQ+0.0,scr3_low,3,1,"Island",Fast passive,0,Inf,
+scr3_low_island_qf1_dP-05_dQ+0.0,scr3_low,3,1,"Island",IEEE passive,0,Inf,
+scr3_low_island_qf1_dP-15_dQ-5.0,scr3_low,3,1,"Island",Fast passive,1,38,ov1
+scr3_low_island_qf1_dP-15_dQ-5.0,scr3_low,3,1,"Island",IEEE passive,0,Inf,
+scr3_low_island_qf2.5_dP+00_dQ+0.0,scr3_low,3,1,"Island",Fast passive,0,Inf,
+scr3_low_island_qf2.5_dP+00_dQ+0.0,scr3_low,3,1,"Island",IEEE passive,0,Inf,
+scr3_low_island_qf2.5_dP+00_dQ+2.5,scr3_low,3,1,"Island",Fast passive,0,Inf,
+scr3_low_island_qf2.5_dP+00_dQ+2.5,scr3_low,3,1,"Island",IEEE passive,0,Inf,
+scr3_low_island_qf2.5_dP+00_dQ-2.5,scr3_low,3,1,"Island",Fast passive,1,28,rocof
+scr3_low_island_qf2.5_dP+00_dQ-2.5,scr3_low,3,1,"Island",IEEE passive,0,Inf,
+scr3_low_island_qf2.5_dP+05_dQ+0.0,scr3_low,3,1,"Island",Fast passive,0,Inf,
+scr3_low_island_qf2.5_dP+05_dQ+0.0,scr3_low,3,1,"Island",IEEE passive,0,Inf,
+scr3_low_island_qf2.5_dP+15_dQ+5.0,scr3_low,3,1,"Island",Fast passive,1,14,rocof
+scr3_low_island_qf2.5_dP+15_dQ+5.0,scr3_low,3,1,"Island",IEEE passive,0,Inf,
+scr3_low_island_qf2.5_dP-05_dQ+0.0,scr3_low,3,1,"Island",Fast passive,1,23,rocof
+scr3_low_island_qf2.5_dP-05_dQ+0.0,scr3_low,3,1,"Island",IEEE passive,0,Inf,
+scr3_low_island_qf2.5_dP-15_dQ-5.0,scr3_low,3,1,"Island",Fast passive,1,17,rocof
+scr3_low_island_qf2.5_dP-15_dQ-5.0,scr3_low,3,1,"Island",IEEE passive,0,Inf,
+scr3_pv_event01,scr3_pv,3,0,"Irradiance 1000 to 600 W/m2",Fast passive,1,12,rocof
+scr3_pv_event01,scr3_pv,3,0,"Irradiance 1000 to 600 W/m2",IEEE passive,0,Inf,
+scr3_pv_event02,scr3_pv,3,0,"Irradiance 600 to 1000 W/m2",Fast passive,1,29,of1
+scr3_pv_event02,scr3_pv,3,0,"Irradiance 600 to 1000 W/m2",IEEE passive,0,Inf,
+scr3_pv_event03,scr3_pv,3,0,"Wind 6 to 4.5 m/s",Fast passive,1,236,rocof
+scr3_pv_event03,scr3_pv,3,0,"Wind 6 to 4.5 m/s",IEEE passive,0,Inf,
+scr3_pv_event04,scr3_pv,3,0,"Load switched on (+6 kW)",Fast passive,1,20,uf1
+scr3_pv_event04,scr3_pv,3,0,"Load switched on (+6 kW)",IEEE passive,0,Inf,
+scr3_pv_event05,scr3_pv,3,0,"Capacitor switched on (5 kvar)",Fast passive,1,4,rocof
+scr3_pv_event05,scr3_pv,3,0,"Capacitor switched on (5 kvar)",IEEE passive,0,Inf,
+scr3_pv_event06,scr3_pv,3,0,"Voltage sag to 0.7 pu, 0.5 s",Fast passive,1,9.00000000000001,of1
+scr3_pv_event06,scr3_pv,3,0,"Voltage sag to 0.7 pu, 0.5 s",IEEE passive,0,Inf,
+scr3_pv_event07,scr3_pv,3,0,"Voltage sag to 0.5 pu, 0.2 s",Fast passive,1,3,rocof
+scr3_pv_event07,scr3_pv,3,0,"Voltage sag to 0.5 pu, 0.2 s",IEEE passive,0,Inf,
+scr3_pv_event08,scr3_pv,3,0,"Voltage swell to 1.15 pu, 0.5 s",Fast passive,1,18,ov1
+scr3_pv_event08,scr3_pv,3,0,"Voltage swell to 1.15 pu, 0.5 s",IEEE passive,0,Inf,
+scr3_pv_event09,scr3_pv,3,0,"Frequency ramp -2 Hz/s for 0.5 s",Fast passive,1,29,rocof
+scr3_pv_event09,scr3_pv,3,0,"Frequency ramp -2 Hz/s for 0.5 s",IEEE passive,0,Inf,
+scr3_pv_event10,scr3_pv,3,0,"Frequency ramp +2 Hz/s for 0.5 s",Fast passive,1,271,of1
+scr3_pv_event10,scr3_pv,3,0,"Frequency ramp +2 Hz/s for 0.5 s",IEEE passive,0,Inf,
+scr3_pv_event11,scr3_pv,3,0,"Phase jump 20 deg",Fast passive,1,3,rocof
+scr3_pv_event11,scr3_pv,3,0,"Phase jump 20 deg",IEEE passive,0,Inf,
+scr3_pv_island_qf1_dP+00_dQ+0.0,scr3_pv,3,1,"Island",Fast passive,1,24,rocof
+scr3_pv_island_qf1_dP+00_dQ+0.0,scr3_pv,3,1,"Island",IEEE passive,0,Inf,
+scr3_pv_island_qf1_dP+00_dQ+2.5,scr3_pv,3,1,"Island",Fast passive,1,9.00000000000001,rocof
+scr3_pv_island_qf1_dP+00_dQ+2.5,scr3_pv,3,1,"Island",IEEE passive,0,Inf,
+scr3_pv_island_qf1_dP+00_dQ-2.5,scr3_pv,3,1,"Island",Fast passive,1,10,rocof
+scr3_pv_island_qf1_dP+00_dQ-2.5,scr3_pv,3,1,"Island",IEEE passive,0,Inf,
+scr3_pv_island_qf1_dP+05_dQ+0.0,scr3_pv,3,1,"Island",Fast passive,1,28,rocof
+scr3_pv_island_qf1_dP+05_dQ+0.0,scr3_pv,3,1,"Island",IEEE passive,0,Inf,
+scr3_pv_island_qf1_dP+15_dQ+5.0,scr3_pv,3,1,"Island",Fast passive,1,28,of1
+scr3_pv_island_qf1_dP+15_dQ+5.0,scr3_pv,3,1,"Island",IEEE passive,0,Inf,
+scr3_pv_island_qf1_dP-05_dQ+0.0,scr3_pv,3,1,"Island",Fast passive,1,16,rocof
+scr3_pv_island_qf1_dP-05_dQ+0.0,scr3_pv,3,1,"Island",IEEE passive,0,Inf,
+scr3_pv_island_qf1_dP-15_dQ-5.0,scr3_pv,3,1,"Island",Fast passive,1,35,uf1
+scr3_pv_island_qf1_dP-15_dQ-5.0,scr3_pv,3,1,"Island",IEEE passive,0,Inf,
+scr3_pv_island_qf2.5_dP+00_dQ+0.0,scr3_pv,3,1,"Island",Fast passive,0,Inf,
+scr3_pv_island_qf2.5_dP+00_dQ+0.0,scr3_pv,3,1,"Island",IEEE passive,0,Inf,
+scr3_pv_island_qf2.5_dP+00_dQ+2.5,scr3_pv,3,1,"Island",Fast passive,0,Inf,
+scr3_pv_island_qf2.5_dP+00_dQ+2.5,scr3_pv,3,1,"Island",IEEE passive,0,Inf,
+scr3_pv_island_qf2.5_dP+00_dQ-2.5,scr3_pv,3,1,"Island",Fast passive,1,20,rocof
+scr3_pv_island_qf2.5_dP+00_dQ-2.5,scr3_pv,3,1,"Island",IEEE passive,0,Inf,
+scr3_pv_island_qf2.5_dP+05_dQ+0.0,scr3_pv,3,1,"Island",Fast passive,1,29,rocof
+scr3_pv_island_qf2.5_dP+05_dQ+0.0,scr3_pv,3,1,"Island",IEEE passive,0,Inf,
+scr3_pv_island_qf2.5_dP+15_dQ+5.0,scr3_pv,3,1,"Island",Fast passive,1,16,rocof
+scr3_pv_island_qf2.5_dP+15_dQ+5.0,scr3_pv,3,1,"Island",IEEE passive,0,Inf,
+scr3_pv_island_qf2.5_dP-05_dQ+0.0,scr3_pv,3,1,"Island",Fast passive,1,21,rocof
+scr3_pv_island_qf2.5_dP-05_dQ+0.0,scr3_pv,3,1,"Island",IEEE passive,0,Inf,
+scr3_pv_island_qf2.5_dP-15_dQ-5.0,scr3_pv,3,1,"Island",Fast passive,1,11,rocof
+scr3_pv_island_qf2.5_dP-15_dQ-5.0,scr3_pv,3,1,"Island",IEEE passive,0,Inf,
+scr3_wind_event01,scr3_wind,3,0,"Irradiance 300 to 180 W/m2",Fast passive,1,20,rocof
+scr3_wind_event01,scr3_wind,3,0,"Irradiance 300 to 180 W/m2",IEEE passive,0,Inf,
+scr3_wind_event02,scr3_wind,3,0,"Irradiance 180 to 300 W/m2",Fast passive,1,25,rocof
+scr3_wind_event02,scr3_wind,3,0,"Irradiance 180 to 300 W/m2",IEEE passive,0,Inf,
+scr3_wind_event03,scr3_wind,3,0,"Wind 12 to 9 m/s",Fast passive,0,Inf,
+scr3_wind_event03,scr3_wind,3,0,"Wind 12 to 9 m/s",IEEE passive,0,Inf,
+scr3_wind_event04,scr3_wind,3,0,"Load switched on (+6 kW)",Fast passive,1,9.00000000000001,rocof
+scr3_wind_event04,scr3_wind,3,0,"Load switched on (+6 kW)",IEEE passive,0,Inf,
+scr3_wind_event05,scr3_wind,3,0,"Capacitor switched on (5 kvar)",Fast passive,1,3,rocof
+scr3_wind_event05,scr3_wind,3,0,"Capacitor switched on (5 kvar)",IEEE passive,0,Inf,
+scr3_wind_event06,scr3_wind,3,0,"Voltage sag to 0.7 pu, 0.5 s",Fast passive,1,4,rocof
+scr3_wind_event06,scr3_wind,3,0,"Voltage sag to 0.7 pu, 0.5 s",IEEE passive,0,Inf,
+scr3_wind_event07,scr3_wind,3,0,"Voltage sag to 0.5 pu, 0.2 s",Fast passive,1,3,rocof
+scr3_wind_event07,scr3_wind,3,0,"Voltage sag to 0.5 pu, 0.2 s",IEEE passive,0,Inf,
+scr3_wind_event08,scr3_wind,3,0,"Voltage swell to 1.15 pu, 0.5 s",Fast passive,1,5,rocof
+scr3_wind_event08,scr3_wind,3,0,"Voltage swell to 1.15 pu, 0.5 s",IEEE passive,0,Inf,
+scr3_wind_event09,scr3_wind,3,0,"Frequency ramp -2 Hz/s for 0.5 s",Fast passive,1,37,rocof
+scr3_wind_event09,scr3_wind,3,0,"Frequency ramp -2 Hz/s for 0.5 s",IEEE passive,0,Inf,
+scr3_wind_event10,scr3_wind,3,0,"Frequency ramp +2 Hz/s for 0.5 s",Fast passive,1,51,rocof
+scr3_wind_event10,scr3_wind,3,0,"Frequency ramp +2 Hz/s for 0.5 s",IEEE passive,0,Inf,
+scr3_wind_event11,scr3_wind,3,0,"Phase jump 20 deg",Fast passive,1,3,rocof
+scr3_wind_event11,scr3_wind,3,0,"Phase jump 20 deg",IEEE passive,0,Inf,
+scr3_wind_island_qf1_dP+00_dQ+0.0,scr3_wind,3,1,"Island",Fast passive,1,20,rocof
+scr3_wind_island_qf1_dP+00_dQ+0.0,scr3_wind,3,1,"Island",IEEE passive,0,Inf,
+scr3_wind_island_qf1_dP+00_dQ+2.5,scr3_wind,3,1,"Island",Fast passive,1,11,rocof
+scr3_wind_island_qf1_dP+00_dQ+2.5,scr3_wind,3,1,"Island",IEEE passive,0,Inf,
+scr3_wind_island_qf1_dP+00_dQ-2.5,scr3_wind,3,1,"Island",Fast passive,1,13,rocof
+scr3_wind_island_qf1_dP+00_dQ-2.5,scr3_wind,3,1,"Island",IEEE passive,0,Inf,
+scr3_wind_island_qf1_dP+05_dQ+0.0,scr3_wind,3,1,"Island",Fast passive,1,28,rocof
+scr3_wind_island_qf1_dP+05_dQ+0.0,scr3_wind,3,1,"Island",IEEE passive,0,Inf,
+scr3_wind_island_qf1_dP+15_dQ+5.0,scr3_wind,3,1,"Island",Fast passive,1,12,rocof
+scr3_wind_island_qf1_dP+15_dQ+5.0,scr3_wind,3,1,"Island",IEEE passive,0,Inf,
+scr3_wind_island_qf1_dP-05_dQ+0.0,scr3_wind,3,1,"Island",Fast passive,1,15,rocof
+scr3_wind_island_qf1_dP-05_dQ+0.0,scr3_wind,3,1,"Island",IEEE passive,0,Inf,
+scr3_wind_island_qf1_dP-15_dQ-5.0,scr3_wind,3,1,"Island",Fast passive,1,12,rocof
+scr3_wind_island_qf1_dP-15_dQ-5.0,scr3_wind,3,1,"Island",IEEE passive,0,Inf,
+scr3_wind_island_qf2.5_dP+00_dQ+0.0,scr3_wind,3,1,"Island",Fast passive,1,31,rocof
+scr3_wind_island_qf2.5_dP+00_dQ+0.0,scr3_wind,3,1,"Island",IEEE passive,0,Inf,
+scr3_wind_island_qf2.5_dP+00_dQ+2.5,scr3_wind,3,1,"Island",Fast passive,1,14,rocof
+scr3_wind_island_qf2.5_dP+00_dQ+2.5,scr3_wind,3,1,"Island",IEEE passive,0,Inf,
+scr3_wind_island_qf2.5_dP+00_dQ-2.5,scr3_wind,3,1,"Island",Fast passive,1,21,rocof
+scr3_wind_island_qf2.5_dP+00_dQ-2.5,scr3_wind,3,1,"Island",IEEE passive,0,Inf,
+scr3_wind_island_qf2.5_dP+05_dQ+0.0,scr3_wind,3,1,"Island",Fast passive,0,Inf,
+scr3_wind_island_qf2.5_dP+05_dQ+0.0,scr3_wind,3,1,"Island",IEEE passive,0,Inf,
+scr3_wind_island_qf2.5_dP+15_dQ+5.0,scr3_wind,3,1,"Island",Fast passive,1,14,rocof
+scr3_wind_island_qf2.5_dP+15_dQ+5.0,scr3_wind,3,1,"Island",IEEE passive,0,Inf,
+scr3_wind_island_qf2.5_dP-05_dQ+0.0,scr3_wind,3,1,"Island",Fast passive,1,22,rocof
+scr3_wind_island_qf2.5_dP-05_dQ+0.0,scr3_wind,3,1,"Island",IEEE passive,0,Inf,
+scr3_wind_island_qf2.5_dP-15_dQ-5.0,scr3_wind,3,1,"Island",Fast passive,1,14,rocof
+scr3_wind_island_qf2.5_dP-15_dQ-5.0,scr3_wind,3,1,"Island",IEEE passive,0,Inf,
+scr5_full_event01,scr5_full,5,0,"Irradiance 1000 to 600 W/m2",Fast passive,1,12,rocof
+scr5_full_event01,scr5_full,5,0,"Irradiance 1000 to 600 W/m2",IEEE passive,0,Inf,
+scr5_full_event02,scr5_full,5,0,"Irradiance 600 to 1000 W/m2",Fast passive,1,14,rocof
+scr5_full_event02,scr5_full,5,0,"Irradiance 600 to 1000 W/m2",IEEE passive,0,Inf,
+scr5_full_event03,scr5_full,5,0,"Wind 12 to 9 m/s",Fast passive,0,Inf,
+scr5_full_event03,scr5_full,5,0,"Wind 12 to 9 m/s",IEEE passive,0,Inf,
+scr5_full_event04,scr5_full,5,0,"Load switched on (+6 kW)",Fast passive,1,5,rocof
+scr5_full_event04,scr5_full,5,0,"Load switched on (+6 kW)",IEEE passive,0,Inf,
+scr5_full_event05,scr5_full,5,0,"Capacitor switched on (5 kvar)",Fast passive,1,4,rocof
+scr5_full_event05,scr5_full,5,0,"Capacitor switched on (5 kvar)",IEEE passive,0,Inf,
+scr5_full_event06,scr5_full,5,0,"Voltage sag to 0.7 pu, 0.5 s",Fast passive,1,4,rocof
+scr5_full_event06,scr5_full,5,0,"Voltage sag to 0.7 pu, 0.5 s",IEEE passive,0,Inf,
+scr5_full_event07,scr5_full,5,0,"Voltage sag to 0.5 pu, 0.2 s",Fast passive,1,3,rocof
+scr5_full_event07,scr5_full,5,0,"Voltage sag to 0.5 pu, 0.2 s",IEEE passive,0,Inf,
+scr5_full_event08,scr5_full,5,0,"Voltage swell to 1.15 pu, 0.5 s",Fast passive,1,5,rocof
+scr5_full_event08,scr5_full,5,0,"Voltage swell to 1.15 pu, 0.5 s",IEEE passive,0,Inf,
+scr5_full_event09,scr5_full,5,0,"Frequency ramp -2 Hz/s for 0.5 s",Fast passive,1,45,rocof
+scr5_full_event09,scr5_full,5,0,"Frequency ramp -2 Hz/s for 0.5 s",IEEE passive,0,Inf,
+scr5_full_event10,scr5_full,5,0,"Frequency ramp +2 Hz/s for 0.5 s",Fast passive,1,54,rocof
+scr5_full_event10,scr5_full,5,0,"Frequency ramp +2 Hz/s for 0.5 s",IEEE passive,0,Inf,
+scr5_full_event11,scr5_full,5,0,"Phase jump 20 deg",Fast passive,1,3,rocof
+scr5_full_event11,scr5_full,5,0,"Phase jump 20 deg",IEEE passive,0,Inf,
+scr5_full_island_qf1_dP+00_dQ+0.0,scr5_full,5,1,"Island",Fast passive,1,25,rocof
+scr5_full_island_qf1_dP+00_dQ+0.0,scr5_full,5,1,"Island",IEEE passive,0,Inf,
+scr5_full_island_qf1_dP+00_dQ+2.5,scr5_full,5,1,"Island",Fast passive,1,12,rocof
+scr5_full_island_qf1_dP+00_dQ+2.5,scr5_full,5,1,"Island",IEEE passive,0,Inf,
+scr5_full_island_qf1_dP+00_dQ-2.5,scr5_full,5,1,"Island",Fast passive,1,14,rocof
+scr5_full_island_qf1_dP+00_dQ-2.5,scr5_full,5,1,"Island",IEEE passive,0,Inf,
+scr5_full_island_qf1_dP+05_dQ+0.0,scr5_full,5,1,"Island",Fast passive,1,39,rocof
+scr5_full_island_qf1_dP+05_dQ+0.0,scr5_full,5,1,"Island",IEEE passive,0,Inf,
+scr5_full_island_qf1_dP+15_dQ+5.0,scr5_full,5,1,"Island",Fast passive,1,13,rocof
+scr5_full_island_qf1_dP+15_dQ+5.0,scr5_full,5,1,"Island",IEEE passive,0,Inf,
+scr5_full_island_qf1_dP-05_dQ+0.0,scr5_full,5,1,"Island",Fast passive,1,16,rocof
+scr5_full_island_qf1_dP-05_dQ+0.0,scr5_full,5,1,"Island",IEEE passive,0,Inf,
+scr5_full_island_qf1_dP-15_dQ-5.0,scr5_full,5,1,"Island",Fast passive,1,10,rocof
+scr5_full_island_qf1_dP-15_dQ-5.0,scr5_full,5,1,"Island",IEEE passive,0,Inf,
+scr5_full_island_qf2.5_dP+00_dQ+0.0,scr5_full,5,1,"Island",Fast passive,0,Inf,
+scr5_full_island_qf2.5_dP+00_dQ+0.0,scr5_full,5,1,"Island",IEEE passive,0,Inf,
+scr5_full_island_qf2.5_dP+00_dQ+2.5,scr5_full,5,1,"Island",Fast passive,1,8.00000000000001,rocof
+scr5_full_island_qf2.5_dP+00_dQ+2.5,scr5_full,5,1,"Island",IEEE passive,0,Inf,
+scr5_full_island_qf2.5_dP+00_dQ-2.5,scr5_full,5,1,"Island",Fast passive,1,15,rocof
+scr5_full_island_qf2.5_dP+00_dQ-2.5,scr5_full,5,1,"Island",IEEE passive,0,Inf,
+scr5_full_island_qf2.5_dP+05_dQ+0.0,scr5_full,5,1,"Island",Fast passive,0,Inf,
+scr5_full_island_qf2.5_dP+05_dQ+0.0,scr5_full,5,1,"Island",IEEE passive,0,Inf,
+scr5_full_island_qf2.5_dP+15_dQ+5.0,scr5_full,5,1,"Island",Fast passive,1,14,rocof
+scr5_full_island_qf2.5_dP+15_dQ+5.0,scr5_full,5,1,"Island",IEEE passive,0,Inf,
+scr5_full_island_qf2.5_dP-05_dQ+0.0,scr5_full,5,1,"Island",Fast passive,0,Inf,
+scr5_full_island_qf2.5_dP-05_dQ+0.0,scr5_full,5,1,"Island",IEEE passive,0,Inf,
+scr5_full_island_qf2.5_dP-15_dQ-5.0,scr5_full,5,1,"Island",Fast passive,1,11,rocof
+scr5_full_island_qf2.5_dP-15_dQ-5.0,scr5_full,5,1,"Island",IEEE passive,0,Inf,
+scr5_low_event01,scr5_low,5,0,"Irradiance 500 to 300 W/m2",Fast passive,1,12,rocof
+scr5_low_event01,scr5_low,5,0,"Irradiance 500 to 300 W/m2",IEEE passive,0,Inf,
+scr5_low_event02,scr5_low,5,0,"Irradiance 300 to 500 W/m2",Fast passive,1,17,rocof
+scr5_low_event02,scr5_low,5,0,"Irradiance 300 to 500 W/m2",IEEE passive,0,Inf,
+scr5_low_event03,scr5_low,5,0,"Wind 8 to 6 m/s",Fast passive,0,Inf,
+scr5_low_event03,scr5_low,5,0,"Wind 8 to 6 m/s",IEEE passive,0,Inf,
+scr5_low_event04,scr5_low,5,0,"Load switched on (+6 kW)",Fast passive,1,6.00000000000001,rocof
+scr5_low_event04,scr5_low,5,0,"Load switched on (+6 kW)",IEEE passive,0,Inf,
+scr5_low_event05,scr5_low,5,0,"Capacitor switched on (5 kvar)",Fast passive,1,3,rocof
+scr5_low_event05,scr5_low,5,0,"Capacitor switched on (5 kvar)",IEEE passive,0,Inf,
+scr5_low_event06,scr5_low,5,0,"Voltage sag to 0.7 pu, 0.5 s",Fast passive,1,4,rocof
+scr5_low_event06,scr5_low,5,0,"Voltage sag to 0.7 pu, 0.5 s",IEEE passive,0,Inf,
+scr5_low_event07,scr5_low,5,0,"Voltage sag to 0.5 pu, 0.2 s",Fast passive,1,3,rocof
+scr5_low_event07,scr5_low,5,0,"Voltage sag to 0.5 pu, 0.2 s",IEEE passive,0,Inf,
+scr5_low_event08,scr5_low,5,0,"Voltage swell to 1.15 pu, 0.5 s",Fast passive,1,4.99999999999995,rocof
+scr5_low_event08,scr5_low,5,0,"Voltage swell to 1.15 pu, 0.5 s",IEEE passive,0,Inf,
+scr5_low_event09,scr5_low,5,0,"Frequency ramp -2 Hz/s for 0.5 s",Fast passive,1,64.0000000000001,rocof
+scr5_low_event09,scr5_low,5,0,"Frequency ramp -2 Hz/s for 0.5 s",IEEE passive,0,Inf,
+scr5_low_event10,scr5_low,5,0,"Frequency ramp +2 Hz/s for 0.5 s",Fast passive,1,45,rocof
+scr5_low_event10,scr5_low,5,0,"Frequency ramp +2 Hz/s for 0.5 s",IEEE passive,0,Inf,
+scr5_low_event11,scr5_low,5,0,"Phase jump 20 deg",Fast passive,1,2,rocof
+scr5_low_event11,scr5_low,5,0,"Phase jump 20 deg",IEEE passive,0,Inf,
+scr5_low_island_qf1_dP+00_dQ+0.0,scr5_low,5,1,"Island",Fast passive,1,23,rocof
+scr5_low_island_qf1_dP+00_dQ+0.0,scr5_low,5,1,"Island",IEEE passive,0,Inf,
+scr5_low_island_qf1_dP+00_dQ+2.5,scr5_low,5,1,"Island",Fast passive,1,9.00000000000001,rocof
+scr5_low_island_qf1_dP+00_dQ+2.5,scr5_low,5,1,"Island",IEEE passive,0,Inf,
+scr5_low_island_qf1_dP+00_dQ-2.5,scr5_low,5,1,"Island",Fast passive,1,11,rocof
+scr5_low_island_qf1_dP+00_dQ-2.5,scr5_low,5,1,"Island",IEEE passive,0,Inf,
+scr5_low_island_qf1_dP+05_dQ+0.0,scr5_low,5,1,"Island",Fast passive,1,27,rocof
+scr5_low_island_qf1_dP+05_dQ+0.0,scr5_low,5,1,"Island",IEEE passive,0,Inf,
+scr5_low_island_qf1_dP+15_dQ+5.0,scr5_low,5,1,"Island",Fast passive,1,13,rocof
+scr5_low_island_qf1_dP+15_dQ+5.0,scr5_low,5,1,"Island",IEEE passive,0,Inf,
+scr5_low_island_qf1_dP-05_dQ+0.0,scr5_low,5,1,"Island",Fast passive,1,18,rocof
+scr5_low_island_qf1_dP-05_dQ+0.0,scr5_low,5,1,"Island",IEEE passive,0,Inf,
+scr5_low_island_qf1_dP-15_dQ-5.0,scr5_low,5,1,"Island",Fast passive,1,15,rocof
+scr5_low_island_qf1_dP-15_dQ-5.0,scr5_low,5,1,"Island",IEEE passive,0,Inf,
+scr5_low_island_qf2.5_dP+00_dQ+0.0,scr5_low,5,1,"Island",Fast passive,1,35,rocof
+scr5_low_island_qf2.5_dP+00_dQ+0.0,scr5_low,5,1,"Island",IEEE passive,0,Inf,
+scr5_low_island_qf2.5_dP+00_dQ+2.5,scr5_low,5,1,"Island",Fast passive,1,19,rocof
+scr5_low_island_qf2.5_dP+00_dQ+2.5,scr5_low,5,1,"Island",IEEE passive,0,Inf,
+scr5_low_island_qf2.5_dP+00_dQ-2.5,scr5_low,5,1,"Island",Fast passive,1,19,rocof
+scr5_low_island_qf2.5_dP+00_dQ-2.5,scr5_low,5,1,"Island",IEEE passive,0,Inf,
+scr5_low_island_qf2.5_dP+05_dQ+0.0,scr5_low,5,1,"Island",Fast passive,1,68.0000000000001,rocof
+scr5_low_island_qf2.5_dP+05_dQ+0.0,scr5_low,5,1,"Island",IEEE passive,0,Inf,
+scr5_low_island_qf2.5_dP+15_dQ+5.0,scr5_low,5,1,"Island",Fast passive,1,15,rocof
+scr5_low_island_qf2.5_dP+15_dQ+5.0,scr5_low,5,1,"Island",IEEE passive,0,Inf,
+scr5_low_island_qf2.5_dP-05_dQ+0.0,scr5_low,5,1,"Island",Fast passive,1,15,rocof
+scr5_low_island_qf2.5_dP-05_dQ+0.0,scr5_low,5,1,"Island",IEEE passive,0,Inf,
+scr5_low_island_qf2.5_dP-15_dQ-5.0,scr5_low,5,1,"Island",Fast passive,1,14,rocof
+scr5_low_island_qf2.5_dP-15_dQ-5.0,scr5_low,5,1,"Island",IEEE passive,0,Inf,
+scr5_pv_event01,scr5_pv,5,0,"Irradiance 1000 to 600 W/m2",Fast passive,1,11,rocof
+scr5_pv_event01,scr5_pv,5,0,"Irradiance 1000 to 600 W/m2",IEEE passive,0,Inf,
+scr5_pv_event02,scr5_pv,5,0,"Irradiance 600 to 1000 W/m2",Fast passive,1,14,rocof
+scr5_pv_event02,scr5_pv,5,0,"Irradiance 600 to 1000 W/m2",IEEE passive,0,Inf,
+scr5_pv_event03,scr5_pv,5,0,"Wind 6 to 4.5 m/s",Fast passive,0,Inf,
+scr5_pv_event03,scr5_pv,5,0,"Wind 6 to 4.5 m/s",IEEE passive,0,Inf,
+scr5_pv_event04,scr5_pv,5,0,"Load switched on (+6 kW)",Fast passive,1,7.00000000000001,rocof
+scr5_pv_event04,scr5_pv,5,0,"Load switched on (+6 kW)",IEEE passive,0,Inf,
+scr5_pv_event05,scr5_pv,5,0,"Capacitor switched on (5 kvar)",Fast passive,1,3,rocof
+scr5_pv_event05,scr5_pv,5,0,"Capacitor switched on (5 kvar)",IEEE passive,0,Inf,
+scr5_pv_event06,scr5_pv,5,0,"Voltage sag to 0.7 pu, 0.5 s",Fast passive,1,4,rocof
+scr5_pv_event06,scr5_pv,5,0,"Voltage sag to 0.7 pu, 0.5 s",IEEE passive,0,Inf,
+scr5_pv_event07,scr5_pv,5,0,"Voltage sag to 0.5 pu, 0.2 s",Fast passive,1,3,rocof
+scr5_pv_event07,scr5_pv,5,0,"Voltage sag to 0.5 pu, 0.2 s",IEEE passive,0,Inf,
+scr5_pv_event08,scr5_pv,5,0,"Voltage swell to 1.15 pu, 0.5 s",Fast passive,1,4,rocof
+scr5_pv_event08,scr5_pv,5,0,"Voltage swell to 1.15 pu, 0.5 s",IEEE passive,0,Inf,
+scr5_pv_event09,scr5_pv,5,0,"Frequency ramp -2 Hz/s for 0.5 s",Fast passive,1,64.0000000000001,rocof
+scr5_pv_event09,scr5_pv,5,0,"Frequency ramp -2 Hz/s for 0.5 s",IEEE passive,0,Inf,
+scr5_pv_event10,scr5_pv,5,0,"Frequency ramp +2 Hz/s for 0.5 s",Fast passive,1,37,rocof
+scr5_pv_event10,scr5_pv,5,0,"Frequency ramp +2 Hz/s for 0.5 s",IEEE passive,0,Inf,
+scr5_pv_event11,scr5_pv,5,0,"Phase jump 20 deg",Fast passive,1,2,rocof
+scr5_pv_event11,scr5_pv,5,0,"Phase jump 20 deg",IEEE passive,0,Inf,
+scr5_pv_island_qf1_dP+00_dQ+0.0,scr5_pv,5,1,"Island",Fast passive,1,17,rocof
+scr5_pv_island_qf1_dP+00_dQ+0.0,scr5_pv,5,1,"Island",IEEE passive,0,Inf,
+scr5_pv_island_qf1_dP+00_dQ+2.5,scr5_pv,5,1,"Island",Fast passive,1,9.00000000000001,rocof
+scr5_pv_island_qf1_dP+00_dQ+2.5,scr5_pv,5,1,"Island",IEEE passive,0,Inf,
+scr5_pv_island_qf1_dP+00_dQ-2.5,scr5_pv,5,1,"Island",Fast passive,1,13,rocof
+scr5_pv_island_qf1_dP+00_dQ-2.5,scr5_pv,5,1,"Island",IEEE passive,0,Inf,
+scr5_pv_island_qf1_dP+05_dQ+0.0,scr5_pv,5,1,"Island",Fast passive,1,47,rocof
+scr5_pv_island_qf1_dP+05_dQ+0.0,scr5_pv,5,1,"Island",IEEE passive,0,Inf,
+scr5_pv_island_qf1_dP+15_dQ+5.0,scr5_pv,5,1,"Island",Fast passive,1,10,rocof
+scr5_pv_island_qf1_dP+15_dQ+5.0,scr5_pv,5,1,"Island",IEEE passive,0,Inf,
+scr5_pv_island_qf1_dP-05_dQ+0.0,scr5_pv,5,1,"Island",Fast passive,1,16,rocof
+scr5_pv_island_qf1_dP-05_dQ+0.0,scr5_pv,5,1,"Island",IEEE passive,0,Inf,
+scr5_pv_island_qf1_dP-15_dQ-5.0,scr5_pv,5,1,"Island",Fast passive,1,11,rocof
+scr5_pv_island_qf1_dP-15_dQ-5.0,scr5_pv,5,1,"Island",IEEE passive,0,Inf,
+scr5_pv_island_qf2.5_dP+00_dQ+0.0,scr5_pv,5,1,"Island",Fast passive,1,18,rocof
+scr5_pv_island_qf2.5_dP+00_dQ+0.0,scr5_pv,5,1,"Island",IEEE passive,0,Inf,
+scr5_pv_island_qf2.5_dP+00_dQ+2.5,scr5_pv,5,1,"Island",Fast passive,1,15,rocof
+scr5_pv_island_qf2.5_dP+00_dQ+2.5,scr5_pv,5,1,"Island",IEEE passive,0,Inf,
+scr5_pv_island_qf2.5_dP+00_dQ-2.5,scr5_pv,5,1,"Island",Fast passive,1,17,rocof
+scr5_pv_island_qf2.5_dP+00_dQ-2.5,scr5_pv,5,1,"Island",IEEE passive,0,Inf,
+scr5_pv_island_qf2.5_dP+05_dQ+0.0,scr5_pv,5,1,"Island",Fast passive,0,Inf,
+scr5_pv_island_qf2.5_dP+05_dQ+0.0,scr5_pv,5,1,"Island",IEEE passive,0,Inf,
+scr5_pv_island_qf2.5_dP+15_dQ+5.0,scr5_pv,5,1,"Island",Fast passive,1,12,rocof
+scr5_pv_island_qf2.5_dP+15_dQ+5.0,scr5_pv,5,1,"Island",IEEE passive,0,Inf,
+scr5_pv_island_qf2.5_dP-05_dQ+0.0,scr5_pv,5,1,"Island",Fast passive,1,26,rocof
+scr5_pv_island_qf2.5_dP-05_dQ+0.0,scr5_pv,5,1,"Island",IEEE passive,0,Inf,
+scr5_pv_island_qf2.5_dP-15_dQ-5.0,scr5_pv,5,1,"Island",Fast passive,1,11,rocof
+scr5_pv_island_qf2.5_dP-15_dQ-5.0,scr5_pv,5,1,"Island",IEEE passive,0,Inf,
+scr5_wind_event01,scr5_wind,5,0,"Irradiance 300 to 180 W/m2",Fast passive,1,27,rocof
+scr5_wind_event01,scr5_wind,5,0,"Irradiance 300 to 180 W/m2",IEEE passive,0,Inf,
+scr5_wind_event02,scr5_wind,5,0,"Irradiance 180 to 300 W/m2",Fast passive,1,28,rocof
+scr5_wind_event02,scr5_wind,5,0,"Irradiance 180 to 300 W/m2",IEEE passive,0,Inf,
+scr5_wind_event03,scr5_wind,5,0,"Wind 12 to 9 m/s",Fast passive,0,Inf,
+scr5_wind_event03,scr5_wind,5,0,"Wind 12 to 9 m/s",IEEE passive,0,Inf,
+scr5_wind_event04,scr5_wind,5,0,"Load switched on (+6 kW)",Fast passive,1,8.00000000000001,rocof
+scr5_wind_event04,scr5_wind,5,0,"Load switched on (+6 kW)",IEEE passive,0,Inf,
+scr5_wind_event05,scr5_wind,5,0,"Capacitor switched on (5 kvar)",Fast passive,1,3,rocof
+scr5_wind_event05,scr5_wind,5,0,"Capacitor switched on (5 kvar)",IEEE passive,0,Inf,
+scr5_wind_event06,scr5_wind,5,0,"Voltage sag to 0.7 pu, 0.5 s",Fast passive,1,4,rocof
+scr5_wind_event06,scr5_wind,5,0,"Voltage sag to 0.7 pu, 0.5 s",IEEE passive,0,Inf,
+scr5_wind_event07,scr5_wind,5,0,"Voltage sag to 0.5 pu, 0.2 s",Fast passive,1,3,rocof
+scr5_wind_event07,scr5_wind,5,0,"Voltage sag to 0.5 pu, 0.2 s",IEEE passive,0,Inf,
+scr5_wind_event08,scr5_wind,5,0,"Voltage swell to 1.15 pu, 0.5 s",Fast passive,1,5,rocof
+scr5_wind_event08,scr5_wind,5,0,"Voltage swell to 1.15 pu, 0.5 s",IEEE passive,0,Inf,
+scr5_wind_event09,scr5_wind,5,0,"Frequency ramp -2 Hz/s for 0.5 s",Fast passive,1,43,rocof
+scr5_wind_event09,scr5_wind,5,0,"Frequency ramp -2 Hz/s for 0.5 s",IEEE passive,0,Inf,
+scr5_wind_event10,scr5_wind,5,0,"Frequency ramp +2 Hz/s for 0.5 s",Fast passive,1,68.0000000000001,rocof
+scr5_wind_event10,scr5_wind,5,0,"Frequency ramp +2 Hz/s for 0.5 s",IEEE passive,0,Inf,
+scr5_wind_event11,scr5_wind,5,0,"Phase jump 20 deg",Fast passive,1,2,rocof
+scr5_wind_event11,scr5_wind,5,0,"Phase jump 20 deg",IEEE passive,0,Inf,
+scr5_wind_island_qf1_dP+00_dQ+0.0,scr5_wind,5,1,"Island",Fast passive,1,25,rocof
+scr5_wind_island_qf1_dP+00_dQ+0.0,scr5_wind,5,1,"Island",IEEE passive,0,Inf,
+scr5_wind_island_qf1_dP+00_dQ+2.5,scr5_wind,5,1,"Island",Fast passive,1,7.00000000000001,rocof
+scr5_wind_island_qf1_dP+00_dQ+2.5,scr5_wind,5,1,"Island",IEEE passive,0,Inf,
+scr5_wind_island_qf1_dP+00_dQ-2.5,scr5_wind,5,1,"Island",Fast passive,1,15,rocof
+scr5_wind_island_qf1_dP+00_dQ-2.5,scr5_wind,5,1,"Island",IEEE passive,0,Inf,
+scr5_wind_island_qf1_dP+05_dQ+0.0,scr5_wind,5,1,"Island",Fast passive,1,35,rocof
+scr5_wind_island_qf1_dP+05_dQ+0.0,scr5_wind,5,1,"Island",IEEE passive,0,Inf,
+scr5_wind_island_qf1_dP+15_dQ+5.0,scr5_wind,5,1,"Island",Fast passive,1,11,rocof
+scr5_wind_island_qf1_dP+15_dQ+5.0,scr5_wind,5,1,"Island",IEEE passive,0,Inf,
+scr5_wind_island_qf1_dP-05_dQ+0.0,scr5_wind,5,1,"Island",Fast passive,1,14,rocof
+scr5_wind_island_qf1_dP-05_dQ+0.0,scr5_wind,5,1,"Island",IEEE passive,0,Inf,
+scr5_wind_island_qf1_dP-15_dQ-5.0,scr5_wind,5,1,"Island",Fast passive,1,12,rocof
+scr5_wind_island_qf1_dP-15_dQ-5.0,scr5_wind,5,1,"Island",IEEE passive,0,Inf,
+scr5_wind_island_qf2.5_dP+00_dQ+0.0,scr5_wind,5,1,"Island",Fast passive,0,Inf,
+scr5_wind_island_qf2.5_dP+00_dQ+0.0,scr5_wind,5,1,"Island",IEEE passive,0,Inf,
+scr5_wind_island_qf2.5_dP+00_dQ+2.5,scr5_wind,5,1,"Island",Fast passive,1,14,rocof
+scr5_wind_island_qf2.5_dP+00_dQ+2.5,scr5_wind,5,1,"Island",IEEE passive,0,Inf,
+scr5_wind_island_qf2.5_dP+00_dQ-2.5,scr5_wind,5,1,"Island",Fast passive,1,16,rocof
+scr5_wind_island_qf2.5_dP+00_dQ-2.5,scr5_wind,5,1,"Island",IEEE passive,0,Inf,
+scr5_wind_island_qf2.5_dP+05_dQ+0.0,scr5_wind,5,1,"Island",Fast passive,0,Inf,
+scr5_wind_island_qf2.5_dP+05_dQ+0.0,scr5_wind,5,1,"Island",IEEE passive,0,Inf,
+scr5_wind_island_qf2.5_dP+15_dQ+5.0,scr5_wind,5,1,"Island",Fast passive,1,12,rocof
+scr5_wind_island_qf2.5_dP+15_dQ+5.0,scr5_wind,5,1,"Island",IEEE passive,0,Inf,
+scr5_wind_island_qf2.5_dP-05_dQ+0.0,scr5_wind,5,1,"Island",Fast passive,1,15,rocof
+scr5_wind_island_qf2.5_dP-05_dQ+0.0,scr5_wind,5,1,"Island",IEEE passive,0,Inf,
+scr5_wind_island_qf2.5_dP-15_dQ-5.0,scr5_wind,5,1,"Island",Fast passive,1,14,rocof
+scr5_wind_island_qf2.5_dP-15_dQ-5.0,scr5_wind,5,1,"Island",IEEE passive,0,Inf,

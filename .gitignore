@@ -20,3 +20,4 @@ MATLAB_R2018a/IEEE_1547_2018_Inverter.slx
 results/*.mat
 results/*.txt
 results/ndz/
+results/stress/

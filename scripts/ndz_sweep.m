@@ -25,22 +25,10 @@ for afd = [0 1]
             P.afd.on = afd;
             fprintf('\n##### AFD %d, dP %+.1f %%, dQ %+.1f %%\n', afd, 100*dP, 100*dQ);
             S = run_model(tEnd, P, '');
-            R = reduce(S);
+            R = reduce_run(S, 0.2, 0.4);           % 1 ms signals; power quality before the island
             save(f, '-struct', 'R');
         end
     end
 end
 T = evaluate_ndz(dPs, dQs);
-end
-
-function R = reduce(S)
-% Keep 1 ms signals for detector replay, and grid-connected power quality.
-t = (0:1e-3:S.Vpcc_rms.Time(end))';
-R.P = S.P;
-for n = {'Vpcc_rms', 'freq', 'VDC', 'ID', 'IQ'}
-    x = S.(n{1});
-    R.(n{1}) = timeseries(interp1(x.Time, double(x.Data(:,1)), t), t);
-end
-M = signal_metrics(S, 0.2, 0.4);                     % before the island
-R.pre = struct('P', M.P, 'Q', M.Q, 'thd', M.thd, 'thdV', M.thdV);
 end
