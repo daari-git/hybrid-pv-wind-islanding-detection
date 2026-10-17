@@ -181,11 +181,19 @@ Three baseline detectors, all evaluated offline on the same logged PCC voltage a
 
 The sign of the drift gain matters: with K > 0 a matched island holds at 49.95 Hz and is never detected; with K < 0 its frequency runs away (`afd_sign_test.m`).
 
+![Matched island without and with frequency drift](docs/island_matched_afd.png)
+
+A matched island (no active or reactive mismatch) stays at 50.05 Hz and 1.0 pu, so no passive setting can see it. With frequency drift the inverter injects reactive current as soon as the frequency moves, the frequency runs to 58.4 Hz, and the IEEE OF2 element (51.67 Hz, 0.16 s) trips 191 ms after islanding. The voltage ripple with drift is partly a measurement effect: the RMS window is fixed at 50 Hz while the island runs at 58 Hz.
+
 **Non-detection zones.** The grid breaker opens at 0.4 s with an RLC load (Q_f = 1) sized relative to the inverter's measured output (18.57 kW, 813 var), and each detector gets the 2 s IEEE 1547-2018 allows (`ndz_sweep.m`, `island_case.m`, 70 runs):
 
 ![Detection time over the mismatch plane](docs/ndz_maps.png)
 
 **False trips.** Eleven ordinary disturbances with the grid connected; every trip is false (`false_trip_test.m`). The grid events use a programmable source; the load and capacitor are switched in at the PCC.
+
+![Rate of change of frequency for an island and four ordinary events](docs/rocof_island_vs_events.png)
+
+Why a threshold cannot work: the rate of change of frequency the relay sees after an island (peak 16 Hz/s) is no different in kind from what an irradiance step (4 Hz/s), a capacitor switching (10 Hz/s), a voltage sag (17 Hz/s) or a phase jump (106 Hz/s) produces. Any threshold low enough to catch the island also trips on these events.
 
 | Event | Fast passive | IEEE passive | IEEE + AFD |
 |---|---|---|---|
@@ -206,6 +214,8 @@ The sign of the drift gain matters: with K > 0 a matched island holds at 49.95 H
 | Fast passive | 34 | 7 to 52 ms | 10 |
 | IEEE passive | 0 | none within 2 s | 0 |
 | IEEE + AFD | 35 | 160 to 275 ms | 0 |
+
+![Islands detected against false trips](docs/detector_summary.png)
 
 Reading the results:
 
@@ -330,6 +340,9 @@ scripts/afd_sign_test.m        Matched island with no drift and with drift of ea
 scripts/ndz_sweep.m            Non-detection-zone sweep (70 runs); evaluate_ndz.m scores it
 scripts/false_trip_test.m      Eleven non-islanding disturbances through every detector
 scripts/plot_ndz.m            Draws docs/ndz_maps.png
+scripts/plot_phase4.m          Draws the island, ROCOF and detector-summary figures
+scripts/disturbance_events.m   The eleven ordinary disturbances used for false-trip tests
+scripts/relay_signals.m        Voltage, frequency and ROCOF as a relay sees them
 docs/                          Model diagrams and result figures
 results/                       Simulation outputs, not tracked in git
 data/, ml/, paper/             Planned
