@@ -155,6 +155,40 @@ P.der2.Qlim = 0.3*P.der2.P;                            % var
 P.der2.Ts   = 1e-5;                                    % reference update period (s)
 P.der2.tOn  = 0.02;                                    % start time (s)
 
+% ---- Sensor noise and grid background distortion (Phase 7) ----
+% White noise, sampled at the control rate, on every measurement the controls
+% and detectors use: PCC voltage, inverter and grid-side currents, DC-link
+% voltage. Standard deviations are per unit of the rated peak phase voltage,
+% the rated peak current and the DC-link reference.
+P.noise.on   = 0;
+P.noise.v    = 0.005;
+P.noise.i    = 0.01;
+P.noise.vdc  = 0.002;
+P.noise.seed = 1;
+% Background harmonics of the grid voltage: [order, amplitude (pu), phase (deg),
+% sequence (1 positive, 2 negative)]. Applied when an amplitude is non-zero.
+P.grid.harmA = [5 0 0 2];
+P.grid.harmB = [7 0 0 1];
+
+% ---- Machine-learning islanding detector (Phases 6 and 7) ----
+% The trained network of ml/islanding_classifier.mat, run inside the model by
+% the 'Machine-learning islanding detector' block: a window every P.ml.step,
+% a trip once P.ml.debounce windows in a row score above P.ml.threshold.
+% Windows are evaluated from P.ml.tArm (1e6 = never). With P.ml.trip = 1 a
+% trip opens the inverter's breaker, as the passive protection's does; with
+% 0 the detector only reports its score.
+P.ml.tArm = 1e6;
+P.ml.trip = 1;
+P.ml.threshold = 0.5; P.ml.debounce = 6; P.ml.W = 0.01; P.ml.Wb = 0.04; P.ml.step = 0.005;
+P.ml.theta = 0; P.ml.layers = [22 20 10 2];
+f = fullfile(fileparts(here), 'ml', 'islanding_classifier.mat');
+if exist(f, 'file')
+    M = load(f);
+    P.ml.threshold = M.threshold; P.ml.debounce = M.debounce;
+    P.ml.W = M.W; P.ml.Wb = M.Wb; P.ml.step = M.step;
+    [P.ml.theta, P.ml.layers] = ml_pack(M.model);
+end
+
 % ---- Non-islanding disturbances (programmable grid source, switched equipment) ----
 % P.event.entity: 'None', 'Amplitude', 'Frequency' or 'Phase'; P.event.type: 'Step',
 % 'Ramp' or 'Table of time-amplitude pairs'. run_model sets these on the source.

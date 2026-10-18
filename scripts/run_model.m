@@ -24,12 +24,18 @@ if ~strcmp(P.event.entity, 'None')                     % grid disturbance on the
         in = in.setBlockParameter(gv, 'VariationTypeAlt', P.event.type);
     end
 end
+if isfield(P.grid, 'harmA') && any([P.grid.harmA(2) P.grid.harmB(2)] > 0)   % background harmonics
+    in = in.setBlockParameter([mdl '/Grid voltage'], 'HarmonicGeneration', 'on');
+end
 t0 = tic; out = sim(in);
 fprintf('Simulated %.2f s in %.0f s of wall time\n', stopTime, toc(t0));
 
-tags = {'Vabc','Igrid','Iabc','VDC','ID','IQ','freq','Vpcc_rms','VPV','IPV','trip','wm_wind'};
+tags = {'Vabc','Igrid','Iabc','VDC','ID','IQ','freq','Vpcc_rms','VPV','IPV','trip','wm_wind','ml_score','ml_trip','Igrid_true'};
 S = struct('P', P);
-for k = 1:numel(tags), S.(tags{k}) = out.get(['log_' tags{k}]); end
+have = out.who;
+for k = 1:numel(tags)
+    if any(strcmp(have, ['log_' tags{k}])), S.(tags{k}) = out.get(['log_' tags{k}]); end   % older builds log fewer signals
+end
 if ~exist(fullfile(root, 'results'), 'dir'), mkdir(fullfile(root, 'results')); end
 if ~isempty(tag), save(fullfile(root, 'results', [tag '.mat']), '-struct', 'S'); end   % empty tag: do not save
 if nargout == 0 || ~isempty(tag), report(S); end

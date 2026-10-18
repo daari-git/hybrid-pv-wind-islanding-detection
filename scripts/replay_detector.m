@@ -1,4 +1,4 @@
-function S = replay_detector(Ws, models, thr, deb)
+function S = replay_detector(Ws, models, thr, deb, tag)
 % REPLAY_DETECTOR  Phase 6: run saved classifier scores as a relay would, case by case.
 %   S = REPLAY_DETECTOR(WS, MODELS, THR, DEB) takes the test scores saved by
 %   TRAIN_CLASSIFIERS and, for every decision threshold in THR (default
@@ -13,9 +13,11 @@ function S = replay_detector(Ws, models, thr, deb)
 %                     operation
 %   Writes results/classifier_cases.csv (every case, every setting) and
 %   results/classifier_summary.csv (one row per window length, model, fold
-%   family, threshold and debounce).
+%   family, threshold and debounce). With TAG (Phase 7) the outputs are
+%   classifier_cases<TAG>.csv and classifier_summary<TAG>.csv.
 if nargin < 3 || isempty(thr), thr = 0.5:0.1:0.9; end
 if nargin < 4 || isempty(deb), deb = [2 3 4 6 8 10]; end
+if nargin < 5, tag = ''; end
 root = fileparts(fileparts(mfilename('fullpath')));
 C = cell(0, 1);
 for W = Ws
@@ -37,9 +39,9 @@ for W = Ws
     end
 end
 C = vertcat(C{:});
-writetable(C, fullfile(root, 'results', 'classifier_cases.csv'));
+writetable(C, fullfile(root, 'results', ['classifier_cases' tag '.csv']));
 S = summarise(C);
-writetable(S, fullfile(root, 'results', 'classifier_summary.csv'));
+writetable(S, fullfile(root, 'results', ['classifier_summary' tag '.csv']));
 end
 
 function R = replay(T, g, pos, W, m, fam, th, d)

@@ -9,9 +9,12 @@ P.pv.G0 = c.G;  P.pv.G1 = c.G;
 P.wind.v0 = c.v;  P.wind.v1 = c.v;  P.wind.wm0 = P.wind.lamOpt*c.v/P.wind.R;
 if c.scr < 5, P.pv.Gstart = 200; P.pv.tStart = 0.3; end
 P.prot.tArm = 1e6;
-f = fullfile(fileparts(fileparts(mfilename('fullpath'))), 'results', 'operating_points.csv');
-if exist(f, 'file')
-    T = readtable(f, 'TextType', 'string');
+if isfield(c, 'harm') && c.harm                         % background grid distortion (TEST_CONDITIONS)
+    P.grid.harmA = [5 0.02 0 2]; P.grid.harmB = [7 0.015 0 1];
+end
+for f = fullfile(fileparts(fileparts(mfilename('fullpath'))), 'results', {'operating_points.csv', 'operating_points_test.csv'})
+    if ~exist(f{1}, 'file'), continue; end
+    T = readtable(f{1}, 'TextType', 'string');
     r = T(T.id == c.id, :);
     if height(r) == 1, P.island.Pinv = r.Pinv_W; P.island.Qinv = r.Qinv_var; end
 end

@@ -92,7 +92,7 @@ legend(ax, 'Location', 'southeast', 'Box', 'off', 'FontSize', 9);
 title(ax, 'Chosen detector: when each kind of island is detected', 'FontWeight', 'normal', 'FontSize', 10);
 
 ax = nexttile(tl);
-F = readtable(fullfile(root, 'results', 'feature_importance.csv'), 'TextType', 'string');
+F = readtable(fullfile(root, 'results', 'feature_importance_noisefree.csv'), 'TextType', 'string');
 F = F(1:12, :);
 plain = containers.Map( ...
   {'dV_max','phase_jump','dV_pos','df_max','df_end','dI_pos','Zh_ratio','dTHD_v','dV_mean','dVdc_max','dP','dV_neg', ...

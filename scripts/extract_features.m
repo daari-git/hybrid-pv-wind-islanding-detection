@@ -1,4 +1,4 @@
-function T = extract_features(W, Wb, step)
+function T = extract_features(W, Wb, step, level)
 % EXTRACT_FEATURES  Phase 6: sliding-window features for every case in data/raw/.
 %   T = EXTRACT_FEATURES(W, WB, STEP) slides a window of W seconds (default
 %   0.02) in steps of STEP (default 5 ms) over each case's record, each with
@@ -13,15 +13,31 @@ function T = extract_features(W, Wb, step)
 %   few island windows that straddle the opening and are left out of
 %   training (they are still used when a detector is evaluated).
 %   Saves data/features/features_W<ms>.mat.
+%
+%   T = EXTRACT_FEATURES(W, WB, STEP, LEVEL) with LEVEL > 0 (Phase 7) first
+%   adds measured sensor noise to every signal of every case: a randomly
+%   placed stretch of one of the noise records of NOISE_CALIBRATION (chosen
+%   at random per case), scaled by LEVEL (1 = the sensors of P.noise). The
+%   windows are the same as without noise, row for row. Saves
+%   data/features/features_W<ms>_noise<LEVEL>.mat.
 if nargin < 1 || isempty(W), W = 0.02; end
 if nargin < 2 || isempty(Wb), Wb = 0.04; end
 if nargin < 3 || isempty(step), step = 0.005; end
+if nargin < 4 || isempty(level), level = 0; end
 root = fileparts(fileparts(mfilename('fullpath')));
 I = readtable(fullfile(root, 'results', 'dataset_index.csv'), 'TextType', 'string', 'VariableNamingRule', 'preserve');
 P = params(10);
+if level > 0
+    nf = dir(fullfile(root, 'data', 'noise', '*.mat'));
+    N = arrayfun(@(f) load(fullfile(f.folder, f.name)), nf);
+end
 rows = cell(height(I), 1);
 for k = 1:height(I)
     D = load(fullfile(root, 'data', 'raw', I.("case")(k) + ".mat"));
+    if level > 0
+        rng(1000*level + k);
+        D = add_noise(D, N(randi(numel(N))), level);
+    end
     tE = D.meta.tEvent - D.t0;                               % event time within the record (0.1 s)
     tEnd = (numel(D.freq) - 1)/D.fs;
     ts = (Wb:step:tEnd - W + 1e-9)';
@@ -43,7 +59,23 @@ end
 T = vertcat(rows{:});
 out = fullfile(root, 'data', 'features');
 if ~exist(out, 'dir'), mkdir(out); end
-save(fullfile(out, sprintf('features_W%02d.mat', round(1e3*W))), 'T', 'W', 'Wb', 'step');
-fprintf('W = %g ms: %d windows from %d cases (%d island, %d not, %d left out of training)\n', ...
-    1e3*W, height(T), height(I), sum(T.y == 1), sum(T.y == 0), sum(isnan(T.y)));
+f = sprintf('features_W%02d.mat', round(1e3*W));
+if level > 0, f = sprintf('features_W%02d_noise%g.mat', round(1e3*W), level); end
+save(fullfile(out, f), 'T', 'W', 'Wb', 'step', 'level');
+fprintf('W = %g ms, noise %g: %d windows from %d cases (%d island, %d not, %d left out of training)\n', ...
+    1e3*W, level, height(T), height(I), sum(T.y == 1), sum(T.y == 0), sum(isnan(T.y)));
+end
+
+function D = add_noise(D, N, level)
+% A random stretch of the noise record N, scaled by LEVEL, added to every signal.
+n = numel(D.freq);
+o = randi(numel(N.freq) - n + 1) - 1;                     % offset in ms, the same for both rates
+r = D.fsWave/D.fs;
+for s = {'freq', 'Vpcc_rms', 'VDC', 'ID', 'IQ'}
+    D.(s{1}) = D.(s{1}) + level*N.(s{1})(o + (1:n));
+end
+nw = size(D.Vabc, 1);
+for s = {'Vabc', 'Igrid'}
+    D.(s{1}) = D.(s{1}) + level*N.(s{1})(r*o + (1:nw), :);
+end
 end

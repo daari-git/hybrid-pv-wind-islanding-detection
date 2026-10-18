@@ -35,7 +35,7 @@ for W = Ws
         for fo = folds
             rng(1);
             tr = ~fo.test & ~isnan(y);
-            mdl = fit_model(m, X(tr,:), y(tr));
+            mdl = fit_detector(m, X(tr,:), y(tr));
             [~, sc] = predict(mdl, X(fo.test,:));
             score(fo.test, 1 + (fo.family == "mix")) = sc(:, 2);
             fprintf('W %2d ms  %-6s  %-8s done\n', W, m, fo.name);
@@ -44,21 +44,4 @@ for W = Ws
     end
 end
 S = replay_detector(Ws, models);
-end
-
-function mdl = fit_model(m, X, y)
-switch m
-    case 'tree'
-        mdl = fitctree(X, y, 'MinLeafSize', 50);
-    case 'forest'
-        mdl = fitcensemble(X, y, 'Method', 'Bag', 'NumLearningCycles', 100, ...
-            'Learners', templateTree('MinLeafSize', 5));
-    case 'svm'
-        k = randperm(numel(y), min(6000, numel(y)));
-        mdl = fitcsvm(X(k,:), y(k), 'KernelFunction', 'gaussian', 'KernelScale', 'auto', ...
-            'Standardize', true, 'CacheSize', 'maximal');
-        mdl = fitPosterior(mdl);
-    case 'nn'
-        mdl = fitcnet(X, y, 'LayerSizes', [20 10], 'Standardize', true, 'IterationLimit', 500);
-end
 end

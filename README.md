@@ -2,7 +2,7 @@
 
 Ride-through-compatible islanding detection for a grid-connected hybrid solar PV–wind system, using a machine-learning classifier on top of an H-infinity current controller. MATLAB/Simulink.
 
-> **Status:** work in progress. Phases 1 to 6 are done (results below); phases 7 and 8 are planned and have no results yet.
+> **Status:** work in progress. Phases 1 to 7 are done (results below); phase 8, the paper, is next.
 
 ## Problem
 
@@ -299,7 +299,7 @@ Four models were trained at window lengths of 10, 20 and 40 ms: a decision tree,
 
 ![Trade-off between islands detected and false trips](docs/ml_tradeoff.png)
 
-Chosen detector: a neural network (two hidden layers, 20 and 10 neurons) on 10 ms windows, threshold 0.5, trip after 6 windows in a row. On the same 400 cases (`results/detector_cases.csv`):
+Chosen detector: a neural network (two hidden layers, 20 and 10 neurons) on 10 ms windows, threshold 0.5, trip after 6 windows in a row. On the same 400 cases (`results/detector_cases_noisefree.csv`):
 
 | Detector | Islands detected (224) | Matched islands (32) | Ordinary events tripped (176) | Steady-state alarms (400) | Median detection time |
 |---|---|---|---|---|---|
@@ -322,18 +322,75 @@ Reading the results:
 - **On grid strengths inside the training range the detector made no error**: every island detected, matched ones included, with no false trip and no steady-state alarm. All four errors are on SCR 3, the weakest grid. When SCR 3 is held out the model has never seen a grid that weak, so this is extrapolation; a weak grid in the training data is the obvious remedy and will be checked.
 - **It detects islands about five times faster than active frequency drift** (median 35 ms against 160 to 488 ms) without injecting anything, so it cannot be cancelled by a neighbouring inverter or destabilise a weak grid.
 - **Matched islands are the slow ones** (median about 60 ms, all within 220 ms). In the first 40 ms they change almost nothing: frequency by 0.04 to 0.1 Hz and voltage by 0.007 pu. The detector picks up the small voltage wander that follows when the stiff grid is gone, which is why the largest voltage change is by far its most important feature.
-- **Model choice.** The forest and the tree detect every island too but false-trip on 6 to 10% of events. The SVM is a close second (98.2% detected, 2.3% false trips, no steady alarms, median 45 ms). The network file is 9.6 kB (`ml/islanding_classifier.mat`), small enough to run inside the Simulink model.
+- **Model choice.** The forest and the tree detect every island too but false-trip on 6 to 10% of events. The SVM is a close second (98.2% detected, 2.3% false trips, no steady alarms, median 45 ms). The network file is 9.6 kB (`ml/islanding_classifier_noisefree.mat`), small enough to run inside the Simulink model (Phase 7 does).
 - **Two things that did not work**, recorded so they are not tried again:
   - A distortion-impedance feature, meant to see the PCC impedance rise when the grid is lost, barely helps. At low harmonics the parallel RLC load has a lower impedance than the grid, and at the switching frequency the capacitors dominate either way.
   - An estimate of voltage sensitivity to the inverter's own power changes was flat across grid strengths, so it was removed.
 - **What Phase 7 must test.** These cases are noise-free. The matched-island detections rest on small voltage changes that measurement noise could hide, and the detector has not yet tripped the breaker inside the simulation.
+
+### Phase 7: the detector inside the model, with sensor noise, on conditions it never saw
+
+Three things were added to the test bed (`build_model.m`, sections 7d and 7e):
+
+- **The detector runs inside the Simulink model.** A block buffers the inverter's own measurements, computes the features every 5 ms with the same code used offline (`ml_features.m`), runs the network and, after enough windows in a row above threshold, opens the inverter's breaker through the protection's latch. Its scores match the offline computation to 5e-13 (`verify_detector.m`).
+- **Sensor noise on every measurement** the controls and detectors use: white noise sampled at the 10 kHz control rate, standard deviation 0.5% of rated peak voltage, 1% of rated peak current and 0.2% of the DC-link voltage (`P.noise`). Because it passes through the PLL, the RMS measurement and the control loops, what the detector sees is measured rather than assumed (`noise_calibration.m`). Frequency wanders by 0.005 Hz (standard deviation) at SCR 10 and 0.03 Hz at SCR 3. Voltage and current waveforms deviate by 0.6 to 1.3% and 2.1%, including the controls' response to the noise.
+- **Three operating conditions outside the dataset** (`test_conditions.m`), with a different grid strength and generation mix each, and one with background grid distortion:
+
+| Condition | Grid strength | Irradiance, wind | Background distortion |
+|---|---|---|---|
+| scr15_t1 | SCR 15 | 800 W/m², 10 m/s | none |
+| scr7_t2 | SCR 7 | 600 W/m², 11 m/s | 2% fifth and 1.5% seventh harmonic |
+| scr4_t3 | SCR 4 (weak grid start) | 900 W/m², 7 m/s | none |
+
+![The detector block inside the model](docs/ml_detector_block.png)
+
+**Sensor noise breaks a detector trained without it.** With the sensors above, the Phase 6 design (trained on noise-free windows) still never false-trips, but it detects only 64% of islands and 38% of matched ones; at twice that noise, 9%. It has learned voltage changes smaller than the noise. Training on the noise-free windows plus the same windows with measured noise added (`extract_features.m`, `noise_study.m`) restores detection.
+
+![Islands detected and false trips against sensor noise](docs/noise_robustness.png)
+
+| Grid strength held out, 400 cases | Islands detected | Matched islands | Ordinary events tripped | Steady-state alarms | Median time |
+|---|---|---|---|---|---|
+| Trained without noise, tested without noise (with the Phase 7 voltage measure, hence not the Phase 6 table) | 99.1% | 100% | 5.1% | 0.5% | 35 ms |
+| Trained without noise, nominal sensor noise | 64.3% | 37.5% | 0% | 0% | 50 ms |
+| **Trained with noise, nominal sensor noise** | **98.7%** | **90.6%** | **4.5%** | **0.25%** | **30 ms** |
+| Trained with noise, twice the noise | 83.0% | 65.6% | 3.4% | 0% | 35 ms |
+
+The setting was chosen by the Phase 6 rule, applied to the PV/wind-mix folds at nominal noise (`select_detector.m`). It is a network on 20 ms windows that trips after 4 windows in a row score above 0.8 (`ml/islanding_classifier.mat`).
+
+**A measurement problem that only the closed loop exposed.** The first version of the in-loop detector caught all 10 islands at SCR 15 but tripped on both 2 Hz/s frequency ramps, about 0.5 s in. By then the grid had settled at 49 or 51 Hz, inside the range where IEEE 1547-2018 requires an inverter to keep running. The cause was the model's RMS voltage measurement: it averages over a fixed 20 ms, so off 50 Hz it ripples at twice the grid frequency. At 49 Hz its fluctuation was ten times larger than at 50 Hz (standard deviation 0.0005 to 0.007 pu), which the detector took for an island's voltage wander. The dataset could not show this, because its records end 0.35 s after each event, before a ramp settles. The detector now computes the voltage magnitude itself, every 1 ms, as the positive-sequence phasor over the last cycle at the measured frequency. This measure does not ripple off 50 Hz and ignores fifth and seventh harmonics. A half-cycle version was tried first and raised false trips on the held-out grid strengths to 6.8%, so the full cycle, the same averaging as the RMS measurement it replaces, was kept. The first version's runs are kept in `data/closedloop/pi_v1/`.
+
+**In the loop on the three new conditions** (`closed_loop_test.m`). Each case was run with sensor noise on, the detector armed 0.25 s before the event, and its trip disconnecting the inverter. Every case was repeated with H-infinity current control (`results/closed_loop_pi.csv`, `results/closed_loop_hinfinity.csv`). The relays were evaluated on the same logged signals up to the detector's trip. Frequency drift was run separately with the detector off.
+
+![The detector in the loop: an island that defeats frequency drift, and a sag it rides through](docs/closed_loop_traces.png)
+
+| Detector, 3 unseen conditions | Islands detected (30) | Islands with an opposing second inverter (3) | Ordinary events tripped (33) | Steady runs with a local load tripped (3) | Detection time |
+|---|---|---|---|---|---|
+| **ML in the loop, PI control** | **30** | **3** | **0** | **0** | median 30 ms, all within 105 ms |
+| **ML in the loop, H-infinity control** | **30** | **3** | **0** | **0** | median 32 ms, all within 105 ms |
+| Frequency drift + IEEE 1547 relay | 6 of 9 tested | 0 (none within 2 s) | 0 of 6 tested (both sags) | 0 | 168 to 200 ms |
+| Fast relay | 15 before the ML trip | | 30 (26 with H-infinity) | | 7 to 19 ms |
+| IEEE 1547 relay, no drift | 0 before the ML trip | | 0 | | none |
+
+![Detection time in the loop, and the non-detection-zone grid](docs/closed_loop_summary.png)
+
+Reading the results:
+
+- **Every island was cleared, far inside the 2 s limit**, on grid strengths, generation mixes and grid distortion the detector never saw, with sensor noise, under both controllers: 30 of 30 with PI and 30 of 30 with H-infinity, all within 105 ms. The 35-point non-detection-zone grid (active mismatch -20 to +20%, reactive -5 to +5%, SCR 7 with distortion) was detected completely, all within 95 ms. On the same mismatch grid at SCR 10 (Phase 4) the IEEE relay without drift detected none of the 35 islands and the fast relay 34. The slowest points are the largest active mismatches (±20%), not the matched ones. Such an island first looks like a voltage step, which the detector has learned to ride through, and it trips once the frequency moves.
+- **It catches the island that defeats active frequency drift.** With a second inverter whose reactive power works against the drift, drift with the IEEE relay never detects the island (3 of 3 missed within 2 s). The ML detector clears it in 85 to 105 ms, because it injects nothing for a neighbour to cancel.
+- **No false trip on the 33 ordinary events**, including 0.5 and 0.7 pu sags, a 1.15 pu swell, ±2 Hz/s ramps to 49 and 51 Hz, a 20° phase jump, and load, capacitor, irradiance and wind steps. On the same signals the fast relay trips on 30 of them.
+- **The inverter does cease to energise.** 30 to 50 ms after a trip the inverter's current is 0.06 A (median). Where a second inverter holds the island up it is 0.7 A: the current of the LCL filter capacitor, which stays connected to the energised PCC.
+- **The controller makes no difference to detection.** With H-infinity control, detection times differ from PI by -60 to +55 ms (median 0), with the same 30 detected and 0 false trips. The detector was trained on PI data only.
+- **Distortion.** The ML detector injects nothing, so it adds no distortion. The frequency drift implemented here is a reactive-current bias, not a waveform distortion. It shifts the inverter's reactive output by about 200 var (1% of rating), and its effect on current THD was within ±0.3 points, smaller than the spread between operating points.
+- **A weakness found: no local load.** In steady operation with a negligible local load, one run per controller tripped: PI at SCR 4, 15 ms after arming; H-infinity at SCR 7. All three no-load runs score close to the threshold now and then. Every training case had a local load close to the inverter's output, so this state lies outside the training data. With a local load there was no alarm, either in the 3 long steady runs or in the 0.25 s before each of the 63 cases. The remedy is training cases with no or partial local load. Until then the detector should not be used where the inverter can run with no local load.
 
 ### Known limitations
 
 - PI and PLL gains are a first pass, not optimised.
 - PV current readings are unreliable when the PV voltage is far above its operating point, including after a trip.
 - Generator stator inductance (3 mH) and rotor inertia (10 kg m²) were changed from the original so the machine can deliver 10 kW through a diode rectifier.
-- The classifier has been tested on noise-free simulated measurements only; noise and closed-loop tripping are Phase 7.
+- The detector has been tested in simulation only, with one sensor-noise model (white noise at the control rate, calibrated in `noise_calibration.m`); real sensors also drift and saturate.
+- With a negligible local load the detector false-tripped in 1 of 3 steady runs under each controller (Phase 7): training data with no or partial local load is still needed.
+- The detector was trained with PI current control only; H-infinity control did not change its results, but the PID and fuzzy controllers were not tested in the loop.
 - The second inverter is an averaged current source with ideal current control, not a switching model; it represents a neighbouring unit's power and reactive drift, not its control dynamics.
 
 ## Workflow
@@ -398,17 +455,14 @@ flowchart TD
 - 22 features over a sliding window (10, 20 or 40 ms, every 5 ms) against the 40 ms before it: voltage magnitude, frequency and rate of change of frequency, phase jump, sequence components, power changes, distortion, DC-link and d/q current deviations.
 - Split by operating condition (grid strength or PV/wind mix held out), never by window or case.
 - Decision tree, random forest, SVM and a small neural network; the setting chosen by a rule fixed in advance on one family of folds and reported on the other.
-- Output: `ml/islanding_classifier.mat`, `results/classifier_summary.csv`, `results/detector_cases.csv`, `results/feature_importance.csv`.
+- Output: `ml/islanding_classifier_noisefree.mat`, `results/classifier_summary.csv`, `results/detector_cases_noisefree.csv`, `results/feature_importance_noisefree.csv`.
 
-### Phase 7 — Closed-loop validation
-- Put the trained classifier back into Simulink so it trips the breaker itself.
-- Re-run the full test set with measurement noise added.
-- Report, for the proposed method and both baselines:
-  - detection time against the 2-second limit,
-  - non-detection zone,
-  - false-trip rate during ride-through events,
-  - effect on current distortion.
-- Repeat with PI and with H-infinity control to show what the controller contributes.
+### Phase 7 — Closed-loop validation (done)
+- The trained detector inside the Simulink model, tripping the inverter's breaker itself; scores match the offline code (`verify_detector.m`).
+- Sensor noise on every measurement, calibrated through the model's PLL and controls; detectors trained with and without it.
+- Three operating conditions outside the dataset (SCR 15, 7 with grid distortion, 4), each with 10 islands, 11 ordinary events and steady runs; a 35-point non-detection-zone grid; frequency drift with the IEEE relay as the baseline.
+- Repeated with H-infinity current control.
+- Output: `ml/islanding_classifier.mat`, `results/closed_loop_pi.csv`, `results/closed_loop_hinfinity.csv`, `results/classifier_summary_noise.csv`, `results/detector_selection.csv`, `results/noise_calibration.csv`, `results/feature_importance.csv`, `results/detector_cases.csv`.
 
 ### Phase 8 — Paper
 - Comparison table against recent published methods.
@@ -465,10 +519,22 @@ scripts/train_classifiers.m    Four classifiers, tested on held-out grid strengt
 scripts/replay_detector.m      Replays classifier scores case by case as a relay, for every threshold and debounce
 scripts/final_classifier.m     Feature importance and the final trained detector
 scripts/plot_phase6.m          Draws docs/ml_tradeoff.png and docs/ml_detection.png
+scripts/ml_features.m          The 22 features from measurement buffers, shared by the offline code and the model
+scripts/ml_pack.m              Packs the trained network into one parameter vector for the model
+scripts/fit_detector.m         Trains one classifier (tree, forest, SVM or network)
+scripts/run_phase7.m           Runs every Phase 7 stage in order
+scripts/noise_calibration.m    Sensor noise as the detector sees it, through the PLL and controls
+scripts/noise_study.m          Classifiers trained without and with noise, tested at three noise levels
+scripts/select_detector.m      Applies the selection rule to the noise study
+scripts/verify_detector.m      Checks the detector inside the model against the offline code
+scripts/test_conditions.m      The three operating conditions outside the dataset
+scripts/closed_loop_test.m     The detector in the loop: islands, events, steady runs, drift baseline, NDZ grid
+scripts/plot_phase7.m          Draws docs/noise_robustness.png, docs/closed_loop_traces.png, docs/closed_loop_summary.png
 docs/                          Model diagrams and result figures
 results/                       Result tables (.csv); simulation runs (.mat) are not tracked
-data/raw/                      Phase 5 dataset, generated, not tracked
-ml/islanding_classifier.mat    The trained detector (Phase 6) with its window, threshold and debounce
+data/                          Dataset, features, noise records and closed-loop runs, generated, not tracked
+ml/islanding_classifier.mat    The detector the model runs (Phase 7, trained with noise), with its window, threshold and debounce
+ml/islanding_classifier_noisefree.mat  The Phase 6 detector, trained without noise
 paper/                         Planned
 report/, archive/              Kept locally, not tracked
 ```

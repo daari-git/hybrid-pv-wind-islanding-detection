@@ -1,0 +1,401 @@
+W_ms,model,family,threshold,debounce,case,scr,mix,island,event,tTrip_ms,steadyAlarm,detected,falseTrip
+10,nn,scr,0.5,6,scr10_full_event01,10,full,0,"Irradiance 1000 to 600 W/m2",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_full_event02,10,full,0,"Irradiance 600 to 1000 W/m2",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_full_event03,10,full,0,"Wind 12 to 9 m/s",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_full_event04,10,full,0,"Load switched on (+6 kW)",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_full_event05,10,full,0,"Capacitor switched on (5 kvar)",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_full_event06,10,full,0,"Voltage sag to 0.7 pu, 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_full_event07,10,full,0,"Voltage sag to 0.5 pu, 0.2 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_full_event08,10,full,0,"Voltage swell to 1.15 pu, 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_full_event09,10,full,0,"Frequency ramp -2 Hz/s for 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_full_event10,10,full,0,"Frequency ramp +2 Hz/s for 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_full_event11,10,full,0,"Phase jump 20 deg",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_full_island_qf1_dP+00_dQ+0.0,10,full,1,"Island",45,0,1,0
+10,nn,scr,0.5,6,scr10_full_island_qf1_dP+00_dQ+2.5,10,full,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr10_full_island_qf1_dP+00_dQ-2.5,10,full,1,"Island",40,0,1,0
+10,nn,scr,0.5,6,scr10_full_island_qf1_dP+05_dQ+0.0,10,full,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr10_full_island_qf1_dP+15_dQ+5.0,10,full,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr10_full_island_qf1_dP-05_dQ+0.0,10,full,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr10_full_island_qf1_dP-15_dQ-5.0,10,full,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr10_full_island_qf2.5_dP+00_dQ+0.0,10,full,1,"Island",70,0,1,0
+10,nn,scr,0.5,6,scr10_full_island_qf2.5_dP+00_dQ+2.5,10,full,1,"Island",40,0,1,0
+10,nn,scr,0.5,6,scr10_full_island_qf2.5_dP+00_dQ-2.5,10,full,1,"Island",40,0,1,0
+10,nn,scr,0.5,6,scr10_full_island_qf2.5_dP+05_dQ+0.0,10,full,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr10_full_island_qf2.5_dP+15_dQ+5.0,10,full,1,"Island",40,0,1,0
+10,nn,scr,0.5,6,scr10_full_island_qf2.5_dP-05_dQ+0.0,10,full,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr10_full_island_qf2.5_dP-15_dQ-5.0,10,full,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr10_low_event01,10,low,0,"Irradiance 500 to 300 W/m2",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_low_event02,10,low,0,"Irradiance 300 to 500 W/m2",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_low_event03,10,low,0,"Wind 8 to 6 m/s",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_low_event04,10,low,0,"Load switched on (+6 kW)",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_low_event05,10,low,0,"Capacitor switched on (5 kvar)",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_low_event06,10,low,0,"Voltage sag to 0.7 pu, 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_low_event07,10,low,0,"Voltage sag to 0.5 pu, 0.2 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_low_event08,10,low,0,"Voltage swell to 1.15 pu, 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_low_event09,10,low,0,"Frequency ramp -2 Hz/s for 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_low_event10,10,low,0,"Frequency ramp +2 Hz/s for 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_low_event11,10,low,0,"Phase jump 20 deg",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_low_island_qf1_dP+00_dQ+0.0,10,low,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr10_low_island_qf1_dP+00_dQ+2.5,10,low,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr10_low_island_qf1_dP+00_dQ-2.5,10,low,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr10_low_island_qf1_dP+05_dQ+0.0,10,low,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr10_low_island_qf1_dP+15_dQ+5.0,10,low,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr10_low_island_qf1_dP-05_dQ+0.0,10,low,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr10_low_island_qf1_dP-15_dQ-5.0,10,low,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr10_low_island_qf2.5_dP+00_dQ+0.0,10,low,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr10_low_island_qf2.5_dP+00_dQ+2.5,10,low,1,"Island",40,0,1,0
+10,nn,scr,0.5,6,scr10_low_island_qf2.5_dP+00_dQ-2.5,10,low,1,"Island",40,0,1,0
+10,nn,scr,0.5,6,scr10_low_island_qf2.5_dP+05_dQ+0.0,10,low,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr10_low_island_qf2.5_dP+15_dQ+5.0,10,low,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr10_low_island_qf2.5_dP-05_dQ+0.0,10,low,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr10_low_island_qf2.5_dP-15_dQ-5.0,10,low,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr10_pv_event01,10,pv,0,"Irradiance 1000 to 600 W/m2",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_pv_event02,10,pv,0,"Irradiance 600 to 1000 W/m2",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_pv_event03,10,pv,0,"Wind 6 to 4.5 m/s",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_pv_event04,10,pv,0,"Load switched on (+6 kW)",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_pv_event05,10,pv,0,"Capacitor switched on (5 kvar)",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_pv_event06,10,pv,0,"Voltage sag to 0.7 pu, 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_pv_event07,10,pv,0,"Voltage sag to 0.5 pu, 0.2 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_pv_event08,10,pv,0,"Voltage swell to 1.15 pu, 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_pv_event09,10,pv,0,"Frequency ramp -2 Hz/s for 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_pv_event10,10,pv,0,"Frequency ramp +2 Hz/s for 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_pv_event11,10,pv,0,"Phase jump 20 deg",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_pv_island_qf1_dP+00_dQ+0.0,10,pv,1,"Island",50,0,1,0
+10,nn,scr,0.5,6,scr10_pv_island_qf1_dP+00_dQ+2.5,10,pv,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr10_pv_island_qf1_dP+00_dQ-2.5,10,pv,1,"Island",40,0,1,0
+10,nn,scr,0.5,6,scr10_pv_island_qf1_dP+05_dQ+0.0,10,pv,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr10_pv_island_qf1_dP+15_dQ+5.0,10,pv,1,"Island",50,0,1,0
+10,nn,scr,0.5,6,scr10_pv_island_qf1_dP-05_dQ+0.0,10,pv,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr10_pv_island_qf1_dP-15_dQ-5.0,10,pv,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr10_pv_island_qf2.5_dP+00_dQ+0.0,10,pv,1,"Island",45,0,1,0
+10,nn,scr,0.5,6,scr10_pv_island_qf2.5_dP+00_dQ+2.5,10,pv,1,"Island",45,0,1,0
+10,nn,scr,0.5,6,scr10_pv_island_qf2.5_dP+00_dQ-2.5,10,pv,1,"Island",45,0,1,0
+10,nn,scr,0.5,6,scr10_pv_island_qf2.5_dP+05_dQ+0.0,10,pv,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr10_pv_island_qf2.5_dP+15_dQ+5.0,10,pv,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr10_pv_island_qf2.5_dP-05_dQ+0.0,10,pv,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr10_pv_island_qf2.5_dP-15_dQ-5.0,10,pv,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr10_wind_event01,10,wind,0,"Irradiance 300 to 180 W/m2",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_wind_event02,10,wind,0,"Irradiance 180 to 300 W/m2",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_wind_event03,10,wind,0,"Wind 12 to 9 m/s",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_wind_event04,10,wind,0,"Load switched on (+6 kW)",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_wind_event05,10,wind,0,"Capacitor switched on (5 kvar)",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_wind_event06,10,wind,0,"Voltage sag to 0.7 pu, 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_wind_event07,10,wind,0,"Voltage sag to 0.5 pu, 0.2 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_wind_event08,10,wind,0,"Voltage swell to 1.15 pu, 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_wind_event09,10,wind,0,"Frequency ramp -2 Hz/s for 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_wind_event10,10,wind,0,"Frequency ramp +2 Hz/s for 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_wind_event11,10,wind,0,"Phase jump 20 deg",Inf,0,0,0
+10,nn,scr,0.5,6,scr10_wind_island_qf1_dP+00_dQ+0.0,10,wind,1,"Island",180,0,1,0
+10,nn,scr,0.5,6,scr10_wind_island_qf1_dP+00_dQ+2.5,10,wind,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr10_wind_island_qf1_dP+00_dQ-2.5,10,wind,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr10_wind_island_qf1_dP+05_dQ+0.0,10,wind,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr10_wind_island_qf1_dP+15_dQ+5.0,10,wind,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr10_wind_island_qf1_dP-05_dQ+0.0,10,wind,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr10_wind_island_qf1_dP-15_dQ-5.0,10,wind,1,"Island",50,0,1,0
+10,nn,scr,0.5,6,scr10_wind_island_qf2.5_dP+00_dQ+0.0,10,wind,1,"Island",80,0,1,0
+10,nn,scr,0.5,6,scr10_wind_island_qf2.5_dP+00_dQ+2.5,10,wind,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr10_wind_island_qf2.5_dP+00_dQ-2.5,10,wind,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr10_wind_island_qf2.5_dP+05_dQ+0.0,10,wind,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr10_wind_island_qf2.5_dP+15_dQ+5.0,10,wind,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr10_wind_island_qf2.5_dP-05_dQ+0.0,10,wind,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr10_wind_island_qf2.5_dP-15_dQ-5.0,10,wind,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr20_full_event01,20,full,0,"Irradiance 1000 to 600 W/m2",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_full_event02,20,full,0,"Irradiance 600 to 1000 W/m2",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_full_event03,20,full,0,"Wind 12 to 9 m/s",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_full_event04,20,full,0,"Load switched on (+6 kW)",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_full_event05,20,full,0,"Capacitor switched on (5 kvar)",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_full_event06,20,full,0,"Voltage sag to 0.7 pu, 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_full_event07,20,full,0,"Voltage sag to 0.5 pu, 0.2 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_full_event08,20,full,0,"Voltage swell to 1.15 pu, 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_full_event09,20,full,0,"Frequency ramp -2 Hz/s for 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_full_event10,20,full,0,"Frequency ramp +2 Hz/s for 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_full_event11,20,full,0,"Phase jump 20 deg",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_full_island_qf1_dP+00_dQ+0.0,20,full,1,"Island",90,0,1,0
+10,nn,scr,0.5,6,scr20_full_island_qf1_dP+00_dQ+2.5,20,full,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr20_full_island_qf1_dP+00_dQ-2.5,20,full,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr20_full_island_qf1_dP+05_dQ+0.0,20,full,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr20_full_island_qf1_dP+15_dQ+5.0,20,full,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr20_full_island_qf1_dP-05_dQ+0.0,20,full,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr20_full_island_qf1_dP-15_dQ-5.0,20,full,1,"Island",95,0,1,0
+10,nn,scr,0.5,6,scr20_full_island_qf2.5_dP+00_dQ+0.0,20,full,1,"Island",105,0,1,0
+10,nn,scr,0.5,6,scr20_full_island_qf2.5_dP+00_dQ+2.5,20,full,1,"Island",40,0,1,0
+10,nn,scr,0.5,6,scr20_full_island_qf2.5_dP+00_dQ-2.5,20,full,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr20_full_island_qf2.5_dP+05_dQ+0.0,20,full,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr20_full_island_qf2.5_dP+15_dQ+5.0,20,full,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr20_full_island_qf2.5_dP-05_dQ+0.0,20,full,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr20_full_island_qf2.5_dP-15_dQ-5.0,20,full,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr20_low_event01,20,low,0,"Irradiance 500 to 300 W/m2",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_low_event02,20,low,0,"Irradiance 300 to 500 W/m2",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_low_event03,20,low,0,"Wind 8 to 6 m/s",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_low_event04,20,low,0,"Load switched on (+6 kW)",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_low_event05,20,low,0,"Capacitor switched on (5 kvar)",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_low_event06,20,low,0,"Voltage sag to 0.7 pu, 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_low_event07,20,low,0,"Voltage sag to 0.5 pu, 0.2 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_low_event08,20,low,0,"Voltage swell to 1.15 pu, 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_low_event09,20,low,0,"Frequency ramp -2 Hz/s for 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_low_event10,20,low,0,"Frequency ramp +2 Hz/s for 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_low_event11,20,low,0,"Phase jump 20 deg",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_low_island_qf1_dP+00_dQ+0.0,20,low,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr20_low_island_qf1_dP+00_dQ+2.5,20,low,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr20_low_island_qf1_dP+00_dQ-2.5,20,low,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr20_low_island_qf1_dP+05_dQ+0.0,20,low,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr20_low_island_qf1_dP+15_dQ+5.0,20,low,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr20_low_island_qf1_dP-05_dQ+0.0,20,low,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr20_low_island_qf1_dP-15_dQ-5.0,20,low,1,"Island",60,0,1,0
+10,nn,scr,0.5,6,scr20_low_island_qf2.5_dP+00_dQ+0.0,20,low,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr20_low_island_qf2.5_dP+00_dQ+2.5,20,low,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr20_low_island_qf2.5_dP+00_dQ-2.5,20,low,1,"Island",55,0,1,0
+10,nn,scr,0.5,6,scr20_low_island_qf2.5_dP+05_dQ+0.0,20,low,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr20_low_island_qf2.5_dP+15_dQ+5.0,20,low,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr20_low_island_qf2.5_dP-05_dQ+0.0,20,low,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr20_low_island_qf2.5_dP-15_dQ-5.0,20,low,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr20_pv_event01,20,pv,0,"Irradiance 1000 to 600 W/m2",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_pv_event02,20,pv,0,"Irradiance 600 to 1000 W/m2",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_pv_event03,20,pv,0,"Wind 6 to 4.5 m/s",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_pv_event04,20,pv,0,"Load switched on (+6 kW)",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_pv_event05,20,pv,0,"Capacitor switched on (5 kvar)",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_pv_event06,20,pv,0,"Voltage sag to 0.7 pu, 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_pv_event07,20,pv,0,"Voltage sag to 0.5 pu, 0.2 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_pv_event08,20,pv,0,"Voltage swell to 1.15 pu, 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_pv_event09,20,pv,0,"Frequency ramp -2 Hz/s for 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_pv_event10,20,pv,0,"Frequency ramp +2 Hz/s for 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_pv_event11,20,pv,0,"Phase jump 20 deg",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_pv_island_qf1_dP+00_dQ+0.0,20,pv,1,"Island",70,0,1,0
+10,nn,scr,0.5,6,scr20_pv_island_qf1_dP+00_dQ+2.5,20,pv,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr20_pv_island_qf1_dP+00_dQ-2.5,20,pv,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr20_pv_island_qf1_dP+05_dQ+0.0,20,pv,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr20_pv_island_qf1_dP+15_dQ+5.0,20,pv,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr20_pv_island_qf1_dP-05_dQ+0.0,20,pv,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr20_pv_island_qf1_dP-15_dQ-5.0,20,pv,1,"Island",45,0,1,0
+10,nn,scr,0.5,6,scr20_pv_island_qf2.5_dP+00_dQ+0.0,20,pv,1,"Island",80,0,1,0
+10,nn,scr,0.5,6,scr20_pv_island_qf2.5_dP+00_dQ+2.5,20,pv,1,"Island",40,0,1,0
+10,nn,scr,0.5,6,scr20_pv_island_qf2.5_dP+00_dQ-2.5,20,pv,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr20_pv_island_qf2.5_dP+05_dQ+0.0,20,pv,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr20_pv_island_qf2.5_dP+15_dQ+5.0,20,pv,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr20_pv_island_qf2.5_dP-05_dQ+0.0,20,pv,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr20_pv_island_qf2.5_dP-15_dQ-5.0,20,pv,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr20_wind_event01,20,wind,0,"Irradiance 300 to 180 W/m2",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_wind_event02,20,wind,0,"Irradiance 180 to 300 W/m2",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_wind_event03,20,wind,0,"Wind 12 to 9 m/s",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_wind_event04,20,wind,0,"Load switched on (+6 kW)",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_wind_event05,20,wind,0,"Capacitor switched on (5 kvar)",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_wind_event06,20,wind,0,"Voltage sag to 0.7 pu, 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_wind_event07,20,wind,0,"Voltage sag to 0.5 pu, 0.2 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_wind_event08,20,wind,0,"Voltage swell to 1.15 pu, 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_wind_event09,20,wind,0,"Frequency ramp -2 Hz/s for 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_wind_event10,20,wind,0,"Frequency ramp +2 Hz/s for 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_wind_event11,20,wind,0,"Phase jump 20 deg",Inf,0,0,0
+10,nn,scr,0.5,6,scr20_wind_island_qf1_dP+00_dQ+0.0,20,wind,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr20_wind_island_qf1_dP+00_dQ+2.5,20,wind,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr20_wind_island_qf1_dP+00_dQ-2.5,20,wind,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr20_wind_island_qf1_dP+05_dQ+0.0,20,wind,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr20_wind_island_qf1_dP+15_dQ+5.0,20,wind,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr20_wind_island_qf1_dP-05_dQ+0.0,20,wind,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr20_wind_island_qf1_dP-15_dQ-5.0,20,wind,1,"Island",45,0,1,0
+10,nn,scr,0.5,6,scr20_wind_island_qf2.5_dP+00_dQ+0.0,20,wind,1,"Island",220,0,1,0
+10,nn,scr,0.5,6,scr20_wind_island_qf2.5_dP+00_dQ+2.5,20,wind,1,"Island",40,0,1,0
+10,nn,scr,0.5,6,scr20_wind_island_qf2.5_dP+00_dQ-2.5,20,wind,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr20_wind_island_qf2.5_dP+05_dQ+0.0,20,wind,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr20_wind_island_qf2.5_dP+15_dQ+5.0,20,wind,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr20_wind_island_qf2.5_dP-05_dQ+0.0,20,wind,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr20_wind_island_qf2.5_dP-15_dQ-5.0,20,wind,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr3_full_event01,3,full,0,"Irradiance 1000 to 600 W/m2",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_full_event02,3,full,0,"Irradiance 600 to 1000 W/m2",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_full_event03,3,full,0,"Wind 12 to 9 m/s",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_full_event04,3,full,0,"Load switched on (+6 kW)",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_full_event05,3,full,0,"Capacitor switched on (5 kvar)",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_full_event06,3,full,0,"Voltage sag to 0.7 pu, 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_full_event07,3,full,0,"Voltage sag to 0.5 pu, 0.2 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_full_event08,3,full,0,"Voltage swell to 1.15 pu, 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_full_event09,3,full,0,"Frequency ramp -2 Hz/s for 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_full_event10,3,full,0,"Frequency ramp +2 Hz/s for 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_full_event11,3,full,0,"Phase jump 20 deg",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_full_island_qf1_dP+00_dQ+0.0,3,full,1,"Island",50,0,1,0
+10,nn,scr,0.5,6,scr3_full_island_qf1_dP+00_dQ+2.5,3,full,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr3_full_island_qf1_dP+00_dQ-2.5,3,full,1,"Island",65,0,1,0
+10,nn,scr,0.5,6,scr3_full_island_qf1_dP+05_dQ+0.0,3,full,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr3_full_island_qf1_dP+15_dQ+5.0,3,full,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr3_full_island_qf1_dP-05_dQ+0.0,3,full,1,"Island",65,0,1,0
+10,nn,scr,0.5,6,scr3_full_island_qf1_dP-15_dQ-5.0,3,full,1,"Island",25,0,1,0
+10,nn,scr,0.5,6,scr3_full_island_qf2.5_dP+00_dQ+0.0,3,full,1,"Island",85,0,1,0
+10,nn,scr,0.5,6,scr3_full_island_qf2.5_dP+00_dQ+2.5,3,full,1,"Island",45,0,1,0
+10,nn,scr,0.5,6,scr3_full_island_qf2.5_dP+00_dQ-2.5,3,full,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr3_full_island_qf2.5_dP+05_dQ+0.0,3,full,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr3_full_island_qf2.5_dP+15_dQ+5.0,3,full,1,"Island",10,0,1,0
+10,nn,scr,0.5,6,scr3_full_island_qf2.5_dP-05_dQ+0.0,3,full,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr3_full_island_qf2.5_dP-15_dQ-5.0,3,full,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr3_low_event01,3,low,0,"Irradiance 500 to 300 W/m2",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_low_event02,3,low,0,"Irradiance 300 to 500 W/m2",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_low_event03,3,low,0,"Wind 8 to 6 m/s",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_low_event04,3,low,0,"Load switched on (+6 kW)",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_low_event05,3,low,0,"Capacitor switched on (5 kvar)",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_low_event06,3,low,0,"Voltage sag to 0.7 pu, 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_low_event07,3,low,0,"Voltage sag to 0.5 pu, 0.2 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_low_event08,3,low,0,"Voltage swell to 1.15 pu, 0.5 s",160,0,0,1
+10,nn,scr,0.5,6,scr3_low_event09,3,low,0,"Frequency ramp -2 Hz/s for 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_low_event10,3,low,0,"Frequency ramp +2 Hz/s for 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_low_event11,3,low,0,"Phase jump 20 deg",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_low_island_qf1_dP+00_dQ+0.0,3,low,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr3_low_island_qf1_dP+00_dQ+2.5,3,low,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr3_low_island_qf1_dP+00_dQ-2.5,3,low,1,"Island",40,0,1,0
+10,nn,scr,0.5,6,scr3_low_island_qf1_dP+05_dQ+0.0,3,low,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr3_low_island_qf1_dP+15_dQ+5.0,3,low,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr3_low_island_qf1_dP-05_dQ+0.0,3,low,1,"Island",60,0,1,0
+10,nn,scr,0.5,6,scr3_low_island_qf1_dP-15_dQ-5.0,3,low,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr3_low_island_qf2.5_dP+00_dQ+0.0,3,low,1,"Island",60,0,1,0
+10,nn,scr,0.5,6,scr3_low_island_qf2.5_dP+00_dQ+2.5,3,low,1,"Island",40,0,1,0
+10,nn,scr,0.5,6,scr3_low_island_qf2.5_dP+00_dQ-2.5,3,low,1,"Island",50,0,1,0
+10,nn,scr,0.5,6,scr3_low_island_qf2.5_dP+05_dQ+0.0,3,low,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr3_low_island_qf2.5_dP+15_dQ+5.0,3,low,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr3_low_island_qf2.5_dP-05_dQ+0.0,3,low,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr3_low_island_qf2.5_dP-15_dQ-5.0,3,low,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr3_pv_event01,3,pv,0,"Irradiance 1000 to 600 W/m2",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_pv_event02,3,pv,0,"Irradiance 600 to 1000 W/m2",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_pv_event03,3,pv,0,"Wind 6 to 4.5 m/s",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_pv_event04,3,pv,0,"Load switched on (+6 kW)",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_pv_event05,3,pv,0,"Capacitor switched on (5 kvar)",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_pv_event06,3,pv,0,"Voltage sag to 0.7 pu, 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_pv_event07,3,pv,0,"Voltage sag to 0.5 pu, 0.2 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_pv_event08,3,pv,0,"Voltage swell to 1.15 pu, 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_pv_event09,3,pv,0,"Frequency ramp -2 Hz/s for 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_pv_event10,3,pv,0,"Frequency ramp +2 Hz/s for 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_pv_event11,3,pv,0,"Phase jump 20 deg",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_pv_island_qf1_dP+00_dQ+0.0,3,pv,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr3_pv_island_qf1_dP+00_dQ+2.5,3,pv,1,"Island",50,0,1,0
+10,nn,scr,0.5,6,scr3_pv_island_qf1_dP+00_dQ-2.5,3,pv,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr3_pv_island_qf1_dP+05_dQ+0.0,3,pv,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr3_pv_island_qf1_dP+15_dQ+5.0,3,pv,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr3_pv_island_qf1_dP-05_dQ+0.0,3,pv,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr3_pv_island_qf1_dP-15_dQ-5.0,3,pv,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr3_pv_island_qf2.5_dP+00_dQ+0.0,3,pv,1,"Island",65,0,1,0
+10,nn,scr,0.5,6,scr3_pv_island_qf2.5_dP+00_dQ+2.5,3,pv,1,"Island",45,0,1,0
+10,nn,scr,0.5,6,scr3_pv_island_qf2.5_dP+00_dQ-2.5,3,pv,1,"Island",45,0,1,0
+10,nn,scr,0.5,6,scr3_pv_island_qf2.5_dP+05_dQ+0.0,3,pv,1,"Island",40,0,1,0
+10,nn,scr,0.5,6,scr3_pv_island_qf2.5_dP+15_dQ+5.0,3,pv,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr3_pv_island_qf2.5_dP-05_dQ+0.0,3,pv,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr3_pv_island_qf2.5_dP-15_dQ-5.0,3,pv,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr3_wind_event01,3,wind,0,"Irradiance 300 to 180 W/m2",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_wind_event02,3,wind,0,"Irradiance 180 to 300 W/m2",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_wind_event03,3,wind,0,"Wind 12 to 9 m/s",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_wind_event04,3,wind,0,"Load switched on (+6 kW)",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_wind_event05,3,wind,0,"Capacitor switched on (5 kvar)",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_wind_event06,3,wind,0,"Voltage sag to 0.7 pu, 0.5 s",210,0,0,1
+10,nn,scr,0.5,6,scr3_wind_event07,3,wind,0,"Voltage sag to 0.5 pu, 0.2 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_wind_event08,3,wind,0,"Voltage swell to 1.15 pu, 0.5 s",210,0,0,1
+10,nn,scr,0.5,6,scr3_wind_event09,3,wind,0,"Frequency ramp -2 Hz/s for 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_wind_event10,3,wind,0,"Frequency ramp +2 Hz/s for 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_wind_event11,3,wind,0,"Phase jump 20 deg",Inf,0,0,0
+10,nn,scr,0.5,6,scr3_wind_island_qf1_dP+00_dQ+0.0,3,wind,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr3_wind_island_qf1_dP+00_dQ+2.5,3,wind,1,"Island",40,0,1,0
+10,nn,scr,0.5,6,scr3_wind_island_qf1_dP+00_dQ-2.5,3,wind,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr3_wind_island_qf1_dP+05_dQ+0.0,3,wind,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr3_wind_island_qf1_dP+15_dQ+5.0,3,wind,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr3_wind_island_qf1_dP-05_dQ+0.0,3,wind,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr3_wind_island_qf1_dP-15_dQ-5.0,3,wind,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr3_wind_island_qf2.5_dP+00_dQ+0.0,3,wind,1,"Island",120,0,1,0
+10,nn,scr,0.5,6,scr3_wind_island_qf2.5_dP+00_dQ+2.5,3,wind,1,"Island",40,0,1,0
+10,nn,scr,0.5,6,scr3_wind_island_qf2.5_dP+00_dQ-2.5,3,wind,1,"Island",45,0,1,0
+10,nn,scr,0.5,6,scr3_wind_island_qf2.5_dP+05_dQ+0.0,3,wind,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr3_wind_island_qf2.5_dP+15_dQ+5.0,3,wind,1,"Island",25,0,1,0
+10,nn,scr,0.5,6,scr3_wind_island_qf2.5_dP-05_dQ+0.0,3,wind,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr3_wind_island_qf2.5_dP-15_dQ-5.0,3,wind,1,"Island",-5,1,0,0
+10,nn,scr,0.5,6,scr5_full_event01,5,full,0,"Irradiance 1000 to 600 W/m2",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_full_event02,5,full,0,"Irradiance 600 to 1000 W/m2",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_full_event03,5,full,0,"Wind 12 to 9 m/s",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_full_event04,5,full,0,"Load switched on (+6 kW)",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_full_event05,5,full,0,"Capacitor switched on (5 kvar)",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_full_event06,5,full,0,"Voltage sag to 0.7 pu, 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_full_event07,5,full,0,"Voltage sag to 0.5 pu, 0.2 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_full_event08,5,full,0,"Voltage swell to 1.15 pu, 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_full_event09,5,full,0,"Frequency ramp -2 Hz/s for 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_full_event10,5,full,0,"Frequency ramp +2 Hz/s for 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_full_event11,5,full,0,"Phase jump 20 deg",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_full_island_qf1_dP+00_dQ+0.0,5,full,1,"Island",90,0,1,0
+10,nn,scr,0.5,6,scr5_full_island_qf1_dP+00_dQ+2.5,5,full,1,"Island",40,0,1,0
+10,nn,scr,0.5,6,scr5_full_island_qf1_dP+00_dQ-2.5,5,full,1,"Island",40,0,1,0
+10,nn,scr,0.5,6,scr5_full_island_qf1_dP+05_dQ+0.0,5,full,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr5_full_island_qf1_dP+15_dQ+5.0,5,full,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr5_full_island_qf1_dP-05_dQ+0.0,5,full,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr5_full_island_qf1_dP-15_dQ-5.0,5,full,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr5_full_island_qf2.5_dP+00_dQ+0.0,5,full,1,"Island",95,0,1,0
+10,nn,scr,0.5,6,scr5_full_island_qf2.5_dP+00_dQ+2.5,5,full,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr5_full_island_qf2.5_dP+00_dQ-2.5,5,full,1,"Island",55,0,1,0
+10,nn,scr,0.5,6,scr5_full_island_qf2.5_dP+05_dQ+0.0,5,full,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr5_full_island_qf2.5_dP+15_dQ+5.0,5,full,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr5_full_island_qf2.5_dP-05_dQ+0.0,5,full,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr5_full_island_qf2.5_dP-15_dQ-5.0,5,full,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr5_low_event01,5,low,0,"Irradiance 500 to 300 W/m2",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_low_event02,5,low,0,"Irradiance 300 to 500 W/m2",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_low_event03,5,low,0,"Wind 8 to 6 m/s",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_low_event04,5,low,0,"Load switched on (+6 kW)",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_low_event05,5,low,0,"Capacitor switched on (5 kvar)",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_low_event06,5,low,0,"Voltage sag to 0.7 pu, 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_low_event07,5,low,0,"Voltage sag to 0.5 pu, 0.2 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_low_event08,5,low,0,"Voltage swell to 1.15 pu, 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_low_event09,5,low,0,"Frequency ramp -2 Hz/s for 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_low_event10,5,low,0,"Frequency ramp +2 Hz/s for 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_low_event11,5,low,0,"Phase jump 20 deg",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_low_island_qf1_dP+00_dQ+0.0,5,low,1,"Island",50,0,1,0
+10,nn,scr,0.5,6,scr5_low_island_qf1_dP+00_dQ+2.5,5,low,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr5_low_island_qf1_dP+00_dQ-2.5,5,low,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr5_low_island_qf1_dP+05_dQ+0.0,5,low,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr5_low_island_qf1_dP+15_dQ+5.0,5,low,1,"Island",45,0,1,0
+10,nn,scr,0.5,6,scr5_low_island_qf1_dP-05_dQ+0.0,5,low,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr5_low_island_qf1_dP-15_dQ-5.0,5,low,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr5_low_island_qf2.5_dP+00_dQ+0.0,5,low,1,"Island",60,0,1,0
+10,nn,scr,0.5,6,scr5_low_island_qf2.5_dP+00_dQ+2.5,5,low,1,"Island",45,0,1,0
+10,nn,scr,0.5,6,scr5_low_island_qf2.5_dP+00_dQ-2.5,5,low,1,"Island",50,0,1,0
+10,nn,scr,0.5,6,scr5_low_island_qf2.5_dP+05_dQ+0.0,5,low,1,"Island",40,0,1,0
+10,nn,scr,0.5,6,scr5_low_island_qf2.5_dP+15_dQ+5.0,5,low,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr5_low_island_qf2.5_dP-05_dQ+0.0,5,low,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr5_low_island_qf2.5_dP-15_dQ-5.0,5,low,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr5_pv_event01,5,pv,0,"Irradiance 1000 to 600 W/m2",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_pv_event02,5,pv,0,"Irradiance 600 to 1000 W/m2",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_pv_event03,5,pv,0,"Wind 6 to 4.5 m/s",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_pv_event04,5,pv,0,"Load switched on (+6 kW)",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_pv_event05,5,pv,0,"Capacitor switched on (5 kvar)",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_pv_event06,5,pv,0,"Voltage sag to 0.7 pu, 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_pv_event07,5,pv,0,"Voltage sag to 0.5 pu, 0.2 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_pv_event08,5,pv,0,"Voltage swell to 1.15 pu, 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_pv_event09,5,pv,0,"Frequency ramp -2 Hz/s for 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_pv_event10,5,pv,0,"Frequency ramp +2 Hz/s for 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_pv_event11,5,pv,0,"Phase jump 20 deg",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_pv_island_qf1_dP+00_dQ+0.0,5,pv,1,"Island",50,0,1,0
+10,nn,scr,0.5,6,scr5_pv_island_qf1_dP+00_dQ+2.5,5,pv,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr5_pv_island_qf1_dP+00_dQ-2.5,5,pv,1,"Island",40,0,1,0
+10,nn,scr,0.5,6,scr5_pv_island_qf1_dP+05_dQ+0.0,5,pv,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr5_pv_island_qf1_dP+15_dQ+5.0,5,pv,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr5_pv_island_qf1_dP-05_dQ+0.0,5,pv,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr5_pv_island_qf1_dP-15_dQ-5.0,5,pv,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr5_pv_island_qf2.5_dP+00_dQ+0.0,5,pv,1,"Island",40,0,1,0
+10,nn,scr,0.5,6,scr5_pv_island_qf2.5_dP+00_dQ+2.5,5,pv,1,"Island",45,0,1,0
+10,nn,scr,0.5,6,scr5_pv_island_qf2.5_dP+00_dQ-2.5,5,pv,1,"Island",45,0,1,0
+10,nn,scr,0.5,6,scr5_pv_island_qf2.5_dP+05_dQ+0.0,5,pv,1,"Island",40,0,1,0
+10,nn,scr,0.5,6,scr5_pv_island_qf2.5_dP+15_dQ+5.0,5,pv,1,"Island",45,0,1,0
+10,nn,scr,0.5,6,scr5_pv_island_qf2.5_dP-05_dQ+0.0,5,pv,1,"Island",40,0,1,0
+10,nn,scr,0.5,6,scr5_pv_island_qf2.5_dP-15_dQ-5.0,5,pv,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr5_wind_event01,5,wind,0,"Irradiance 300 to 180 W/m2",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_wind_event02,5,wind,0,"Irradiance 180 to 300 W/m2",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_wind_event03,5,wind,0,"Wind 12 to 9 m/s",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_wind_event04,5,wind,0,"Load switched on (+6 kW)",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_wind_event05,5,wind,0,"Capacitor switched on (5 kvar)",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_wind_event06,5,wind,0,"Voltage sag to 0.7 pu, 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_wind_event07,5,wind,0,"Voltage sag to 0.5 pu, 0.2 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_wind_event08,5,wind,0,"Voltage swell to 1.15 pu, 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_wind_event09,5,wind,0,"Frequency ramp -2 Hz/s for 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_wind_event10,5,wind,0,"Frequency ramp +2 Hz/s for 0.5 s",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_wind_event11,5,wind,0,"Phase jump 20 deg",Inf,0,0,0
+10,nn,scr,0.5,6,scr5_wind_island_qf1_dP+00_dQ+0.0,5,wind,1,"Island",150,0,1,0
+10,nn,scr,0.5,6,scr5_wind_island_qf1_dP+00_dQ+2.5,5,wind,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr5_wind_island_qf1_dP+00_dQ-2.5,5,wind,1,"Island",40,0,1,0
+10,nn,scr,0.5,6,scr5_wind_island_qf1_dP+05_dQ+0.0,5,wind,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr5_wind_island_qf1_dP+15_dQ+5.0,5,wind,1,"Island",45,0,1,0
+10,nn,scr,0.5,6,scr5_wind_island_qf1_dP-05_dQ+0.0,5,wind,1,"Island",30,0,1,0
+10,nn,scr,0.5,6,scr5_wind_island_qf1_dP-15_dQ-5.0,5,wind,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr5_wind_island_qf2.5_dP+00_dQ+0.0,5,wind,1,"Island",90,0,1,0
+10,nn,scr,0.5,6,scr5_wind_island_qf2.5_dP+00_dQ+2.5,5,wind,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr5_wind_island_qf2.5_dP+00_dQ-2.5,5,wind,1,"Island",55,0,1,0
+10,nn,scr,0.5,6,scr5_wind_island_qf2.5_dP+05_dQ+0.0,5,wind,1,"Island",40,0,1,0
+10,nn,scr,0.5,6,scr5_wind_island_qf2.5_dP+15_dQ+5.0,5,wind,1,"Island",35,0,1,0
+10,nn,scr,0.5,6,scr5_wind_island_qf2.5_dP-05_dQ+0.0,5,wind,1,"Island",40,0,1,0
+10,nn,scr,0.5,6,scr5_wind_island_qf2.5_dP-15_dQ-5.0,5,wind,1,"Island",35,0,1,0
