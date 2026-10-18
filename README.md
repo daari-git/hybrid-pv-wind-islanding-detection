@@ -2,7 +2,7 @@
 
 Ride-through-compatible islanding detection for a grid-connected hybrid solar PV–wind system, using a machine-learning classifier on top of an H-infinity current controller. MATLAB/Simulink.
 
-> **Status:** work in progress. Phases 1 to 5 are done (results below); phases 6 to 8 are planned and have no results yet.
+> **Status:** work in progress. Phases 1 to 6 are done (results below); phases 7 and 8 are planned and have no results yet.
 
 ## Problem
 
@@ -277,11 +277,63 @@ The passive relays on the dataset's own windows (`dataset_baselines.m`; within 0
 
 The fast relay misses 38 islands, all of them matched or nearly matched (ΔP ±5% with ΔQ = 0, and at Q_f 2.5 also ΔQ ±2.5%), and still trips on 154 of the 176 ordinary events: every load and capacitor switching, sag, swell, frequency ramp and phase jump, and most irradiance steps. Within 0.35 s the IEEE settings act on nothing. The classifier of Phase 6 has to work exactly where both relay families fail: the matched and small-mismatch islands, and the disturbances a ride-through relay must ignore.
 
+### Phase 6: a passive classifier tested on unseen operating conditions
+
+**How the detector works.** Every 5 ms it takes the latest window of measurements (10 ms in the chosen design) and compares it with the 40 ms before (`window_features.m`). Everything it uses is measured at the inverter's own terminals: PCC voltage, its own current, its PLL frequency, DC-link voltage and its d/q currents. There are 22 features, all changes from the baseline, so the operating point itself is never a feature:
+
+- voltage magnitude and frequency changes, and rate of change of frequency;
+- phase jump and positive- and negative-sequence voltage and current, from a least-squares fit of the 10 kHz waveforms;
+- active and reactive power changes;
+- voltage and current distortion, and a distortion-impedance ratio;
+- DC-link voltage and d/q current deviations.
+
+The classifier labels each window, and the detector trips once 6 windows in a row (30 ms) are labelled island.
+
+**How it is tested.** Cases are never split between training and testing; every test case comes from an operating condition the model never saw. One family of folds holds out each grid strength in turn (SCR 20, 10, 5, 3), the other each PV/wind mix. Each test case is replayed window by window, as a relay in service would see it, and scored as a whole case (`replay_detector.m`):
+
+- an island is detected or missed, with the time from the breaker opening to the trip;
+- any trip after an ordinary event is a false trip;
+- any trip before the event is a false alarm in steady operation.
+
+Four models were trained at window lengths of 10, 20 and 40 ms: a decision tree, a random forest (bagged trees), an SVM with a Gaussian kernel, and a small neural network (`train_classifiers.m`). The setting was chosen by a rule fixed in advance and applied to the mix folds only: no steady-state alarm, at most 2% false trips, then the most islands detected. The numbers below come from the grid-strength folds, which played no part in the choice.
+
+![Trade-off between islands detected and false trips](docs/ml_tradeoff.png)
+
+Chosen detector: a neural network (two hidden layers, 20 and 10 neurons) on 10 ms windows, threshold 0.5, trip after 6 windows in a row. On the same 400 cases (`results/detector_cases.csv`):
+
+| Detector | Islands detected (224) | Matched islands (32) | Ordinary events tripped (176) | Steady-state alarms (400) | Median detection time |
+|---|---|---|---|---|---|
+| **Neural network (unseen grid strength)** | **223** | **32** | **3** | **1** | **35 ms** (95% within 82 ms) |
+| Fast relay | 186 | 16 | 154 | 0 | 14 ms |
+| IEEE 1547 relay | 0 within 0.35 s | 0 | 0 | 0 | none |
+| Active frequency drift (Phases 4, 5) | all tested, except with an opposing second inverter | not detected with an opposing inverter | false trip on a weak-grid sag | 0 | 160 to 488 ms |
+
+| Grid strength held out | Islands detected | False trips | Steady-state alarms |
+|---|---|---|---|
+| SCR 20 | 56 of 56 | 0 of 44 | 0 |
+| SCR 10 | 56 of 56 | 0 of 44 | 0 |
+| SCR 5 | 56 of 56 | 0 of 44 | 0 |
+| SCR 3 | 55 of 56 | 3 of 44 (two 1.15 pu swells, one 0.7 pu sag) | 1 |
+
+![When each kind of island is detected, and the features the detector relies on](docs/ml_detection.png)
+
+Reading the results:
+
+- **On grid strengths inside the training range the detector made no error**: every island detected, matched ones included, with no false trip and no steady-state alarm. All four errors are on SCR 3, the weakest grid. When SCR 3 is held out the model has never seen a grid that weak, so this is extrapolation; a weak grid in the training data is the obvious remedy and will be checked.
+- **It detects islands about five times faster than active frequency drift** (median 35 ms against 160 to 488 ms) without injecting anything, so it cannot be cancelled by a neighbouring inverter or destabilise a weak grid.
+- **Matched islands are the slow ones** (median about 60 ms, all within 220 ms). In the first 40 ms they change almost nothing: frequency by 0.04 to 0.1 Hz and voltage by 0.007 pu. The detector picks up the small voltage wander that follows when the stiff grid is gone, which is why the largest voltage change is by far its most important feature.
+- **Model choice.** The forest and the tree detect every island too but false-trip on 6 to 10% of events. The SVM is a close second (98.2% detected, 2.3% false trips, no steady alarms, median 45 ms). The network file is 9.6 kB (`ml/islanding_classifier.mat`), small enough to run inside the Simulink model.
+- **Two things that did not work**, recorded so they are not tried again:
+  - A distortion-impedance feature, meant to see the PCC impedance rise when the grid is lost, barely helps. At low harmonics the parallel RLC load has a lower impedance than the grid, and at the switching frequency the capacitors dominate either way.
+  - An estimate of voltage sensitivity to the inverter's own power changes was flat across grid strengths, so it was removed.
+- **What Phase 7 must test.** These cases are noise-free. The matched-island detections rest on small voltage changes that measurement noise could hide, and the detector has not yet tripped the breaker inside the simulation.
+
 ### Known limitations
 
 - PI and PLL gains are a first pass, not optimised.
 - PV current readings are unreliable when the PV voltage is far above its operating point, including after a trip.
 - Generator stator inductance (3 mH) and rotor inertia (10 kg m²) were changed from the original so the machine can deliver 10 kW through a diode rectifier.
+- The classifier has been tested on noise-free simulated measurements only; noise and closed-loop tripping are Phase 7.
 - The second inverter is an averaged current source with ideal current control, not a switching model; it represents a neighbouring unit's power and reactive drift, not its control dynamics.
 
 ## Workflow
@@ -342,11 +394,11 @@ flowchart TD
 - Run sequentially by `run_phase5.m` (one simulation process fits in memory, so `parsim` was not used); finished cases are skipped on restart.
 - Output: 400 labelled cases in `data/raw/`, `results/dataset_index.csv`, `results/afd_stress.csv`.
 
-### Phase 6 — Features and classifier
-- Extract features over a short sliding window: voltage magnitude, frequency, rate of change of frequency, phase jump, rate of change of power, current and voltage distortion, negative-sequence voltage.
-- Split by operating condition, not by random sample, so the test set contains unseen conditions.
-- Train a random forest and an SVM first, then a small neural network; keep the simplest model that meets the targets.
-- Output: trained model, confusion matrix, feature importance.
+### Phase 6 — Features and classifier (done)
+- 22 features over a sliding window (10, 20 or 40 ms, every 5 ms) against the 40 ms before it: voltage magnitude, frequency and rate of change of frequency, phase jump, sequence components, power changes, distortion, DC-link and d/q current deviations.
+- Split by operating condition (grid strength or PV/wind mix held out), never by window or case.
+- Decision tree, random forest, SVM and a small neural network; the setting chosen by a rule fixed in advance on one family of folds and reported on the other.
+- Output: `ml/islanding_classifier.mat`, `results/classifier_summary.csv`, `results/detector_cases.csv`, `results/feature_importance.csv`.
 
 ### Phase 7 — Closed-loop validation
 - Put the trained classifier back into Simulink so it trips the breaker itself.
@@ -407,10 +459,17 @@ scripts/make_dataset.m         The 400-case labelled dataset in data/raw/
 scripts/dataset_baselines.m    The passive relays on the dataset's windows
 scripts/reduce_run.m           Keeps a run's 1 ms signals for detector replay
 scripts/plot_phase5.m          Draws docs/afd_stress.png and docs/dataset_overview.png
+scripts/window_features.m      The 22 features of one measurement window
+scripts/extract_features.m     Sliding-window features for every case (data/features/)
+scripts/train_classifiers.m    Four classifiers, tested on held-out grid strengths and PV/wind mixes
+scripts/replay_detector.m      Replays classifier scores case by case as a relay, for every threshold and debounce
+scripts/final_classifier.m     Feature importance and the final trained detector
+scripts/plot_phase6.m          Draws docs/ml_tradeoff.png and docs/ml_detection.png
 docs/                          Model diagrams and result figures
 results/                       Result tables (.csv); simulation runs (.mat) are not tracked
 data/raw/                      Phase 5 dataset, generated, not tracked
-ml/, paper/                    Planned
+ml/islanding_classifier.mat    The trained detector (Phase 6) with its window, threshold and debounce
+paper/                         Planned
 report/, archive/              Kept locally, not tracked
 ```
 

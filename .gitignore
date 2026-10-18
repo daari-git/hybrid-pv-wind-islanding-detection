@@ -21,3 +21,4 @@ results/*.mat
 results/*.txt
 results/ndz/
 results/stress/
+results/classifier_cases.csv
