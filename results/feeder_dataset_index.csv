@@ -1,0 +1,125 @@
+case,cond,scr,mix,G,v,label,event,Qf,dP,dQ,tEvent,Pinv,Qinv,Pload,kind,local,pcc,load
+ft1_a5_low_dt_island_natural,ft1_a5_low,23.5744088979912,low,500,8,1,"Island",0,0,0,0.45095196,6787,857,200,dt,none,6,0.2
+ft1_a5_low_dt_island_qf1_dP+00_dQ+0.0,ft1_a5_low,23.5744088979912,low,500,8,1,"Island",1,0,0,0.45678788,6787,857,3190.90593888641,dt,matched,6,0.2
+ft1_a5_low_dt_island_qf1_dP+00_dQ+2.5,ft1_a5_low,23.5744088979912,low,500,8,1,"Island",1,0,0.025,0.46150924,6787,857,3190.90593888641,dt,matched,6,0.2
+ft1_a5_low_dt_island_qf1_dP-05_dQ+0.0,ft1_a5_low,23.5744088979912,low,500,8,1,"Island",1,-0.05,0,0.46914856,6787,857,2539.73389750753,dt,matched,6,0.2
+ft1_a5_low_dt_island_qf2.5_dP+00_dQ+0.0,ft1_a5_low,23.5744088979912,low,500,8,1,"Island",2.5,0,0,0.45386992,6787,857,3190.90593888641,dt,matched,6,0.2
+ft1_a5_low_dt_island_qf2.5_dP+00_dQ+2.5,ft1_a5_low,23.5744088979912,low,500,8,1,"Island",2.5,0,0.025,0.45859128,6787,857,3190.90593888641,dt,matched,6,0.2
+ft1_a5_low_dt_island_qf2.5_dP-05_dQ+0.0,ft1_a5_low,23.5744088979912,low,500,8,1,"Island",2.5,-0.05,0,0.4662306,6787,857,2539.73389750753,dt,matched,6,0.2
+ft1_a5_low_event01,ft1_a5_low,23.5744088979912,low,500,8,0,"Irradiance 500 to 300 W/m2",NaN,0,0,0.46331264,6787,857,2000,none,household,6,0.2
+ft1_a5_low_event02,ft1_a5_low,23.5744088979912,low,500,8,0,"Irradiance 300 to 500 W/m2",NaN,0,0,0.45567332,6787,857,200,none,none,6,0.2
+ft1_a5_low_event03,ft1_a5_low,23.5744088979912,low,500,8,0,"Wind 8 to 6 m/s",NaN,0,0,0.468034,6787,857,2000,none,household,6,0.2
+ft1_a5_low_event04,ft1_a5_low,23.5744088979912,low,500,8,0,"Load switched on (+6 kW)",NaN,0,0,0.46039468,6787,857,200,none,none,6,0.2
+ft1_a5_low_event05,ft1_a5_low,23.5744088979912,low,500,8,0,"Capacitor switched on (5 kvar)",NaN,0,0,0.45275536,6787,857,2000,none,household,6,0.2
+ft1_a5_low_event06,ft1_a5_low,23.5744088979912,low,500,8,0,"Voltage sag to 0.7 pu, 0.5 s",NaN,0,0,0.46511604,6787,857,200,none,none,6,0.2
+ft1_a5_low_event07,ft1_a5_low,23.5744088979912,low,500,8,0,"Voltage sag to 0.5 pu, 0.2 s",NaN,0,0,0.45747672,6787,857,2000,none,household,6,0.2
+ft1_a5_low_event08,ft1_a5_low,23.5744088979912,low,500,8,0,"Voltage swell to 1.15 pu, 0.5 s",NaN,0,0,0.4698374,6787,857,200,none,none,6,0.2
+ft1_a5_low_event09,ft1_a5_low,23.5744088979912,low,500,8,0,"Frequency ramp -2 Hz/s for 0.5 s",NaN,0,0,0.46219808,6787,857,2000,none,household,6,0.2
+ft1_a5_low_event10,ft1_a5_low,23.5744088979912,low,500,8,0,"Frequency ramp +2 Hz/s for 0.5 s",NaN,0,0,0.45455876,6787,857,200,none,none,6,0.2
+ft1_a5_low_event11,ft1_a5_low,23.5744088979912,low,500,8,0,"Phase jump 20 deg",NaN,0,0,0.46691944,6787,857,2000,none,household,6,0.2
+ft1_a5_low_event12,ft1_a5_low,23.5744088979912,low,500,8,0,"Feeder load at B3 switched on (+5 kW)",NaN,0,0,0.45928012,6787,857,2000,none,household,6,0.2
+ft1_a5_low_event13,ft1_a5_low,23.5744088979912,low,500,8,0,"Feeder load at B3 switched on (+15 kW)",NaN,0,0,0.4516408,6787,857,2000,none,household,6,0.2
+ft1_a5_low_event14,ft1_a5_low,23.5744088979912,low,500,8,0,"Feeder load at B3 switched off (-10 kW)",NaN,0,0,0.46400148,6787,857,2000,none,household,6,0.2
+ft1_a5_low_steady_household,ft1_a5_low,23.5744088979912,low,500,8,0,"none",NaN,0,0,0.45636216,6787,857,2000,none,household,6,0.2
+ft1_a5_low_steady_none,ft1_a5_low,23.5744088979912,low,500,8,0,"none",NaN,0,0,0.46872284,6787,857,200,none,none,6,0.2
+ft1_a5_low_svc_island_qf1_dP+00_dQ+0.0,ft1_a5_low,23.5744088979912,low,500,8,1,"Island",1,0,0,0.45790244,6787,857,6155.58164946611,svc,matched,6,0.2
+ft1_a5_low_svc_island_qf1_dP+00_dQ-2.5,ft1_a5_low,23.5744088979912,low,500,8,1,"Island",1,0,-0.025,0.4626238,6787,857,6155.58164946611,svc,matched,6,0.2
+ft1_a5_low_svc_island_qf1_dP+05_dQ+0.0,ft1_a5_low,23.5744088979912,low,500,8,1,"Island",1,0.05,0,0.45026312,6787,857,6463.36073193942,svc,matched,6,0.2
+ft1_a5_low_svc_island_qf1_dP-15_dQ-5.0,ft1_a5_low,23.5744088979912,low,500,8,1,"Island",1,-0.15,-0.05,0.45498448,6787,857,5232.2444020462,svc,matched,6,0.2
+ft1_a5_low_svc_island_qf2.5_dP+00_dQ+0.0,ft1_a5_low,23.5744088979912,low,500,8,1,"Island",2.5,0,0,0.46734516,6787,857,6155.58164946611,svc,matched,6,0.2
+ft1_a5_low_svc_island_qf2.5_dP+00_dQ-2.5,ft1_a5_low,23.5744088979912,low,500,8,1,"Island",2.5,0,-0.025,0.45206652,6787,857,6155.58164946611,svc,matched,6,0.2
+ft1_a5_low_svc_island_qf2.5_dP+05_dQ+0.0,ft1_a5_low,23.5744088979912,low,500,8,1,"Island",2.5,0.05,0,0.45970584,6787,857,6463.36073193942,svc,matched,6,0.2
+ft1_a5_low_svc_island_qf2.5_dP-15_dQ-5.0,ft1_a5_low,23.5744088979912,low,500,8,1,"Island",2.5,-0.15,-0.05,0.4644272,6787,857,5232.2444020462,svc,matched,6,0.2
+ft2_a4_pv_dt_island_natural,ft2_a4_pv,29.7907734486236,pv,1000,6,1,"Island",0,0,0,0.46649372,10572,783,200,dt,none,5,0.4
+ft2_a4_pv_dt_island_qf1_dP+00_dQ+0.0,ft2_a4_pv,29.7907734486236,pv,1000,6,1,"Island",1,0,0,0.45232964,10572,783,5701.10924460054,dt,matched,5,0.4
+ft2_a4_pv_dt_island_qf1_dP+00_dQ+2.5,ft2_a4_pv,29.7907734486236,pv,1000,6,1,"Island",1,0,0.025,0.457051,10572,783,5701.10924460054,dt,matched,5,0.4
+ft2_a4_pv_dt_island_qf1_dP-05_dQ+0.0,ft2_a4_pv,29.7907734486236,pv,1000,6,1,"Island",1,-0.05,0,0.46469032,10572,783,4322.30364669359,dt,matched,5,0.4
+ft2_a4_pv_dt_island_qf2.5_dP+00_dQ+0.0,ft2_a4_pv,29.7907734486236,pv,1000,6,1,"Island",2.5,0,0,0.46941168,10572,783,5701.10924460054,dt,matched,5,0.4
+ft2_a4_pv_dt_island_qf2.5_dP+00_dQ+2.5,ft2_a4_pv,29.7907734486236,pv,1000,6,1,"Island",2.5,0,0.025,0.45413304,10572,783,5701.10924460054,dt,matched,5,0.4
+ft2_a4_pv_dt_island_qf2.5_dP-05_dQ+0.0,ft2_a4_pv,29.7907734486236,pv,1000,6,1,"Island",2.5,-0.05,0,0.46177236,10572,783,4322.30364669359,dt,matched,5,0.4
+ft2_a4_pv_event01,ft2_a4_pv,29.7907734486236,pv,1000,6,0,"Irradiance 1000 to 600 W/m2",NaN,0,0,0.4588544,10572,783,2000,none,household,5,0.4
+ft2_a4_pv_event02,ft2_a4_pv,29.7907734486236,pv,1000,6,0,"Irradiance 600 to 1000 W/m2",NaN,0,0,0.45121508,10572,783,200,none,none,5,0.4
+ft2_a4_pv_event03,ft2_a4_pv,29.7907734486236,pv,1000,6,0,"Wind 6 to 4.5 m/s",NaN,0,0,0.46357576,10572,783,2000,none,household,5,0.4
+ft2_a4_pv_event04,ft2_a4_pv,29.7907734486236,pv,1000,6,0,"Load switched on (+6 kW)",NaN,0,0,0.45593644,10572,783,200,none,none,5,0.4
+ft2_a4_pv_event05,ft2_a4_pv,29.7907734486236,pv,1000,6,0,"Capacitor switched on (5 kvar)",NaN,0,0,0.46829712,10572,783,2000,none,household,5,0.4
+ft2_a4_pv_event06,ft2_a4_pv,29.7907734486236,pv,1000,6,0,"Voltage sag to 0.7 pu, 0.5 s",NaN,0,0,0.4606578,10572,783,200,none,none,5,0.4
+ft2_a4_pv_event07,ft2_a4_pv,29.7907734486236,pv,1000,6,0,"Voltage sag to 0.5 pu, 0.2 s",NaN,0,0,0.45301848,10572,783,2000,none,household,5,0.4
+ft2_a4_pv_event08,ft2_a4_pv,29.7907734486236,pv,1000,6,0,"Voltage swell to 1.15 pu, 0.5 s",NaN,0,0,0.46537916,10572,783,200,none,none,5,0.4
+ft2_a4_pv_event09,ft2_a4_pv,29.7907734486236,pv,1000,6,0,"Frequency ramp -2 Hz/s for 0.5 s",NaN,0,0,0.45773984,10572,783,2000,none,household,5,0.4
+ft2_a4_pv_event10,ft2_a4_pv,29.7907734486236,pv,1000,6,0,"Frequency ramp +2 Hz/s for 0.5 s",NaN,0,0,0.45010052,10572,783,200,none,none,5,0.4
+ft2_a4_pv_event11,ft2_a4_pv,29.7907734486236,pv,1000,6,0,"Phase jump 20 deg",NaN,0,0,0.4624612,10572,783,2000,none,household,5,0.4
+ft2_a4_pv_event12,ft2_a4_pv,29.7907734486236,pv,1000,6,0,"Feeder load at B3 switched on (+5 kW)",NaN,0,0,0.45482188,10572,783,2000,none,household,5,0.4
+ft2_a4_pv_event13,ft2_a4_pv,29.7907734486236,pv,1000,6,0,"Feeder load at B3 switched on (+15 kW)",NaN,0,0,0.46718256,10572,783,2000,none,household,5,0.4
+ft2_a4_pv_event14,ft2_a4_pv,29.7907734486236,pv,1000,6,0,"Feeder load at B3 switched off (-10 kW)",NaN,0,0,0.45954324,10572,783,2000,none,household,5,0.4
+ft2_a4_pv_steady_household,ft2_a4_pv,29.7907734486236,pv,1000,6,0,"none",NaN,0,0,0.45190392,10572,783,2000,none,household,5,0.4
+ft2_a4_pv_steady_none,ft2_a4_pv,29.7907734486236,pv,1000,6,0,"none",NaN,0,0,0.4642646,10572,783,200,none,none,5,0.4
+ft2_a4_pv_svc_island_qf1_dP+00_dQ+0.0,ft2_a4_pv,29.7907734486236,pv,1000,6,1,"Island",1,0,0,0.4534442,10572,783,10653.6058954275,svc,matched,5,0.4
+ft2_a4_pv_svc_island_qf1_dP+00_dQ-2.5,ft2_a4_pv,29.7907734486236,pv,1000,6,1,"Island",1,0,-0.025,0.45816556,10572,783,10653.6058954275,svc,matched,5,0.4
+ft2_a4_pv_svc_island_qf1_dP+05_dQ+0.0,ft2_a4_pv,29.7907734486236,pv,1000,6,1,"Island",1,0.05,0,0.46580488,10572,783,11186.2861901988,svc,matched,5,0.4
+ft2_a4_pv_svc_island_qf1_dP-15_dQ-5.0,ft2_a4_pv,29.7907734486236,pv,1000,6,1,"Island",1,-0.15,-0.05,0.45052624,10572,783,9055.56501111334,svc,matched,5,0.4
+ft2_a4_pv_svc_island_qf2.5_dP+00_dQ+0.0,ft2_a4_pv,29.7907734486236,pv,1000,6,1,"Island",2.5,0,0,0.46288692,10572,783,10653.6058954275,svc,matched,5,0.4
+ft2_a4_pv_svc_island_qf2.5_dP+00_dQ-2.5,ft2_a4_pv,29.7907734486236,pv,1000,6,1,"Island",2.5,0,-0.025,0.46760828,10572,783,10653.6058954275,svc,matched,5,0.4
+ft2_a4_pv_svc_island_qf2.5_dP+05_dQ+0.0,ft2_a4_pv,29.7907734486236,pv,1000,6,1,"Island",2.5,0.05,0,0.4552476,10572,783,11186.2861901988,svc,matched,5,0.4
+ft2_a4_pv_svc_island_qf2.5_dP-15_dQ-5.0,ft2_a4_pv,29.7907734486236,pv,1000,6,1,"Island",2.5,-0.15,-0.05,0.45996896,10572,783,9055.56501111334,svc,matched,5,0.4
+ft3_a2_full_dt_island_natural,ft3_a2_full,48.0069224337324,full,1000,12,1,"Island",0,0,0,0.46203548,18589,838,200,dt,none,3,0.3
+ft3_a2_full_dt_island_qf1_dP+00_dQ+0.0,ft3_a2_full,48.0069224337324,full,1000,12,1,"Island",1,0,0,0.4678714,18589,838,5383.7915636933,dt,matched,3,0.3
+ft3_a2_full_dt_island_qf1_dP+00_dQ+2.5,ft3_a2_full,48.0069224337324,full,1000,12,1,"Island",1,0,0.025,0.45259276,18589,838,5383.7915636933,dt,matched,3,0.3
+ft3_a2_full_dt_island_qf1_dP-05_dQ+0.0,ft3_a2_full,48.0069224337324,full,1000,12,1,"Island",1,-0.05,0,0.46023208,18589,838,4348.2460286774,dt,matched,3,0.3
+ft3_a2_full_dt_island_qf2.5_dP+00_dQ+0.0,ft3_a2_full,48.0069224337324,full,1000,12,1,"Island",2.5,0,0,0.46495344,18589,838,5383.7915636933,dt,matched,3,0.3
+ft3_a2_full_dt_island_qf2.5_dP+00_dQ+2.5,ft3_a2_full,48.0069224337324,full,1000,12,1,"Island",2.5,0,0.025,0.4696748,18589,838,5383.7915636933,dt,matched,3,0.3
+ft3_a2_full_dt_island_qf2.5_dP-05_dQ+0.0,ft3_a2_full,48.0069224337324,full,1000,12,1,"Island",2.5,-0.05,0,0.45731412,18589,838,4348.2460286774,dt,matched,3,0.3
+ft3_a2_full_event01,ft3_a2_full,48.0069224337324,full,1000,12,0,"Irradiance 1000 to 600 W/m2",NaN,0,0,0.45439616,18589,838,2000,none,household,3,0.3
+ft3_a2_full_event02,ft3_a2_full,48.0069224337324,full,1000,12,0,"Irradiance 600 to 1000 W/m2",NaN,0,0,0.46675684,18589,838,200,none,none,3,0.3
+ft3_a2_full_event03,ft3_a2_full,48.0069224337324,full,1000,12,0,"Wind 12 to 9 m/s",NaN,0,0,0.45911752,18589,838,2000,none,household,3,0.3
+ft3_a2_full_event04,ft3_a2_full,48.0069224337324,full,1000,12,0,"Load switched on (+6 kW)",NaN,0,0,0.4514782,18589,838,200,none,none,3,0.3
+ft3_a2_full_event05,ft3_a2_full,48.0069224337324,full,1000,12,0,"Capacitor switched on (5 kvar)",NaN,0,0,0.46383888,18589,838,2000,none,household,3,0.3
+ft3_a2_full_event06,ft3_a2_full,48.0069224337324,full,1000,12,0,"Voltage sag to 0.7 pu, 0.5 s",NaN,0,0,0.45619956,18589,838,200,none,none,3,0.3
+ft3_a2_full_event07,ft3_a2_full,48.0069224337324,full,1000,12,0,"Voltage sag to 0.5 pu, 0.2 s",NaN,0,0,0.46856024,18589,838,2000,none,household,3,0.3
+ft3_a2_full_event08,ft3_a2_full,48.0069224337324,full,1000,12,0,"Voltage swell to 1.15 pu, 0.5 s",NaN,0,0,0.46092092,18589,838,200,none,none,3,0.3
+ft3_a2_full_event09,ft3_a2_full,48.0069224337324,full,1000,12,0,"Frequency ramp -2 Hz/s for 0.5 s",NaN,0,0,0.4532816,18589,838,2000,none,household,3,0.3
+ft3_a2_full_event10,ft3_a2_full,48.0069224337324,full,1000,12,0,"Frequency ramp +2 Hz/s for 0.5 s",NaN,0,0,0.46564228,18589,838,200,none,none,3,0.3
+ft3_a2_full_event11,ft3_a2_full,48.0069224337324,full,1000,12,0,"Phase jump 20 deg",NaN,0,0,0.45800296,18589,838,2000,none,household,3,0.3
+ft3_a2_full_event12,ft3_a2_full,48.0069224337324,full,1000,12,0,"Feeder load at B3 switched on (+5 kW)",NaN,0,0,0.45036364,18589,838,2000,none,household,3,0.3
+ft3_a2_full_event13,ft3_a2_full,48.0069224337324,full,1000,12,0,"Feeder load at B3 switched on (+15 kW)",NaN,0,0,0.46272432,18589,838,2000,none,household,3,0.3
+ft3_a2_full_event14,ft3_a2_full,48.0069224337324,full,1000,12,0,"Feeder load at B3 switched off (-10 kW)",NaN,0,0,0.455085,18589,838,2000,none,household,3,0.3
+ft3_a2_full_steady_household,ft3_a2_full,48.0069224337324,full,1000,12,0,"none",NaN,0,0,0.46744568,18589,838,2000,none,household,3,0.3
+ft3_a2_full_steady_none,ft3_a2_full,48.0069224337324,full,1000,12,0,"none",NaN,0,0,0.45980636,18589,838,200,none,none,3,0.3
+ft3_a2_full_svc_island_qf1_dP+00_dQ+0.0,ft3_a2_full,48.0069224337324,full,1000,12,1,"Island",1,0,0,0.46898596,18589,838,17609.3371038141,svc,matched,3,0.3
+ft3_a2_full_svc_island_qf1_dP+00_dQ-2.5,ft3_a2_full,48.0069224337324,full,1000,12,1,"Island",1,0,-0.025,0.45370732,18589,838,17609.3371038141,svc,matched,3,0.3
+ft3_a2_full_svc_island_qf1_dP+05_dQ+0.0,ft3_a2_full,48.0069224337324,full,1000,12,1,"Island",1,0.05,0,0.46134664,18589,838,18489.8039590048,svc,matched,3,0.3
+ft3_a2_full_svc_island_qf1_dP-15_dQ-5.0,ft3_a2_full,48.0069224337324,full,1000,12,1,"Island",1,-0.15,-0.05,0.466068,18589,838,14967.936538242,svc,matched,3,0.3
+ft3_a2_full_svc_island_qf2.5_dP+00_dQ+0.0,ft3_a2_full,48.0069224337324,full,1000,12,1,"Island",2.5,0,0,0.45842868,18589,838,17609.3371038141,svc,matched,3,0.3
+ft3_a2_full_svc_island_qf2.5_dP+00_dQ-2.5,ft3_a2_full,48.0069224337324,full,1000,12,1,"Island",2.5,0,-0.025,0.46315004,18589,838,17609.3371038141,svc,matched,3,0.3
+ft3_a2_full_svc_island_qf2.5_dP+05_dQ+0.0,ft3_a2_full,48.0069224337324,full,1000,12,1,"Island",2.5,0.05,0,0.45078936,18589,838,18489.8039590048,svc,matched,3,0.3
+ft3_a2_full_svc_island_qf2.5_dP-15_dQ-5.0,ft3_a2_full,48.0069224337324,full,1000,12,1,"Island",2.5,-0.15,-0.05,0.45551072,18589,838,14967.936538242,svc,matched,3,0.3
+ft4_a1_wind_dt_island_natural,ft4_a1_wind,59.4041820649148,wind,300,12,1,"Island",0,0,0,0.45757724,11218,655,200,dt,none,2,0.7
+ft4_a1_wind_dt_island_qf1_dP+00_dQ+0.0,ft4_a1_wind,59.4041820649148,wind,300,12,1,"Island",1,0,0,0.46341316,11218,655,9557.28920092284,dt,matched,2,0.7
+ft4_a1_wind_dt_island_qf1_dP+00_dQ+2.5,ft4_a1_wind,59.4041820649148,wind,300,12,1,"Island",1,0,0.025,0.46813452,11218,655,9557.28920092284,dt,matched,2,0.7
+ft4_a1_wind_dt_island_qf1_dP-05_dQ+0.0,ft4_a1_wind,59.4041820649148,wind,300,12,1,"Island",1,-0.05,0,0.45577384,11218,655,6707.9188073587,dt,matched,2,0.7
+ft4_a1_wind_dt_island_qf2.5_dP+00_dQ+0.0,ft4_a1_wind,59.4041820649148,wind,300,12,1,"Island",2.5,0,0,0.4604952,11218,655,9557.28920092284,dt,matched,2,0.7
+ft4_a1_wind_dt_island_qf2.5_dP+00_dQ+2.5,ft4_a1_wind,59.4041820649148,wind,300,12,1,"Island",2.5,0,0.025,0.46521656,11218,655,9557.28920092284,dt,matched,2,0.7
+ft4_a1_wind_dt_island_qf2.5_dP-05_dQ+0.0,ft4_a1_wind,59.4041820649148,wind,300,12,1,"Island",2.5,-0.05,0,0.45285588,11218,655,6707.9188073587,dt,matched,2,0.7
+ft4_a1_wind_event01,ft4_a1_wind,59.4041820649148,wind,300,12,0,"Irradiance 300 to 180 W/m2",NaN,0,0,0.46993792,11218,655,2000,none,household,2,0.7
+ft4_a1_wind_event02,ft4_a1_wind,59.4041820649148,wind,300,12,0,"Irradiance 180 to 300 W/m2",NaN,0,0,0.4622986,11218,655,200,none,none,2,0.7
+ft4_a1_wind_event03,ft4_a1_wind,59.4041820649148,wind,300,12,0,"Wind 12 to 9 m/s",NaN,0,0,0.45465928,11218,655,2000,none,household,2,0.7
+ft4_a1_wind_event04,ft4_a1_wind,59.4041820649148,wind,300,12,0,"Load switched on (+6 kW)",NaN,0,0,0.46701996,11218,655,200,none,none,2,0.7
+ft4_a1_wind_event05,ft4_a1_wind,59.4041820649148,wind,300,12,0,"Capacitor switched on (5 kvar)",NaN,0,0,0.45938064,11218,655,2000,none,household,2,0.7
+ft4_a1_wind_event06,ft4_a1_wind,59.4041820649148,wind,300,12,0,"Voltage sag to 0.7 pu, 0.5 s",NaN,0,0,0.45174132,11218,655,200,none,none,2,0.7
+ft4_a1_wind_event07,ft4_a1_wind,59.4041820649148,wind,300,12,0,"Voltage sag to 0.5 pu, 0.2 s",NaN,0,0,0.464102,11218,655,2000,none,household,2,0.7
+ft4_a1_wind_event08,ft4_a1_wind,59.4041820649148,wind,300,12,0,"Voltage swell to 1.15 pu, 0.5 s",NaN,0,0,0.45646268,11218,655,200,none,none,2,0.7
+ft4_a1_wind_event09,ft4_a1_wind,59.4041820649148,wind,300,12,0,"Frequency ramp -2 Hz/s for 0.5 s",NaN,0,0,0.46882336,11218,655,2000,none,household,2,0.7
+ft4_a1_wind_event10,ft4_a1_wind,59.4041820649148,wind,300,12,0,"Frequency ramp +2 Hz/s for 0.5 s",NaN,0,0,0.46118404,11218,655,200,none,none,2,0.7
+ft4_a1_wind_event11,ft4_a1_wind,59.4041820649148,wind,300,12,0,"Phase jump 20 deg",NaN,0,0,0.45354472,11218,655,2000,none,household,2,0.7
+ft4_a1_wind_event12,ft4_a1_wind,59.4041820649148,wind,300,12,0,"Feeder load at B3 switched on (+5 kW)",NaN,0,0,0.4659054,11218,655,2000,none,household,2,0.7
+ft4_a1_wind_event13,ft4_a1_wind,59.4041820649148,wind,300,12,0,"Feeder load at B3 switched on (+15 kW)",NaN,0,0,0.45826608,11218,655,2000,none,household,2,0.7
+ft4_a1_wind_event14,ft4_a1_wind,59.4041820649148,wind,300,12,0,"Feeder load at B3 switched off (-10 kW)",NaN,0,0,0.45062676,11218,655,2000,none,household,2,0.7
+ft4_a1_wind_steady_household,ft4_a1_wind,59.4041820649148,wind,300,12,0,"none",NaN,0,0,0.46298744,11218,655,2000,none,household,2,0.7
+ft4_a1_wind_steady_none,ft4_a1_wind,59.4041820649148,wind,300,12,0,"none",NaN,0,0,0.45534812,11218,655,200,none,none,2,0.7
+ft4_a1_wind_svc_island_qf1_dP+00_dQ+0.0,ft4_a1_wind,59.4041820649148,wind,300,12,1,"Island",1,0,0,0.46452772,11218,655,13274.5142085961,svc,matched,2,0.7
+ft4_a1_wind_svc_island_qf1_dP+00_dQ-2.5,ft4_a1_wind,59.4041820649148,wind,300,12,1,"Island",1,0,-0.025,0.46924908,11218,655,13274.5142085961,svc,matched,2,0.7
+ft4_a1_wind_svc_island_qf1_dP+05_dQ+0.0,ft4_a1_wind,59.4041820649148,wind,300,12,1,"Island",1,0.05,0,0.4568884,11218,655,13938.2399190259,svc,matched,2,0.7
+ft4_a1_wind_svc_island_qf1_dP-15_dQ-5.0,ft4_a1_wind,59.4041820649148,wind,300,12,1,"Island",1,-0.15,-0.05,0.46160976,11218,655,11283.3370773067,svc,matched,2,0.7
+ft4_a1_wind_svc_island_qf2.5_dP+00_dQ+0.0,ft4_a1_wind,59.4041820649148,wind,300,12,1,"Island",2.5,0,0,0.45397044,11218,655,13274.5142085961,svc,matched,2,0.7
+ft4_a1_wind_svc_island_qf2.5_dP+00_dQ-2.5,ft4_a1_wind,59.4041820649148,wind,300,12,1,"Island",2.5,0,-0.025,0.4586918,11218,655,13274.5142085961,svc,matched,2,0.7
+ft4_a1_wind_svc_island_qf2.5_dP+05_dQ+0.0,ft4_a1_wind,59.4041820649148,wind,300,12,1,"Island",2.5,0.05,0,0.46633112,11218,655,13938.2399190259,svc,matched,2,0.7
+ft4_a1_wind_svc_island_qf2.5_dP-15_dQ-5.0,ft4_a1_wind,59.4041820649148,wind,300,12,1,"Island",2.5,-0.15,-0.05,0.45105248,11218,655,11283.3370773067,svc,matched,2,0.7

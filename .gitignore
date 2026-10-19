@@ -23,3 +23,11 @@ results/ndz/
 results/stress/
 results/classifier_cases.csv
 results/classifier_cases_noise.csv
+
+# Paper: only the figures and the code that draws them are public; the draft text stays local
+paper/*
+!paper/figures/
+!paper/figdata/
+!paper/make_figures.py
+!paper/export_figure_data.m
+!paper/export_feeder_data.m

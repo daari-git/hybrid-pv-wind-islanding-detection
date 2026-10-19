@@ -1,4 +1,4 @@
-function T = extract_features(W, Wb, step, level)
+function T = extract_features(W, Wb, step, level, set)
 % EXTRACT_FEATURES  Phase 6: sliding-window features for every case in data/raw/.
 %   T = EXTRACT_FEATURES(W, WB, STEP) slides a window of W seconds (default
 %   0.02) in steps of STEP (default 5 ms) over each case's record, each with
@@ -20,12 +20,19 @@ function T = extract_features(W, Wb, step, level)
 %   at random per case), scaled by LEVEL (1 = the sensors of P.noise). The
 %   windows are the same as without noise, row for row. Saves
 %   data/features/features_W<ms>_noise<LEVEL>.mat.
+%
+%   T = EXTRACT_FEATURES(W, WB, STEP, LEVEL, 'feeder') does the same for the
+%   feeder cases of FEEDER_DATASET (data/raw_feeder/), saving
+%   data/features/feeder_features_W<ms>[_noise<LEVEL>].mat.
 if nargin < 1 || isempty(W), W = 0.02; end
 if nargin < 2 || isempty(Wb), Wb = 0.04; end
 if nargin < 3 || isempty(step), step = 0.005; end
 if nargin < 4 || isempty(level), level = 0; end
+if nargin < 5, set = ''; end
 root = fileparts(fileparts(mfilename('fullpath')));
-I = readtable(fullfile(root, 'results', 'dataset_index.csv'), 'TextType', 'string', 'VariableNamingRule', 'preserve');
+src = struct('index', 'dataset_index.csv', 'raw', 'raw', 'prefix', '');
+if strcmp(set, 'feeder'), src = struct('index', 'feeder_dataset_index.csv', 'raw', 'raw_feeder', 'prefix', 'feeder_'); end
+I = readtable(fullfile(root, 'results', src.index), 'TextType', 'string', 'VariableNamingRule', 'preserve');
 P = params(10);
 if level > 0
     nf = dir(fullfile(root, 'data', 'noise', '*.mat'));
@@ -33,7 +40,7 @@ if level > 0
 end
 rows = cell(height(I), 1);
 for k = 1:height(I)
-    D = load(fullfile(root, 'data', 'raw', I.("case")(k) + ".mat"));
+    D = load(fullfile(root, 'data', src.raw, I.("case")(k) + ".mat"));
     if level > 0
         rng(1000*level + k);
         D = add_noise(D, N(randi(numel(N))), level);
@@ -59,8 +66,8 @@ end
 T = vertcat(rows{:});
 out = fullfile(root, 'data', 'features');
 if ~exist(out, 'dir'), mkdir(out); end
-f = sprintf('features_W%02d.mat', round(1e3*W));
-if level > 0, f = sprintf('features_W%02d_noise%g.mat', round(1e3*W), level); end
+f = sprintf('%sfeatures_W%02d.mat', src.prefix, round(1e3*W));
+if level > 0, f = sprintf('%sfeatures_W%02d_noise%g.mat', src.prefix, round(1e3*W), level); end
 save(fullfile(out, f), 'T', 'W', 'Wb', 'step', 'level');
 fprintf('W = %g ms, noise %g: %d windows from %d cases (%d island, %d not, %d left out of training)\n', ...
     1e3*W, level, height(T), height(I), sum(T.y == 1), sum(T.y == 0), sum(isnan(T.y)));

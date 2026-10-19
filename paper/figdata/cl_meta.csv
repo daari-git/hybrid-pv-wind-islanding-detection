@@ -1,0 +1,5 @@
+case,tEvent,tTrip,threshold
+island_ml,1,0.105,0.8
+island_afd,1,Inf,0.5
+sag_ml,1,Inf,0.8
+sag_afd,1,Inf,0.5

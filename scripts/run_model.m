@@ -8,6 +8,7 @@ if nargin < 2 || isempty(P), P = params(); end
 if nargin < 3, tag = 'run'; end
 root = fileparts(fileparts(mfilename('fullpath')));
 mdl  = 'hybrid_pv_wind_islanding';
+if isfield(P, 'model'), mdl = P.model; end              % hybrid_pv_wind_feeder (FEEDER_PARAMS)
 load_system(fullfile(root, [mdl '.slx']));
 
 in = Simulink.SimulationInput(mdl);
@@ -30,7 +31,8 @@ end
 t0 = tic; out = sim(in);
 fprintf('Simulated %.2f s in %.0f s of wall time\n', stopTime, toc(t0));
 
-tags = {'Vabc','Igrid','Iabc','VDC','ID','IQ','freq','Vpcc_rms','VPV','IPV','trip','wm_wind','ml_score','ml_trip','Igrid_true'};
+tags = {'Vabc','Igrid','Iabc','VDC','ID','IQ','freq','Vpcc_rms','VPV','IPV','trip','wm_wind','ml_score','ml_trip','Igrid_true', ...
+        'Vdt','Idt','Vder2'};                          % the last three on the feeder model only
 S = struct('P', P);
 have = out.who;
 for k = 1:numel(tags)

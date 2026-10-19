@@ -1,8 +1,39 @@
 # hybrid-pv-wind-islanding-detection
 
-Ride-through-compatible islanding detection for a grid-connected hybrid solar PV–wind system, using a machine-learning classifier on top of an H-infinity current controller. MATLAB/Simulink.
+Ride-through-compatible islanding detection for a grid-connected hybrid solar PV–wind system. A small neural network, running inside the inverter's own controls, tells a real island from the ordinary disturbances an inverter must ride through. It is tested in closed loop with sensor noise, on grid conditions it never saw, under four current controllers (PI, PID, H-infinity, fuzzy PI), and on a real 400 V distribution feeder in Nepal. MATLAB/Simulink.
 
-> **Status:** work in progress. Phases 1 to 7 are done (results below); phase 8, the paper, is next.
+## Where the project stands
+
+![The project's steps and which are done](docs/steps.png)
+
+| Step | What | Status |
+|---|---|---|
+| 1 | Corrected test bed | ✅ Done |
+| 2 | PI baseline against grid strength | ✅ Done |
+| 3 | H-infinity and four current controllers compared | ✅ Done |
+| 4 | Islanding test bench and baseline relays | ✅ Done |
+| 5 | Frequency-drift stress tests and the 400-case dataset | ✅ Done |
+| 6 | ML classifier tested on unseen conditions | ✅ Done |
+| 7 | Detector inside the model, with sensor noise, in closed loop | ✅ Done |
+| 8 | Real feeder: NEA Pidari, 400 V feeder of the Khajuri Chanha transformer | ✅ Done |
+| 8.1 | Connection-bus screening | ✅ Done |
+| 8.2 | Feeder model | ✅ Done |
+| 8.3 | Original detector on the feeder, PI | ✅ Done |
+| 8.4 | Feeder training set and retraining | ✅ Done |
+| 8.5 | Retrained detector on the feeder, PI | ✅ Done |
+| 8.6 | Retrained detector on the feeder, H-infinity | ✅ Done |
+| 8.7 | Retrained detector back on the test bed, PI and H-infinity | ✅ Done |
+| 8.8 | Four current controllers on the feeder | ✅ Done |
+| 9 | ML-triggered confirmation, to remove the load-switching false trips (decision 1) | ⬜ To do (next) |
+| 10 | Paper | ⏳ Draft written; feeder results and step 9 still to go in |
+
+In the scripts, steps 1 to 7 are called Phase 1 to Phase 7 (for example `run_phase7.m`).
+
+## Decisions
+
+| No. | Date | Question | Decision |
+|---|---|---|---|
+| 1 | 2026-10-19 | On the real feeder the detector, retrained or not, still trips on load switching close to the unit (8 of 39 ordinary events). How to deal with it? Options were (1) an ML-triggered confirmation, (2) a longer confirmation delay, (3) report it as a limitation. | **Option 1: ML-triggered confirmation** (step 9). When the network raises an alarm, the inverter applies a short reactive-power nudge and trips only if the PCC responds as an island does. |
 
 ## Problem
 
@@ -11,60 +42,94 @@ IEEE 1547-2018 asks an inverter-based source to do two things that pull against 
 - stay connected through voltage sags and frequency swings (ride-through), and
 - detect a real island and stop energising it within 2 seconds.
 
-Passive detection (voltage, frequency, rate of change of frequency) has a non-detection zone when local load and generation are nearly matched, and it false-trips on ordinary disturbances. Active methods shrink that zone but inject disturbances and degrade power quality. Both problems get worse on a weak grid.
+Passive detection (voltage, frequency, rate of change of frequency) has a non-detection zone when local load and generation are nearly matched, and it false-trips on ordinary disturbances. Active methods shrink that zone but inject disturbances, can be cancelled by a neighbouring inverter, and can destabilise a weak grid.
 
-## Proposed approach
+## Approach
 
-1. An **H-infinity current controller** keeps the inverter stable and well-damped across a range of grid strengths, so the test bed behaves properly on a weak grid.
-2. A **machine-learning classifier** separates islanding from non-islanding disturbances using features measured at the point of common coupling.
-3. Both are compared against PI control and against passive and active detection on the same test cases.
+1. A corrected and fully parameterised hybrid PV–wind test bed with four current controllers (PI, PID, structured H-infinity, fuzzy PI).
+2. A **machine-learning detector** that uses only what the inverter already measures, trained and tested by operating condition (never by random split), then run inside the switching model with sensor noise, tripping the inverter itself.
+3. Comparison on the same cases with a fast passive relay, the IEEE 1547-2018 relay, and active frequency drift (AFD).
+4. Validation on a real low-voltage feeder in Nepal: the detector unchanged, then retrained, then (step 9) with a confirmation stage.
 
 ## System under study
 
 | Item | Value |
 |---|---|
-| PV | Array with boost converter and P&O MPPT |
-| Wind | PMSG with rectifier and boost converter |
-| DC link | 800 V |
-| Inverter | Three-phase two-level VSI, 10 kHz switching |
-| Filter | LCL |
-| Grid | 400 V, 50 Hz |
+| PV | 10.7 kW at STC (10 series × 5 parallel modules), boost converter, perturb-and-observe MPPT |
+| Wind | PMSG, 10 kW at 12 m/s, diode rectifier, boost converter, optimal-torque MPPT |
+| DC link | 800 V, 3.2 mF |
+| Inverter | Three-phase two-level VSI, 20 kVA, 10 kHz switching |
+| Filter | LCL: 1.6 mH, 15 µF, 0.8 mH |
+| Grid (test bed) | 400 V, 50 Hz, programmable source behind an impedance set by the short-circuit ratio (SCR), X/R 3 |
+| Grid (real feeder) | NEA Pidari 11 kV feeder, 100 kVA 11/0.433 kV transformer, 400 V overhead ABC feeder (X/R 0.43 to 1.8) |
 
-Ratings will be fixed and documented in phase 1 (the current model and the thesis disagree on the PV rating).
+![The test bed and the detector](docs/system_diagram.png)
 
-## Model
+The PV–wind unit, its inverter and control, the local RLC load and a second inverter all sit at the point of common coupling (PCC). CB1 is the unit's own breaker, opened by the protection; CB2 islands the PCC from the grid. The ML detector (bottom row) takes the inverter's own measurements, computes 22 change features every 5 ms over a 20 ms window, scores them with a 22–20–10–2 network and opens CB1 after 4 windows in a row score above 0.8.
 
-`hybrid_pv_wind_islanding.slx` is the corrected test bed (PI control and a passive detector; the H-infinity controller and ML detector come in later phases).
+## Model pictures
+
+`hybrid_pv_wind_islanding.slx` is the test bed, built by `scripts/build_model.m` from the original model in `MATLAB_R2018a/`. `hybrid_pv_wind_feeder.slx` is the same unit connected to the real feeder, built by `scripts/build_feeder_model.m`. Regenerate the Simulink pictures with `export_diagrams` after any model change.
+
+**Top level of the test bed**
 
 ![Top level of the model](docs/model_top.png)
 
-**Wind turbine, PMSG, rectifier, boost and optimal-torque MPPT**
+**PV, wind and inverter control as block diagrams**: (a) PV chain with perturb-and-observe on the boost duty cycle; (b) wind chain, where the boost current reference follows the optimal-torque curve; (c) grid inverter control: SRF-PLL, DC-link PI, the selectable current controller with decoupling and feed-forward, and the relays or ML detector that act on the trip latch.
+
+![PV, wind and inverter control](docs/control_diagram.png)
+
+**What the PV and wind models produce**: (a, b) the array's current and power against voltage at 200 to 1000 W/m², with the maximum power points the MPPT tracks; (c) the turbine's power coefficient against tip-speed ratio (peak 0.411 at 7.95); (d) turbine power against rotor speed at 6 to 12 m/s, with the optimal-torque curve the MPPT follows.
+
+![PV and wind characteristics](docs/pv_wind_models.png)
+
+**Wind turbine, PMSG, rectifier, boost and optimal-torque MPPT** (Simulink)
 
 ![Wind turbine subsystem](docs/wind_subsystem.png)
 
-**PV boost converter with perturb-and-observe MPPT**
+**PV boost converter with perturb-and-observe MPPT** (Simulink)
 
 ![PV boost converter and MPPT](docs/pv_boost_mppt.png)
 
-**Inverter control: PLL, DC-link and current loops**
+**Inverter control: PLL, DC-link and current loops** (Simulink)
 
 ![Inverter control](docs/inverter_control.png)
 
-**Passive protection: voltage, frequency and rate of change of frequency**
+**Current controller block**: one block holds all four controllers, fed by the same error and followed by the same one-sample computation delay; `P.ctrl.mode` picks PI (1), PID (2), H-infinity (3) or fuzzy PI (4).
+
+![Current controller block](docs/current_controller.png)
+
+**Passive protection: voltage, frequency and rate of change of frequency** (Simulink)
 
 ![Passive protection](docs/passive_protection.png)
 
-**Second inverter (Phase 5 multi-inverter cases): constant-power current references from the PCC voltage, with optional reactive drift**
+**Second inverter**: constant-power current references from the PCC voltage, with optional reactive drift against frequency (used for the multi-inverter cases).
 
 ![Second inverter control](docs/second_inverter.png)
 
-Regenerate the pictures with `export_diagrams` after any model change.
+**Sensor noise**: white noise added to every measured voltage, current and DC-link voltage before the controls and detectors see it.
 
-## Results so far
+![Sensor noise](docs/sensor_noise.png)
 
-All figures below come from `hybrid_pv_wind_islanding.slx` with PI control and the passive detector.
+**The ML detector block**: buffers the inverter's measurements, computes the features with the same code as offline (`ml_features.m`), runs the network and drives the trip.
 
-### Phase 1: corrected test bed
+![The detector block inside the model](docs/ml_detector_block.png)
+
+**The real feeder**: (a) the Pidari 11 kV feeder, coloured by voltage at the recorded peak, with the Khajuri Chanha transformer at its far end (0.81 pu at peak); (b) the 400 V feeder of that transformer as modelled, with the two island points (the transformer breaker, which islands the whole feeder, and the unit's own breaker), the unit at A5 (or A3), the other generation lumped at B3 and the 10 kW switched load used for events.
+
+![The real feeder](docs/feeder_map.png)
+
+**The feeder in Simulink** (`hybrid_pv_wind_feeder.slx`, the part right of the unit): at the bottom left the 11 kV programmable source, the upstream equivalent (11 kV network and the 100 kVA transformer), the transformer breaker that islands the whole feeder, and the meter at the transformer; then the A branch (lines DT–A1 to A4–A5) and the B branch (DT–B1 to B2–B3), each pole with its constant-impedance load, and the switched 10 kW load at B3. The row of "Service to …" branches places the PV–wind unit: the branch to the chosen bus is 1 mΩ and the others 1 MΩ, so one model serves every connection bus. The "Second inverter to …" branches at the top place the other generation the same way (at B3 in all feeder tests), fed by three controlled current sources.
+
+![The feeder in Simulink](docs/feeder_model.png)
+
+**The second inverter on the feeder**: its voltage and frequency inputs are sampled at the inverter's control rate, and the MATLAB function computes the constant-power current reference through a SOGI filter on the voltage. Without the filter, the constant-power law acts as a negative resistance at high frequency and oscillates at 17 to 20 kHz on the lightly loaded feeder.
+
+![The second inverter on the feeder](docs/feeder_second_inverter.png)
+
+---
+
+## Step 1: corrected test bed ✅
 
 | Quantity | Original model | Corrected model |
 |---|---|---|
@@ -79,15 +144,17 @@ All figures below come from `hybrid_pv_wind_islanding.slx` with PI control and t
 
 Exported power is 18.5 kW from about 20.4 kW of generation.
 
-### First islanding check (4.4% reactive mismatch)
+**First islanding check (4.4% reactive mismatch)**
 
 ![Islanding event, 4.4% reactive mismatch](docs/islanding_matched.png)
 
-The fast passive detector trips 10.6 ms after the grid breaker opens. **Correction:** this case was first reported as a matched load, but the load was sized with Q_L = Q_C and ignored the inverter's own 813 var output, so it is really a 4.4% reactive mismatch. A properly matched island is not detected by either passive setting; see Phase 4.
+The fast passive detector trips 10.6 ms after the grid breaker opens. **Correction:** this case was first reported as a matched load, but the load was sized with Q_L = Q_C and ignored the inverter's own 813 var output, so it is really a 4.4% reactive mismatch. A properly matched island is not detected by either passive setting; see step 4.
 
-### Phase 2: PI baseline against grid strength
+## Step 2: PI baseline against grid strength ✅
 
 ![Open-loop Bode plot of the PI current loop](docs/pi_loop_bode.png)
+
+The Bode plot is the PI current loop's open-loop response at each grid strength; the margins below are read from it.
 
 Current-loop margins from the derived plant model (`scripts/plant_model.m`):
 
@@ -104,15 +171,17 @@ Simulation with the local load removed:
 | 3 and 2, hard start at full power | Loses synchronism within 50 ms |
 | 3 and 2, power ramped up after start | Stable at 17.8 kW; current THD 1.2 to 1.3%; voltage THD 2.9 to 3.6%; PCC voltage 1.07 to 1.08 pu |
 
-The PI baseline is stable in steady state down to a short-circuit ratio of 2. It degrades in start-up at full power, in PCC voltage rise and in frequency ripple, so the case for the H-infinity controller (phase 3) rests on those and on the reduced margins once a control delay is included.
+The PI baseline is stable in steady state down to a short-circuit ratio of 2. It degrades in start-up at full power, in PCC voltage rise and in frequency ripple.
 
-### Phase 3: H-infinity current controller
+## Step 3: H-infinity and four current controllers ✅
 
-The current control is now sampled at the switching frequency with a one-sample computation delay, for both controllers. `P.ctrl.mode` selects the current controller in the same model (1 PI, 2 PID, 3 H-infinity, 4 fuzzy PI).
+The current control is sampled at the switching frequency with a one-sample computation delay, for every controller. `P.ctrl.mode` selects the current controller in the same model.
 
-The controller is a structured H-infinity design (`scripts/design_hinf.m`): one order-4 controller tuned against five plants at once, at short-circuit ratios 20, 10, 5, 3 and 2.
+**H-infinity design.** A structured H-infinity design (`scripts/design_hinf.m`): one order-4 controller tuned against five plants at once, at short-circuit ratios 20, 10, 5, 3 and 2.
 
 ![Sensitivity of the current loop, PI against H-infinity](docs/controller_sensitivity.png)
+
+The sensitivity plot shows how much a disturbance is amplified at each frequency: the lower the peak, the more robust the loop. H-infinity lowers the peak from about 1.9 to about 1.45 at every grid strength.
 
 | Design figure (with the control delay) | PI | H-infinity |
 |---|---|---|
@@ -120,23 +189,11 @@ The controller is a structured H-infinity design (`scripts/design_hinf.m`): one 
 | Phase margin | 50° to 66° | 58° to 67° |
 | Sensitivity peak | 1.76 to 1.93 | 1.40 to 1.49 |
 
-Simulation with the local load removed (`scripts/compare_controllers.m`):
+![PI against H-infinity: irradiance step at SCR 5](docs/hinf_demo.png)
 
-| Test | PI | H-infinity |
-|---|---|---|
-| Hard start, SCR 20 | Stable; current THD 1.7%, voltage THD 1.7% | Stable; 1.7%, 1.3% |
-| Hard start, SCR 10 | Stable; 1.0%, 1.6% | Stable; 1.4%, 1.9% |
-| Hard start, SCR 5 | Stable; 0.8%, 1.4% | Stable; 1.4%, 2.9% |
-| Hard start, SCR 3 | Loses synchronism | Loses synchronism |
-| Power ramp, SCR 3 | Stable; 1.3%, 2.7% | Stable; 1.2%, 2.5% |
-| Power ramp, SCR 2 | Stable; 1.3%, 3.4% | Stable; 1.2%, 2.9% |
-| DC-link deviation after the power step | 17.8 V | 17.7 V |
+An irradiance step at 400 ms on a short-circuit ratio of 5 (`demo_hinf.m`): the d-axis current and the DC-link voltage follow almost the same path under both controllers. The extra robustness does not show up as a visibly different response.
 
-The H-infinity controller has better stability margins, but it gives no practical advantage in these tests. The synthesis converged close to a lower-gain PI, which trades low-frequency disturbance rejection for robustness: distortion is slightly lower at short-circuit ratios 3 and 2 and higher at 10 and 5. Neither controller survives a hard start at a ratio of 3, which points to the PLL and not the current loop. PI therefore stays the default controller for the islanding study.
-
-### Four current controllers compared: PI, PID, H-infinity, fuzzy PI
-
-All four sit in the same block, "Current controller d" and "Current controller q", fed by the same error and followed by the same one-sample computation delay. `P.ctrl.mode` picks one.
+**Four controllers compared.** All four sit in the same block (see the current controller picture above).
 
 | Controller | Design | Script |
 |---|---|---|
@@ -177,12 +234,13 @@ Simulation (`compare_controllers.m`, local load removed, protection unarmed). Ea
 Reading the results:
 
 - **Fuzzy PI is the best all-round performer.** It has the lowest distortion on the weak grids (current THD 0.7 to 0.8% against 1.0 to 1.3%, voltage THD 1.9% against 2.5 to 3.4%), the fastest DC-link recovery, and the second-best margins.
-- **H-infinity is the most robust on paper** but gives the highest distortion at SCR 5 and 10 and the slowest DC-link recovery.
+- **H-infinity is the most robust on paper** but gives the highest distortion at SCR 5 and 10 and the slowest DC-link recovery. The synthesis converged close to a lower-gain PI.
 - **PID behaves like PI**, as the margin analysis predicts; the derivative term can only be small on this plant.
 - **No controller survives a hard start at SCR 3.** The failure is in synchronisation (PLL), not the current loop.
 - **Distortion figures come from single runs** and vary by a few tenths of a percent with the MPPT's perturbation, so differences below about 0.3% should not be read as significant.
+- PI stays the default controller; H-infinity is repeated in every closed-loop detector test (steps 7 and 8).
 
-### Phase 4: islanding test bench and baseline detectors
+## Step 4: islanding test bench and baseline relays ✅
 
 Three baseline detectors, all evaluated offline on the same logged PCC voltage and frequency (`detect_islanding.m`):
 
@@ -198,7 +256,7 @@ The sign of the drift gain matters: with K > 0 a matched island holds at 49.95 H
 
 A matched island (no active or reactive mismatch) stays at 50.05 Hz and 1.0 pu, so no passive setting can see it. With frequency drift the inverter injects reactive current as soon as the frequency moves, the frequency runs to 58.4 Hz, and the IEEE OF2 element (51.67 Hz, 0.16 s) trips 191 ms after islanding. The voltage ripple with drift is partly a measurement effect: the RMS window is fixed at 50 Hz while the island runs at 58 Hz.
 
-**Non-detection zones.** The grid breaker opens at 0.4 s with an RLC load (Q_f = 1) sized relative to the inverter's measured output (18.57 kW, 813 var), and each detector gets the 2 s IEEE 1547-2018 allows (`ndz_sweep.m`, `island_case.m`, 70 runs):
+**Non-detection zones.** The grid breaker opens at 0.4 s with an RLC load (Q_f = 1) sized relative to the inverter's measured output (18.57 kW, 813 var), and each detector gets the 2 s IEEE 1547-2018 allows (`ndz_sweep.m`, `island_case.m`, 70 runs). Each map shows the detection time over the plane of active and reactive power mismatch; blank cells were not detected within 2 s.
 
 ![Detection time over the mismatch plane](docs/ndz_maps.png)
 
@@ -233,12 +291,11 @@ Why a threshold cannot work: the rate of change of frequency the relay sees afte
 Reading the results:
 
 - **The trade-off the paper rests on is real.** Settings fast enough to catch islands trip on almost every ordinary disturbance; ride-through-compliant settings trip on nothing, including real islands.
-- **Active frequency drift solves both in this test bed**, at SCR 10 with Q_f = 1: every island detected in under 0.3 s and no false trips. Its cost is small here: grid-connected current THD 2.08% with and without it, and about 100 var of extra reactive exchange.
-- **So the case for an ML detector was not made by Phase 4 alone.** It has to come from conditions where active drift is known to struggle: weak grids, higher quality-factor loads, and several inverters whose drift can cancel. Phase 5 tests exactly these.
+- **Active frequency drift solves both in this test bed**, at SCR 10 with Q_f = 1: every island detected in under 0.3 s and no false trips. So the case for an ML detector has to come from conditions where drift struggles: weak grids, higher quality-factor loads, and several inverters whose drift can cancel. Step 5 tests exactly these.
 
-### Phase 5: where active frequency drift fails, and the dataset
+## Step 5: where active frequency drift fails, and the dataset ✅
 
-**Stress tests of active frequency drift** (`afd_stress.m`, 23 runs, IEEE 1547-2018 settings, 2 s allowed). Two additions to the model make them possible: a second 10 kW inverter at the PCC (an averaged constant-power source whose reactive power can drift with frequency), and a weak-grid start in which the PV is held at 200 W/m² until 0.3 s (at full power from t = 0 the inverter does not synchronise on SCR 3 or 2).
+**Stress tests of active frequency drift** (`afd_stress.m`, 23 runs, IEEE 1547-2018 settings, 2 s allowed). Two additions to the model make them possible: a second 10 kW inverter at the PCC (an averaged constant-power source whose reactive power can drift with frequency), and a weak-grid start in which the PV is held at 200 W/m² until 0.3 s.
 
 | Condition | Result |
 |---|---|
@@ -254,32 +311,29 @@ Reading the results:
 
 Reading the results:
 
-- **Two inverters can cancel each other's drift completely.** The main inverter's drift is equivalent to about 2 kvar/Hz; a neighbouring unit with the same slope and the opposite sign removes it, and a matched island is again invisible. This is the multi-inverter failure reported in the literature, reproduced here.
-- **On a weak grid the drift breaks fault ride-through.** With the grid present, the drift's positive feedback is normally held down by the grid; at SCR 2 during a deep sag it is not, and the inverter trips on an event IEEE 1547-2018 requires it to ride through. Without drift the same sag is ridden through.
-- Drift still copes with a higher load quality factor, but takes up to two and a half times as long (488 ms against 191 ms for the matched island at Q_f = 1).
+- **Two inverters can cancel each other's drift completely.** A neighbouring unit with the same slope and the opposite sign removes the drift, and a matched island is again invisible.
+- **On a weak grid the drift breaks fault ride-through.** At SCR 2 during a deep sag, the drift's positive feedback is no longer held down by the grid, and the inverter trips on an event IEEE 1547-2018 requires it to ride through.
+- Drift still copes with a higher load quality factor, but takes up to two and a half times as long.
 - Together these give the ML detector its purpose: a passive detector, with no injection, that does not depend on what neighbouring inverters do and does not destabilise a weak grid.
 
-**Dataset** (`make_dataset.m`, `operating_conditions.m`). Sixteen operating conditions, four grid strengths (SCR 20, 10, 5, 3) by four PV/wind mixes (18.6, 10.6, 11.2 and 6.8 kW at the PCC, `results/operating_points.csv`), each with 25 cases, all with frequency drift off:
+**Dataset** (`make_dataset.m`, `operating_conditions.m`). Sixteen operating conditions, four grid strengths (SCR 20, 10, 5, 3) by four PV/wind mixes (18.6, 10.6, 11.2 and 6.8 kW at the PCC), each with 25 cases, all with frequency drift off:
 
-- **14 islands**: Q_f 1 and 2.5, each at seven mismatches (ΔP, ΔQ) = (0, 0), (±5%, 0), (0, ±2.5%), (+15%, +5%), (−15%, −5%), with the load sized from that condition's own inverter output.
-- **11 ordinary events**: the disturbances of Phase 4, scaled to each condition's irradiance and wind speed, with the same local load in place.
-- Event times are spread over one 20 ms cycle so the point on the wave varies.
-- Each case keeps 0.1 s before to 0.35 s after the event: PCC voltage and inverter current waveforms at 10 kHz, and frequency, RMS voltage, DC-link voltage and d/q currents at 1 kHz. 400 cases, 224 islands and 176 ordinary events; about 42 MB in `data/raw/` (not in git; index in `results/dataset_index.csv`).
+- **14 islands**: Q_f 1 and 2.5, each at seven mismatches (ΔP, ΔQ) = (0, 0), (±5%, 0), (0, ±2.5%), (+15%, +5%), (−15%, −5%).
+- **11 ordinary events**: the disturbances of step 4, scaled to each condition, with the same local load in place.
+- Event times are spread over one 20 ms cycle so the point on the wave varies. 400 cases, 224 islands and 176 ordinary events (`data/raw/`, not in git; index in `results/dataset_index.csv`).
 
 ![Dataset overview](docs/dataset_overview.png)
 
-The passive relays on the dataset's own windows (`dataset_baselines.m`; within 0.35 s only the IEEE elements with 0.16 s clearing can act):
-
-| Detector | Islands detected (224) | Median detection time | Ordinary events tripped (176) |
+| Detector on the dataset (`dataset_baselines.m`) | Islands detected (224) | Median detection time | Ordinary events tripped (176) |
 |---|---|---|---|
 | Fast passive | 186 | 14 ms | 154 |
 | IEEE passive | 0 | none within 0.35 s | 0 |
 
-The fast relay misses 38 islands, all of them matched or nearly matched (ΔP ±5% with ΔQ = 0, and at Q_f 2.5 also ΔQ ±2.5%), and still trips on 154 of the 176 ordinary events: every load and capacitor switching, sag, swell, frequency ramp and phase jump, and most irradiance steps. Within 0.35 s the IEEE settings act on nothing. The classifier of Phase 6 has to work exactly where both relay families fail: the matched and small-mismatch islands, and the disturbances a ride-through relay must ignore.
+The fast relay misses 38 islands, all matched or nearly matched, and still trips on 154 of the 176 ordinary events. The classifier of step 6 has to work exactly where both relay families fail.
 
-### Phase 6: a passive classifier tested on unseen operating conditions
+## Step 6: a passive classifier tested on unseen operating conditions ✅
 
-**How the detector works.** Every 5 ms it takes the latest window of measurements (10 ms in the chosen design) and compares it with the 40 ms before (`window_features.m`). Everything it uses is measured at the inverter's own terminals: PCC voltage, its own current, its PLL frequency, DC-link voltage and its d/q currents. There are 22 features, all changes from the baseline, so the operating point itself is never a feature:
+**How the detector works.** Every 5 ms it takes the latest window of measurements and compares it with the 40 ms before (`window_features.m`). Everything it uses is measured at the inverter's own terminals: PCC voltage, its own current, its PLL frequency, DC-link voltage and its d/q currents. There are 22 features, all changes from the baseline, so the operating point itself is never a feature:
 
 - voltage magnitude and frequency changes, and rate of change of frequency;
 - phase jump and positive- and negative-sequence voltage and current, from a least-squares fit of the 10 kHz waveforms;
@@ -287,54 +341,35 @@ The fast relay misses 38 islands, all of them matched or nearly matched (ΔP ±5
 - voltage and current distortion, and a distortion-impedance ratio;
 - DC-link voltage and d/q current deviations.
 
-The classifier labels each window, and the detector trips once 6 windows in a row (30 ms) are labelled island.
-
-**How it is tested.** Cases are never split between training and testing; every test case comes from an operating condition the model never saw. One family of folds holds out each grid strength in turn (SCR 20, 10, 5, 3), the other each PV/wind mix. Each test case is replayed window by window, as a relay in service would see it, and scored as a whole case (`replay_detector.m`):
-
-- an island is detected or missed, with the time from the breaker opening to the trip;
-- any trip after an ordinary event is a false trip;
-- any trip before the event is a false alarm in steady operation.
-
-Four models were trained at window lengths of 10, 20 and 40 ms: a decision tree, a random forest (bagged trees), an SVM with a Gaussian kernel, and a small neural network (`train_classifiers.m`). The setting was chosen by a rule fixed in advance and applied to the mix folds only: no steady-state alarm, at most 2% false trips, then the most islands detected. The numbers below come from the grid-strength folds, which played no part in the choice.
+**How it is tested.** Cases are never split between training and testing; every test case comes from an operating condition the model never saw. One family of folds holds out each grid strength in turn, the other each PV/wind mix. Each test case is replayed window by window, as a relay in service would see it (`replay_detector.m`). Four models were trained at window lengths of 10, 20 and 40 ms: a decision tree, a random forest, an SVM and a small neural network (`train_classifiers.m`). The setting was chosen by a rule fixed in advance on the mix folds (no steady-state alarm, at most 2% false trips, then the most islands detected) and reported on the grid-strength folds.
 
 ![Trade-off between islands detected and false trips](docs/ml_tradeoff.png)
 
-Chosen detector: a neural network (two hidden layers, 20 and 10 neurons) on 10 ms windows, threshold 0.5, trip after 6 windows in a row. On the same 400 cases (`results/detector_cases_noisefree.csv`):
+Each point is one model, window and threshold; the best detectors sit top left (many islands, few false trips).
 
 | Detector | Islands detected (224) | Matched islands (32) | Ordinary events tripped (176) | Steady-state alarms (400) | Median detection time |
 |---|---|---|---|---|---|
 | **Neural network (unseen grid strength)** | **223** | **32** | **3** | **1** | **35 ms** (95% within 82 ms) |
 | Fast relay | 186 | 16 | 154 | 0 | 14 ms |
 | IEEE 1547 relay | 0 within 0.35 s | 0 | 0 | 0 | none |
-| Active frequency drift (Phases 4, 5) | all tested, except with an opposing second inverter | not detected with an opposing inverter | false trip on a weak-grid sag | 0 | 160 to 488 ms |
-
-| Grid strength held out | Islands detected | False trips | Steady-state alarms |
-|---|---|---|---|
-| SCR 20 | 56 of 56 | 0 of 44 | 0 |
-| SCR 10 | 56 of 56 | 0 of 44 | 0 |
-| SCR 5 | 56 of 56 | 0 of 44 | 0 |
-| SCR 3 | 55 of 56 | 3 of 44 (two 1.15 pu swells, one 0.7 pu sag) | 1 |
+| Active frequency drift (steps 4, 5) | all tested, except with an opposing second inverter | not detected with an opposing inverter | false trip on a weak-grid sag | 0 | 160 to 488 ms |
 
 ![When each kind of island is detected, and the features the detector relies on](docs/ml_detection.png)
 
 Reading the results:
 
-- **On grid strengths inside the training range the detector made no error**: every island detected, matched ones included, with no false trip and no steady-state alarm. All four errors are on SCR 3, the weakest grid. When SCR 3 is held out the model has never seen a grid that weak, so this is extrapolation; a weak grid in the training data is the obvious remedy and will be checked.
-- **It detects islands about five times faster than active frequency drift** (median 35 ms against 160 to 488 ms) without injecting anything, so it cannot be cancelled by a neighbouring inverter or destabilise a weak grid.
-- **Matched islands are the slow ones** (median about 60 ms, all within 220 ms). In the first 40 ms they change almost nothing: frequency by 0.04 to 0.1 Hz and voltage by 0.007 pu. The detector picks up the small voltage wander that follows when the stiff grid is gone, which is why the largest voltage change is by far its most important feature.
-- **Model choice.** The forest and the tree detect every island too but false-trip on 6 to 10% of events. The SVM is a close second (98.2% detected, 2.3% false trips, no steady alarms, median 45 ms). The network file is 9.6 kB (`ml/islanding_classifier_noisefree.mat`), small enough to run inside the Simulink model (Phase 7 does).
-- **Two things that did not work**, recorded so they are not tried again:
-  - A distortion-impedance feature, meant to see the PCC impedance rise when the grid is lost, barely helps. At low harmonics the parallel RLC load has a lower impedance than the grid, and at the switching frequency the capacitors dominate either way.
-  - An estimate of voltage sensitivity to the inverter's own power changes was flat across grid strengths, so it was removed.
-- **What Phase 7 must test.** These cases are noise-free. The matched-island detections rest on small voltage changes that measurement noise could hide, and the detector has not yet tripped the breaker inside the simulation.
+- **On grid strengths inside the training range the detector made no error.** All four errors are on SCR 3, the weakest grid, which is extrapolation when SCR 3 is held out.
+- **It detects islands about five times faster than active frequency drift** (median 35 ms against 160 to 488 ms) without injecting anything.
+- **Matched islands are the slow ones** (median about 60 ms). The detector picks up the small voltage wander that follows when the stiff grid is gone, which is why the largest voltage change is its most important feature.
+- **Two things that did not work**: a distortion-impedance feature (the RLC load's impedance is lower than the grid's at low harmonics) and a voltage-sensitivity estimate (flat across grid strengths).
 
-### Phase 7: the detector inside the model, with sensor noise, on conditions it never saw
+## Step 7: the detector inside the model, with sensor noise, on conditions it never saw ✅
 
 Three things were added to the test bed (`build_model.m`, sections 7d and 7e):
 
-- **The detector runs inside the Simulink model.** A block buffers the inverter's own measurements, computes the features every 5 ms with the same code used offline (`ml_features.m`), runs the network and, after enough windows in a row above threshold, opens the inverter's breaker through the protection's latch. Its scores match the offline computation to 5e-13 (`verify_detector.m`).
-- **Sensor noise on every measurement** the controls and detectors use: white noise sampled at the 10 kHz control rate, standard deviation 0.5% of rated peak voltage, 1% of rated peak current and 0.2% of the DC-link voltage (`P.noise`). Because it passes through the PLL, the RMS measurement and the control loops, what the detector sees is measured rather than assumed (`noise_calibration.m`). Frequency wanders by 0.005 Hz (standard deviation) at SCR 10 and 0.03 Hz at SCR 3. Voltage and current waveforms deviate by 0.6 to 1.3% and 2.1%, including the controls' response to the noise.
-- **Three operating conditions outside the dataset** (`test_conditions.m`), with a different grid strength and generation mix each, and one with background grid distortion:
+- **The detector runs inside the Simulink model** (the detector block pictured above) and opens the inverter's breaker through the protection's latch. Its scores match the offline computation to 5e-13 (`verify_detector.m`).
+- **Sensor noise on every measurement** (the sensor-noise block pictured above): standard deviation 0.5% of rated peak voltage, 1% of rated peak current and 0.2% of the DC-link voltage at 10 kHz (`P.noise`, calibrated in `noise_calibration.m`).
+- **Three operating conditions outside the dataset** (`test_conditions.m`):
 
 | Condition | Grid strength | Irradiance, wind | Background distortion |
 |---|---|---|---|
@@ -342,26 +377,26 @@ Three things were added to the test bed (`build_model.m`, sections 7d and 7e):
 | scr7_t2 | SCR 7 | 600 W/m², 11 m/s | 2% fifth and 1.5% seventh harmonic |
 | scr4_t3 | SCR 4 (weak grid start) | 900 W/m², 7 m/s | none |
 
-![The detector block inside the model](docs/ml_detector_block.png)
-
-**Sensor noise breaks a detector trained without it.** With the sensors above, the Phase 6 design (trained on noise-free windows) still never false-trips, but it detects only 64% of islands and 38% of matched ones; at twice that noise, 9%. It has learned voltage changes smaller than the noise. Training on the noise-free windows plus the same windows with measured noise added (`extract_features.m`, `noise_study.m`) restores detection.
+**Sensor noise breaks a detector trained without it**: it detects only 64% of islands and 38% of matched ones. Training on the same windows with measured noise added restores detection.
 
 ![Islands detected and false trips against sensor noise](docs/noise_robustness.png)
 
 | Grid strength held out, 400 cases | Islands detected | Matched islands | Ordinary events tripped | Steady-state alarms | Median time |
 |---|---|---|---|---|---|
-| Trained without noise, tested without noise (with the Phase 7 voltage measure, hence not the Phase 6 table) | 99.1% | 100% | 5.1% | 0.5% | 35 ms |
+| Trained without noise, tested without noise | 99.1% | 100% | 5.1% | 0.5% | 35 ms |
 | Trained without noise, nominal sensor noise | 64.3% | 37.5% | 0% | 0% | 50 ms |
 | **Trained with noise, nominal sensor noise** | **98.7%** | **90.6%** | **4.5%** | **0.25%** | **30 ms** |
 | Trained with noise, twice the noise | 83.0% | 65.6% | 3.4% | 0% | 35 ms |
 
-The setting was chosen by the Phase 6 rule, applied to the PV/wind-mix folds at nominal noise (`select_detector.m`). It is a network on 20 ms windows that trips after 4 windows in a row score above 0.8 (`ml/islanding_classifier.mat`).
+The chosen detector is a network on 20 ms windows that trips after 4 windows in a row score above 0.8 (`ml/islanding_classifier.mat`).
 
-**A measurement problem that only the closed loop exposed.** The first version of the in-loop detector caught all 10 islands at SCR 15 but tripped on both 2 Hz/s frequency ramps, about 0.5 s in. By then the grid had settled at 49 or 51 Hz, inside the range where IEEE 1547-2018 requires an inverter to keep running. The cause was the model's RMS voltage measurement: it averages over a fixed 20 ms, so off 50 Hz it ripples at twice the grid frequency. At 49 Hz its fluctuation was ten times larger than at 50 Hz (standard deviation 0.0005 to 0.007 pu), which the detector took for an island's voltage wander. The dataset could not show this, because its records end 0.35 s after each event, before a ramp settles. The detector now computes the voltage magnitude itself, every 1 ms, as the positive-sequence phasor over the last cycle at the measured frequency. This measure does not ripple off 50 Hz and ignores fifth and seventh harmonics. A half-cycle version was tried first and raised false trips on the held-out grid strengths to 6.8%, so the full cycle, the same averaging as the RMS measurement it replaces, was kept. The first version's runs are kept in `data/closedloop/pi_v1/`.
+**A measurement problem that only the closed loop exposed.** The model's RMS voltage averages over a fixed 20 ms, so off 50 Hz it ripples; the first in-loop detector tripped on 2 Hz/s ramps that settled at 49 or 51 Hz. The detector now computes the positive-sequence voltage over the last cycle at the measured frequency. The first version's runs are kept in `data/closedloop/pi_v1/`.
 
-**In the loop on the three new conditions** (`closed_loop_test.m`). Each case was run with sensor noise on, the detector armed 0.25 s before the event, and its trip disconnecting the inverter. Every case was repeated with H-infinity current control (`results/closed_loop_pi.csv`, `results/closed_loop_hinfinity.csv`). The relays were evaluated on the same logged signals up to the detector's trip. Frequency drift was run separately with the detector off.
+**In the loop on the three new conditions** (`closed_loop_test.m`), with PI and with H-infinity control:
 
 ![The detector in the loop: an island that defeats frequency drift, and a sag it rides through](docs/closed_loop_traces.png)
+
+Left: an island held up by a second inverter drifting against AFD; the frequency barely moves, AFD never trips, the ML detector trips within about 100 ms. Right: a 0.5 pu sag that the detector rides through.
 
 | Detector, 3 unseen conditions | Islands detected (30) | Islands with an opposing second inverter (3) | Ordinary events tripped (33) | Steady runs with a local load tripped (3) | Detection time |
 |---|---|---|---|---|---|
@@ -375,109 +410,246 @@ The setting was chosen by the Phase 6 rule, applied to the PV/wind-mix folds at 
 
 Reading the results:
 
-- **Every island was cleared, far inside the 2 s limit**, on grid strengths, generation mixes and grid distortion the detector never saw, with sensor noise, under both controllers: 30 of 30 with PI and 30 of 30 with H-infinity, all within 105 ms. The 35-point non-detection-zone grid (active mismatch -20 to +20%, reactive -5 to +5%, SCR 7 with distortion) was detected completely, all within 95 ms. On the same mismatch grid at SCR 10 (Phase 4) the IEEE relay without drift detected none of the 35 islands and the fast relay 34. The slowest points are the largest active mismatches (±20%), not the matched ones. Such an island first looks like a voltage step, which the detector has learned to ride through, and it trips once the frequency moves.
-- **It catches the island that defeats active frequency drift.** With a second inverter whose reactive power works against the drift, drift with the IEEE relay never detects the island (3 of 3 missed within 2 s). The ML detector clears it in 85 to 105 ms, because it injects nothing for a neighbour to cancel.
-- **No false trip on the 33 ordinary events**, including 0.5 and 0.7 pu sags, a 1.15 pu swell, ±2 Hz/s ramps to 49 and 51 Hz, a 20° phase jump, and load, capacitor, irradiance and wind steps. On the same signals the fast relay trips on 30 of them.
-- **The inverter does cease to energise.** 30 to 50 ms after a trip the inverter's current is 0.06 A (median). Where a second inverter holds the island up it is 0.7 A: the current of the LCL filter capacitor, which stays connected to the energised PCC.
-- **The controller makes no difference to detection.** With H-infinity control, detection times differ from PI by -60 to +55 ms (median 0), with the same 30 detected and 0 false trips. The detector was trained on PI data only.
-- **Distortion.** The ML detector injects nothing, so it adds no distortion. The frequency drift implemented here is a reactive-current bias, not a waveform distortion. It shifts the inverter's reactive output by about 200 var (1% of rating), and its effect on current THD was within ±0.3 points, smaller than the spread between operating points.
-- **A weakness found: no local load.** In steady operation with a negligible local load, one run per controller tripped: PI at SCR 4, 15 ms after arming; H-infinity at SCR 7. All three no-load runs score close to the threshold now and then. Every training case had a local load close to the inverter's output, so this state lies outside the training data. With a local load there was no alarm, either in the 3 long steady runs or in the 0.25 s before each of the 63 cases. The remedy is training cases with no or partial local load. Until then the detector should not be used where the inverter can run with no local load.
+- **Every island was cleared, far inside the 2 s limit**, under both controllers; the 35-point non-detection-zone grid was detected completely, all within 95 ms.
+- **It catches the island that defeats active frequency drift** (3 of 3, 85 to 105 ms), because it injects nothing for a neighbour to cancel.
+- **No false trip on the 33 ordinary events**; on the same signals the fast relay trips on 30.
+- **The controller makes no difference to detection** (H-infinity vs PI: median difference 0 ms).
+- **A weakness found: no local load.** In steady operation with a negligible local load, one run per controller tripped. The feeder training set of step 8 includes cases with no or a small household load.
 
-### Known limitations
+## Step 8: the real feeder ✅
+
+The unit is connected to a real Nepal Electricity Authority (NEA) feeder: the 400 V feeder of the 100 kVA Khajuri Chanha transformer at the far end of the Pidari 11 kV feeder (feeder map above). It is much more resistive than the test bed (X/R 0.43 at A5 against 3), its voltage at the recorded peak is only 0.79 to 0.85 pu, and islands can form at two points: the unit's own breaker, or the transformer breaker, which islands the whole feeder with its loads and other generation.
+
+### 8.1 Connection-bus screening ✅
+
+A load flow of the feeder (`feeder_loadflow.m`, `feeder_screening.m`) with a 20 kW unit at each bus in turn:
+
+![Connection-bus screening](docs/feeder_screening.png)
+
+(a) hosting capacity: the largest unit that keeps every voltage at or below 1.05 pu at 30% load and every line and the transformer within rating; (b) change in feeder losses at peak; (c) voltage at A5 against feeder loading, with and without the unit, and the range in which the unit may enter service.
+
+| Bus | SCR | X/R | Hosting capacity | Loss change at peak |
+|---|---|---|---|---|
+| A1 | 59.4 | 1.15 | 38.9 kW | −0.92 kW |
+| A3 | 39.9 | 0.72 | 24.7 kW | −1.32 kW |
+| A5 (end) | 23.6 | 0.43 | 14.4 kW | −1.32 kW |
+| B3 (end) | 26.7 | 0.43 | 14.4 kW | −0.87 kW |
+
+- **A3 is the best bus for planning**: the largest loss reduction among the buses that can host the 20 kVA unit.
+- **A5 is the worst case for protection**: weakest and most resistive point, so it is the main test location; A3 is used for one test condition.
+- At peak the feeder voltage is far below range (0.79 pu at A5); the unit may enter service only up to about 65% of peak load.
+
+### 8.2 Feeder model ✅
+
+`build_feeder_model.m` replaces the test bed's grid impedance with the feeder: an 11 kV source and upstream impedance, the transformer breaker (island point 1), the transformer, eight line sections with constant-impedance loads, a switched 10 kW load at B3, and the second inverter moved to B3 to represent the other rooftop generation on the feeder. The second inverter needed a SOGI filter on its voltage: without it, its constant-power law behaves as a negative resistance at high frequency and oscillates at 17 to 20 kHz on this lightly damped feeder.
+
+Three test conditions, none used in training:
+
+| Condition | Unit at | Feeder load | Irradiance, wind | Unit output | Other generation at B3 | Distortion |
+|---|---|---|---|---|---|---|
+| F1 | A5 | 30% of peak | 800 W/m², 10 m/s | 12.6 kW | 10 kW | none |
+| F2 | A5 | 50% | 600 W/m², 11 m/s | 12.2 kW | 22 kW | 5th/7th harmonics |
+| F3 | A3 | 60% | 900 W/m², 7 m/s | 10.1 kW | 28 kW | none |
+
+Per condition: 4 islands at the unit's breaker, 5 islands of the whole feeder (the natural one with the unit alone, and 4 balanced ones with the other generation on), 1 feeder island whose other generation drifts against AFD, 13 ordinary events (the 11 of step 4 plus the 10 kW load at B3 switched on and off, with a 2 kW household load at the PCC) and 2 steady runs; plus a 35-point mismatch grid at F1. Sensor noise is on throughout.
+
+### 8.3 The original detector on the feeder, PI ✅
+
+The detector of step 7, unchanged (`feeder_closed_loop.m`, `results/feeder_closed_loop_pi.csv`):
+
+| On F1–F3 | Original detector | Frequency drift + IEEE relay | Fast relay |
+|---|---|---|---|
+| Unit's islands (12) | **12/12**, median 35 ms | 3/3 tested, 168–178 ms | 8/12 |
+| Feeder islands (15) | **15/15**, median 30 ms; natural islands 130–155 ms | 4/6 tested, 192–746 ms (misses Q_f 2.5 at F2, F3) | 10/15 |
+| Feeder islands with opposing drift (3) | **3/3** | **0/3** | 1/3 |
+| Mismatch grid at F1 (35) | **35/35**, within 105 ms | – | – |
+| Ordinary events tripped (39) | **9/39** | 0/6 tested (sags) | 19/39 |
+| Steady runs tripped (6) | 0/6 | – | – |
+
+Every island was caught by a detector that never saw this feeder, including those that defeat frequency drift. But it **false-trips on all load switching near the unit**: the 6 kW load at the PCC and the 10 kW load at B3 switched on and off, at every condition.
+
+### 8.4 Feeder training set and retraining ✅
+
+124 feeder cases (`feeder_dataset.m`) at four other conditions that share no pole, loading or generation mix with F1–F3 (A3 never used): islands at both points, the natural island, the 11 events with a household or no local load, loads of 5 and 15 kW switched on and 10 kW off at B3, and steady runs. The same network, windows, threshold and debounce were retrained on the 400 test-bed cases plus these, with and without sensor noise (`feeder_retrain.m`, `ml/islanding_classifier_feeder.mat`). Offline replay, nominal noise:
+
+![Offline replay before and after retraining with feeder cases](docs/feeder_retrain.png)
+
+| Evaluation | Islands | Matched islands | False trips | Steady alarms | Median |
+|---|---|---|---|---|---|
+| Original detector on the feeder cases | 98.3% | 93.8% | 18.8% | 0% | 35 ms |
+| Retrained, feeder condition held out | 96.7% | 93.8% | **7.8%** | 0% | 30 ms |
+| Retrained, test-bed grid strength held out | 97.3% | 93.8% | **1.7%** | 0.25% | 30 ms |
+| *Step 7 detector, test-bed grid strength held out* | *98.7%* | *90.6%* | *4.5%* | *0.25%* | *30 ms* |
+
+Retraining cut false trips on unseen feeder conditions from 18.8% to 7.8% offline, and also improved the test bed (4.5% to 1.7%, matched islands 90.6% to 93.8%), at a cost of about 1.5 points of islands detected.
+
+### 8.5 and 8.6 The retrained detector in the loop, PI and H-infinity ✅
+
+![The detector on the real feeder, before and after retraining](docs/feeder_results.png)
+
+(a) Share of islands detected against time after the island forms, on F1–F3: every detector setting catches all 30, the retrained one catches the natural feeder islands much sooner; frequency drift catches 7 of the 12 it was tested on. (b) Every ordinary event at each condition, PI control: orange cells are false trips, with the time to trip in ms. (c) Detection time over the mismatch grid for feeder islands at F1, retrained detector, PI.
+
+| On F1–F3, in the loop | Original detector, PI | Retrained detector, PI | Retrained detector, H-infinity |
+|---|---|---|---|
+| Unit's islands (12) | 12/12, median 35 ms | 12/12, median 35 ms | 12/12, median 30 ms |
+| Feeder islands (15) | 15/15, median 30 ms | 15/15, median 30 ms (one at 230 ms) | 15/15, median 35 ms |
+| Natural feeder islands (3 of the 15) | 130–155 ms | **25–35 ms** | **25–35 ms** |
+| Islands with opposing drift (3) | 3/3 | 3/3 | 3/3 |
+| Slowest island | 155 ms | 230 ms | 120 ms |
+| Mismatch grid at F1 (35) | 35/35, max 105 ms | 35/35, **max 90 ms** | not run |
+| Steady runs tripped (6) | 0/6 | 0/6 | 0/6 |
+| **Ordinary events tripped (39)** | **9/39** | **8/39** | **8/39** |
+
+Reading the results:
+
+- **Islands: better.** All still caught; natural feeder islands about five times faster.
+- **The controller makes no difference.** With H-infinity the same 30 islands are caught (median 35 ms, all within 120 ms) and the same 8 load-switching events trip.
+- **False trips: not fixed in closed loop.** Despite 7.8% offline, the same load-switching events still trip in the loop on F1–F3 (8 of 9). On this resistive feeder a load step close to the unit is large next to the unit's 10–12 kW output, and its first 20–40 ms look like an island to a detector that measures only at the unit. More examples of the same kind were not enough. This led to decision 1 and step 9.
+
+### 8.7 The retrained detector back on the test bed ✅
+
+The feeder-trained detector (`ml/islanding_classifier_feeder.mat`) rerun on the three test-bed conditions of step 7, every case and steady run, with PI and with H-infinity (`closed_loop_test.m`, `results/closed_loop_pi_islanding_classifier_feeder.csv`, `results/closed_loop_hinfinity_islanding_classifier_feeder.csv`):
+
+| 3 test-bed conditions | Step 7 detector, PI | Step 7 detector, H-infinity | Retrained, PI | Retrained, H-infinity |
+|---|---|---|---|---|
+| Islands detected (30) | 30, median 30 ms, max 105 | 30, median 32 ms, max 105 | 30, median 30 ms, max 230 | 30, median 30 ms, max 115 |
+| Islands with an opposing second inverter (3) | 3 | 3 | 3 | 3 |
+| Ordinary events tripped (33) | 0 | 0 | 0 | 0 |
+| Steady runs with a local load tripped (3) | 0 | 0 | 0 | 0 |
+| Steady runs with no local load tripped (3) | 1 (SCR 4) | 1 (SCR 7) | **0** | 1 (SCR 7) |
+
+- **Nothing is lost on the test bed.** The retrained detector still catches all 30 islands, including the 3 that defeat frequency drift, with no false trip on the 33 ordinary events, under both controllers.
+- **One slower island**: with PI, the SCR 7 island at Q_f 1.8 with a second inverter took 230 ms (was 105 ms), still far inside 2 s.
+- **The no-load weakness is reduced, not gone**: with PI no steady no-load run tripped (was 1 of 3); with H-infinity the SCR 7 no-load run still tripped. The scores before arming in no-load operation remain close to the threshold, so the no-load case needs its own fix (step 9 helps here too, because an alarm no longer trips by itself).
+
+### 8.8 The four current controllers on the feeder ✅
+
+The comparison of step 3 repeated on the feeder (`feeder_controllers.m`): stability margins of the current loop with the feeder's short-circuit impedance behind A1, A3 and A5 (`results/feeder_margins.csv`), and runs at F1–F3 with a 2 kW household load and an irradiance drop to 60% at 0.6 s (`results/feeder_controllers.csv`).
+
+![The four current controllers on the feeder](docs/feeder_controllers.png)
+
+| Controller | Gain margin (A1 / A3 / A5) | Sensitivity peak | Current THD F1 / F2 / F3 | DC-link dip F1 / F2 / F3 | DC-link settling |
+|---|---|---|---|---|---|
+| PI | 7.3 / 7.3 / 7.4 dB | 1.86–1.87 | 3.4 / 2.6 / 3.9% | 10.2 / 8.9 / 12.8 V | 107–134 ms |
+| PID | 6.6 / 6.6 / 6.7 dB | 1.99–2.00 | 3.4 / 2.6 / 3.7% | 10.3 / 8.7 / 12.8 V | 115–134 ms |
+| H-infinity | 10.6 / 10.6 / 10.7 dB | 1.45–1.46 | 3.6 / **2.3** / 4.8% | 10.2 / 8.6 / 13.0 V | 115–134 ms |
+| Fuzzy PI | 9.7 / 9.7 / 9.7 dB | 1.56 | **2.7** / 3.0 / **2.9%** | 10.2 / 8.8 / 12.8 V | 107–134 ms |
+
+Reading the results:
+
+- **The feeder hardly changes the current loop.** Margins are the same at A1, A3 and A5 to within 0.1 dB and close to the test bed's (step 3): the feeder's impedance (SCR 24 to 59) is small next to the LCL filter's, and its low X/R does not matter to the loop.
+- **The ranking of step 3 holds.** H-infinity has the best margins (sensitivity peak 1.45), fuzzy PI second (1.56), PI 1.87, PID the worst (2.0).
+- **Fuzzy PI gives the lowest distortion** at F1 and F3 (2.7 and 2.9% against 3.4 to 4.8%); H-infinity the lowest at F2, where the grid itself carries 5th and 7th harmonics, but the highest at F3 (4.8%). Current THD is higher than on the test bed (1 to 2%) because the unit runs at 10–12 kW of its 20 kVA rating, so the same ripple is a larger fraction of the current. All stay below the 5% IEEE 1547 limit.
+- **The DC-link response is set by the DC-link loop, not the current controller**: every controller gives the same dip (8.6 to 13.0 V) and settling time (107 to 134 ms).
+- No controller tripped or lost synchronism at any feeder condition.
+
+## Step 9: ML-triggered confirmation (decision 1) ⬜
+
+**Goal:** no false trip on load switching, without losing the detector's speed or its immunity to a neighbour's drift.
+
+**Idea:** the network's alarm no longer trips the inverter directly. It starts a short confirmation: for one to two cycles the inverter shifts its reactive current by a small fixed amount. With the grid connected the PCC voltage and frequency barely move; in an island the RLC load and the rest of the island must absorb the change, and the frequency shifts measurably. The inverter trips only if the response confirms an island; otherwise it returns to normal and the alarm resets. Unlike frequency drift, the nudge is applied only after an alarm and only for a few tens of milliseconds, so it costs nothing in normal operation and a neighbouring inverter's slow drift cannot cancel it.
+
+**Plan:**
+
+1. Add the confirmation stage to the detector block (`build_model.m`, `build_feeder_model.m`): alarm → nudge → measure → trip or reset; size the nudge and the confirmation threshold from the feeder and test-bed islands.
+2. Rerun the feeder conditions F1–F3 (islands, the 13 events, steady runs, mismatch grid) with PI and H-infinity.
+3. Rerun the test-bed conditions of step 7, to show nothing is lost there.
+4. Report the cost: added detection time, and the size and duration of the nudge.
+
+**Targets:** 0 false trips on the 39 feeder events; every island detected; detection within 150 ms (IEEE 1547-2018 allows 2 s).
+
+## Step 10: paper ⏳
+
+A full draft in IEEE Transactions format is written, with a writer's guide for the co-author who will finish it. The draft text stays local until submission; its figures are in `paper/figures/` (SVG for the PDF, 300 dpi PNG for Word), drawn at journal size by `python paper/make_figures.py` from `results/` and `paper/figdata/`. Still to go in: the feeder results of steps 8.3 to 8.8 in the text, step 9, a check of every reference, and a comparison table against recent published ML islanding methods.
+
+### Journal figures
+
+**Fig. 1, workflow.** Steps 1 to 6 design the test bed, the baselines and the detector; steps 7 and 8 test the frozen detector on conditions and on a network it was never trained on.
+
+![Paper Fig. 1: research workflow](paper/figures/fig_workflow.png)
+
+**Fig. 2, test system and detector.** CB1 is the inverter's breaker, opened by the passive protection or by the ML detector through a common latch that also blocks both boost converters. CB2 opens to form the island. The second inverter and the switched load and capacitor are connected only in the tests that need them; drift (AFD) is used only in the baseline runs.
+
+![Paper Fig. 2: test system](paper/figures/fig_system.png)
+
+**Fig. 3, source models.** (a) Current and (b) power of the PV array against its voltage at 25 °C and 200–1000 W/m², with the maximum power points and the range the tracker allows. (c) Power coefficient of the wind turbine against tip-speed ratio. (d) Turbine power against rotor speed at 6–12 m/s, and the optimal-torque tracking curve.
+
+![Paper Fig. 3: PV and wind models](paper/figures/fig_sources.png)
+
+**Fig. 4, control of the converters.** (a) PV boost converter with perturb-and-observe tracking. (b) Wind chain with optimal-torque current control of its boost converter. (c) Grid inverter: PLL, DC-link voltage loop, the four selectable current controllers, and the protection that disconnects the unit.
+
+![Paper Fig. 4: control](paper/figures/fig_control.png)
+
+**Fig. 5, current controllers.** (a) Gain margin and (b) sensitivity peak of the current loop against grid strength. (c) Grid-current distortion after a hard start at full power (SCR 20, 10, 5) and after a power ramp on a weak grid (SCR 3, 2). H-infinity is the most robust; fuzzy PI has the lowest distortion on a weak grid.
+
+![Paper Fig. 5: controllers](paper/figures/fig_controllers.png)
+
+**Fig. 6, the feeder.** (a) Pidari 11 kV feeder from Mujeliya substation, nodes coloured by load-flow voltage at the recorded peak. (b) The 400 V feeder of the 100 kVA Khajuri Chanha transformer, with the two islanding points: the transformer's 11 kV side (the whole feeder islands) and the unit's own breaker.
+
+![Paper Fig. 6: feeder](paper/figures/fig_feeder.png)
+
+**Fig. 7, choosing the connection point.** (a) Hosting capacity of each pole. (b) Change in feeder losses at the peak with a 20 kW unit. (c) Voltage at A5 against feeder loading without and with the unit; the shaded band is where IEEE 1547-2018 lets a DER enter service.
+
+![Paper Fig. 7: screening](paper/figures/fig_screening.png)
+
+**Fig. 8, non-detection zone of the passive relays.** Detection time over the mismatch plane at SCR 10, Q<sub>f</sub> = 1, in ms after CB2 opens (ND: not detected within 2 s). Near-matched islands are not seen.
+
+![Paper Fig. 8: NDZ](paper/figures/fig_ndz.png)
+
+**Fig. 9, why a fast ROCOF relay false-trips.** ROCOF after an island with ΔQ = +2.5 % (left) and after four ordinary disturbances at SCR 10: every trace crosses the 2 Hz/s threshold, so a relay fast enough for islands also trips on ordinary events.
+
+![Paper Fig. 9: ROCOF](paper/figures/fig_rocof.png)
+
+**Fig. 10, where active frequency drift fails.** Frequency after a matched island with AFD and the IEEE relay, against (a) load quality factor, (b) grid strength, (c) a second 10 kW inverter whose drift works with or against the main inverter's, and (d) PLL frequency during a 0.7 pu sag at SCR 2 with and without AFD, grid connected. An opposing neighbour cancels AFD, and AFD destabilises a weak grid during a sag.
+
+![Paper Fig. 10: AFD stress](paper/figures/fig_afd.png)
+
+**Fig. 11, sensor noise.** Islands detected and ordinary events tripped on unseen grid strengths against sensor noise, for a network trained without noise (W = 10 ms, θ = 0.5, D = 6) and one trained with measured noise (W = 20 ms, θ = 0.8, D = 4). Training with noise is what makes the detector usable.
+
+![Paper Fig. 11: noise](paper/figures/fig_noise.png)
+
+**Fig. 12, what the detector looks at.** Permutation importance of the 12 most important of the 22 features, mean over the four held-out grid strengths with the range across them.
+
+![Paper Fig. 12: feature importance](paper/figures/fig_importance.png)
+
+**Fig. 13, the detector in the loop.** SCR 4 (condition T3) with sensor noise. (a) An island held up by a second inverter whose drift opposes AFD: with AFD alone the frequency settles near 50.25 Hz and the island is not detected in 2 s; the ML detector trips after 105 ms. (b) A sag to 0.7 pu for 0.5 s, ridden through with and without the ML detector. Middle row: island score; bottom row: inverter current.
+
+![Paper Fig. 13: closed-loop traces](paper/figures/fig_traces.png)
+
+**Fig. 14, closed-loop results on the test bed.** (a) Detection time of the in-loop detector on the 30 islands of the three unseen conditions under PI and H-infinity control, and of AFD with the IEEE relay on 9 islands. (b) Detection time over the mismatch grid at SCR 7 with background harmonics (T2), PI control.
+
+![Paper Fig. 14: closed-loop summary](paper/figures/fig_closed_loop.png)
+
+**Fig. 15, the retrained detector on the real feeder (step 8.5 and 8.6).** (a) Detection time on the feeder for the unit's islands and the whole-feeder islands with PI, all 30 islands with H-infinity, and drift with the IEEE relay (7 of 12; it misses every island with an opposing neighbour and most at Q<sub>f</sub> = 2.5). (b) Detection time of whole-feeder islands over the mismatch grid at F1, PI control: all 35 caught within 90 ms.
+
+![Paper Fig. 15: feeder results](paper/figures/fig_feeder_results.png)
+
+---
+
+## Known limitations
 
 - PI and PLL gains are a first pass, not optimised.
 - PV current readings are unreliable when the PV voltage is far above its operating point, including after a trip.
 - Generator stator inductance (3 mH) and rotor inertia (10 kg m²) were changed from the original so the machine can deliver 10 kW through a diode rectifier.
-- The detector has been tested in simulation only, with one sensor-noise model (white noise at the control rate, calibrated in `noise_calibration.m`); real sensors also drift and saturate.
-- With a negligible local load the detector false-tripped in 1 of 3 steady runs under each controller (Phase 7): training data with no or partial local load is still needed.
-- The detector was trained with PI current control only; H-infinity control did not change its results, but the PID and fuzzy controllers were not tested in the loop.
-- The second inverter is an averaged current source with ideal current control, not a switching model; it represents a neighbouring unit's power and reactive drift, not its control dynamics.
-
-## Workflow
-
-```mermaid
-flowchart TD
-    A["Baseline hybrid PV-wind model"] --> P1["Phase 1: Clean up model<br/>ratings, grid impedance, variable wind,<br/>frequency measurement, LCL damping"]
-    P1 --> P2["Phase 2: Plant model and PI baseline<br/>transfer function, tuning, SCR sweep"]
-    P2 --> P3["Phase 3: H-infinity controller<br/>uncertainty model, weights, synthesis,<br/>order reduction, discretisation"]
-    P3 --> D1{"Stable across<br/>SCR 2 to 20?"}
-    D1 -- No --> P3
-    D1 -- Yes --> P4["Phase 4: Islanding test bench<br/>RLC load with Q = 1, scripted breaker"]
-    P2 -. "PI baseline" .-> P4
-    P4 --> B["Baselines: passive and active detection<br/>non-detection-zone maps"]
-    P4 --> P5["Phase 5: Dataset generation<br/>islanding and non-islanding events"]
-    P5 --> P6["Phase 6: Features and classifier<br/>split by operating condition, train"]
-    P6 --> D2{"Accuracy and false-trip<br/>targets met on unseen cases?"}
-    D2 -- No --> P5
-    D2 -- Yes --> P7["Phase 7: Closed-loop validation<br/>classifier trips breaker, noise added"]
-    B --> P7
-    P7 --> D3{"Detection under 2 s<br/>and no false trips<br/>during ride-through?"}
-    D3 -- No --> P6
-    D3 -- Yes --> P8["Phase 8: Paper<br/>comparison table, draft, submission"]
-```
-
-### Phase 1 — Clean up the baseline model
-- Fix one rating for PV and wind and use it everywhere.
-- Replace the near-ideal grid source with a realistic impedance, parameterised by short-circuit ratio (SCR).
-- Add a variable wind-speed profile and wind-side MPPT to the hybrid model.
-- Correct the frequency measurement (take it from the PLL; the gain must be `1/(2*pi)`).
-- Redesign the LCL damping resistor to match the design equation.
-- Output: one parameter script, `scripts/params.m`, that every model reads.
-
-### Phase 2 — Plant model and PI baseline
-- Derive the transfer function of inverter + LCL filter + grid impedance.
-- Tune the PI current controller properly and record its margins.
-- Sweep SCR (20, 10, 5, 3, 2) and record where PI degrades.
-- Output: Bode plots, stability limits, baseline distortion and DC-link response.
-
-### Phase 3 — H-infinity controller
-- Model grid inductance as an uncertain parameter over the SCR range.
-- Choose weighting functions for tracking, control effort and robustness, and document the reasoning.
-- Synthesise with the Robust Control Toolbox (`mixsyn` or `ncfsyn`; `musyn` for structured uncertainty).
-- Reduce the controller order and discretise at the switching rate.
-- Output: PI vs H-infinity on the same SCR sweep — stability margins, settling time, overshoot, current distortion.
-
-### Phase 4 — Islanding test bench
-- Add a parallel RLC load at the point of common coupling, tuned to 50 Hz with quality factor 1 (IEEE 1547.1 unintentional-islanding test).
-- Script the grid breaker to open during the run.
-- Implement two baselines: passive (over/under voltage, over/under frequency, rate of change of frequency) and one active method (frequency shift or reactive-power perturbation).
-- Sweep active and reactive power mismatch and map the non-detection zone of each baseline.
-- Output: non-detection-zone maps and detection times for the baselines.
-
-### Phase 5 — Dataset generation (done)
-- Islanding cases: seven mismatches at Q_f 1 and 2.5, four PV/wind mixes and four grid strengths.
-- Non-islanding cases: irradiance and wind steps, load and capacitor switching, sags, a swell, frequency ramps and a phase jump.
-- Stress tests of the active-drift baseline: quality factor, weak grid, a second inverter.
-- Run sequentially by `run_phase5.m` (one simulation process fits in memory, so `parsim` was not used); finished cases are skipped on restart.
-- Output: 400 labelled cases in `data/raw/`, `results/dataset_index.csv`, `results/afd_stress.csv`.
-
-### Phase 6 — Features and classifier (done)
-- 22 features over a sliding window (10, 20 or 40 ms, every 5 ms) against the 40 ms before it: voltage magnitude, frequency and rate of change of frequency, phase jump, sequence components, power changes, distortion, DC-link and d/q current deviations.
-- Split by operating condition (grid strength or PV/wind mix held out), never by window or case.
-- Decision tree, random forest, SVM and a small neural network; the setting chosen by a rule fixed in advance on one family of folds and reported on the other.
-- Output: `ml/islanding_classifier_noisefree.mat`, `results/classifier_summary.csv`, `results/detector_cases_noisefree.csv`, `results/feature_importance_noisefree.csv`.
-
-### Phase 7 — Closed-loop validation (done)
-- The trained detector inside the Simulink model, tripping the inverter's breaker itself; scores match the offline code (`verify_detector.m`).
-- Sensor noise on every measurement, calibrated through the model's PLL and controls; detectors trained with and without it.
-- Three operating conditions outside the dataset (SCR 15, 7 with grid distortion, 4), each with 10 islands, 11 ordinary events and steady runs; a 35-point non-detection-zone grid; frequency drift with the IEEE relay as the baseline.
-- Repeated with H-infinity current control.
-- Output: `ml/islanding_classifier.mat`, `results/closed_loop_pi.csv`, `results/closed_loop_hinfinity.csv`, `results/classifier_summary_noise.csv`, `results/detector_selection.csv`, `results/noise_calibration.csv`, `results/feature_importance.csv`, `results/detector_cases.csv`.
-
-### Phase 8 — Paper
-- Comparison table against recent published methods.
-- Draft, internal review by supervisors, submission.
+- Simulation only, with one sensor-noise model (white noise at the control rate); real sensors also drift and saturate. No hardware-in-the-loop test yet.
+- **On the real feeder the detector trips on load switching near the unit** (8 of 39 events after retraining). Step 9 addresses this.
+- With a negligible local load the step 7 detector false-tripped in 1 of 3 steady runs per controller; the feeder-trained detector had no steady alarm in 6 runs, but the no-load case still needs a dedicated test.
+- The second inverter is an averaged current source with ideal current control, not a switching model.
+- The detector was trained with PI current control only; H-infinity control did not change its results, but PID and fuzzy PI were not tested in the loop.
 
 ## Repository layout
 
 ```
 hybrid_pv_wind_islanding.slx   Corrected test-bed model (R2024b), built by scripts/build_model.m
+hybrid_pv_wind_feeder.slx      The unit on the real feeder, built by scripts/build_feeder_model.m
 MATLAB_R2018a/                 Original Simulink models, saved in R2018a (kept unchanged)
+Real_model/                    The NEA feeder data and load flow the feeder scripts read
 scripts/params.m               Every rating, gain and test setting in one place
 scripts/build_model.m          Rebuilds the corrected model from the original, change by change
-scripts/run_model.m            Runs the model and reports power, DC link, frequency, distortion, trip
+scripts/run_model.m            Runs a model and reports power, DC link, frequency, distortion, trip
 scripts/run_baseline.m         Runs the original model for the before/after comparison
 scripts/export_diagrams.m      Saves the model diagrams to docs/
+scripts/readme_figures.py      Draws docs/steps.png, docs/feeder_results.png, docs/feeder_retrain.png
 scripts/plant_model.m          Current-loop plant: inverter, LCL filter, grid and voltage feedforward
 scripts/loop_margins.m         Stability margins of the current loop
 scripts/analyze_pi.m           Margins of the PI baseline at each grid strength
@@ -495,17 +667,17 @@ scripts/design_flc.m           Fuzzy PI current controller
 scripts/discrete_plant.m       Current-loop plant as the digital controller sees it
 scripts/margins_all.m          Margins of all four controllers at each grid strength
 scripts/plot_controller_comparison.m  Draws docs/controllers_sensitivity.png and docs/controllers_step.png
-scripts/demo_hinf.m            Walk-through of the H-infinity controller for a demonstration
+scripts/demo_hinf.m            Walk-through of the H-infinity controller; draws docs/hinf_demo.png
 scripts/detect_islanding.m     Replays logged voltage and frequency through a set of relay settings
 scripts/island_case.m          Sizes the RLC load for a given active/reactive mismatch
 scripts/afd_sign_test.m        Matched island with no drift and with drift of each sign
 scripts/ndz_sweep.m            Non-detection-zone sweep (70 runs); evaluate_ndz.m scores it
 scripts/false_trip_test.m      Eleven non-islanding disturbances through every detector
-scripts/plot_ndz.m            Draws docs/ndz_maps.png
+scripts/plot_ndz.m             Draws docs/ndz_maps.png
 scripts/plot_phase4.m          Draws the island, ROCOF and detector-summary figures
 scripts/disturbance_events.m   The eleven ordinary disturbances used for false-trip tests
 scripts/relay_signals.m        Voltage, frequency and ROCOF as a relay sees them
-scripts/run_phase5.m           Runs every Phase 5 stage in order
+scripts/run_phase5.m           Runs every step 5 stage in order
 scripts/operating_conditions.m The sixteen operating conditions; condition_params.m sets one up
 scripts/operating_points.m     Inverter output at each condition, used to size islanding loads
 scripts/afd_stress.m           Active frequency drift under high Q_f, weak grid and a second inverter
@@ -514,32 +686,50 @@ scripts/dataset_baselines.m    The passive relays on the dataset's windows
 scripts/reduce_run.m           Keeps a run's 1 ms signals for detector replay
 scripts/plot_phase5.m          Draws docs/afd_stress.png and docs/dataset_overview.png
 scripts/window_features.m      The 22 features of one measurement window
-scripts/extract_features.m     Sliding-window features for every case (data/features/)
+scripts/extract_features.m     Sliding-window features for every case (data/features/), test bed or feeder
 scripts/train_classifiers.m    Four classifiers, tested on held-out grid strengths and PV/wind mixes
-scripts/replay_detector.m      Replays classifier scores case by case as a relay, for every threshold and debounce
+scripts/replay_detector.m      Replays classifier scores case by case as a relay
 scripts/final_classifier.m     Feature importance and the final trained detector
 scripts/plot_phase6.m          Draws docs/ml_tradeoff.png and docs/ml_detection.png
 scripts/ml_features.m          The 22 features from measurement buffers, shared by the offline code and the model
 scripts/ml_pack.m              Packs the trained network into one parameter vector for the model
 scripts/fit_detector.m         Trains one classifier (tree, forest, SVM or network)
-scripts/run_phase7.m           Runs every Phase 7 stage in order
+scripts/run_phase7.m           Runs every step 7 stage in order
 scripts/noise_calibration.m    Sensor noise as the detector sees it, through the PLL and controls
 scripts/noise_study.m          Classifiers trained without and with noise, tested at three noise levels
 scripts/select_detector.m      Applies the selection rule to the noise study
 scripts/verify_detector.m      Checks the detector inside the model against the offline code
-scripts/test_conditions.m      The three operating conditions outside the dataset
-scripts/closed_loop_test.m     The detector in the loop: islands, events, steady runs, drift baseline, NDZ grid
+scripts/test_conditions.m      The three test-bed conditions outside the dataset
+scripts/closed_loop_test.m     The detector in the loop on the test bed (any trained detector)
 scripts/plot_phase7.m          Draws docs/noise_robustness.png, docs/closed_loop_traces.png, docs/closed_loop_summary.png
+scripts/use_detector.m         Loads another trained detector into the model's parameters
+scripts/run_feeder.m           Runs every step 8 stage in order (finished cases are skipped)
+scripts/feeder_loadflow.m      Backward/forward sweep load flow of the 400 V feeder
+scripts/feeder_screening.m     Connection-bus screening and operating window
+scripts/build_feeder_model.m   Builds hybrid_pv_wind_feeder.slx
+scripts/feeder_params.m        Sets the feeder, its loading and the unit's bus; feeder_der2.m places the other generation
+scripts/feeder_conditions.m    The three feeder test conditions F1-F3; feeder_condition_params.m sets one up
+scripts/feeder_operating_points.m  Flows at each feeder condition, used to size feeder islands
+scripts/feeder_island_case.m   Sizes a balanced island of the whole feeder
+scripts/feeder_closed_loop.m   The detector in the loop on the feeder: islands, events, steady runs, AFD, mismatch grid
+scripts/feeder_train_conditions.m  The four feeder training conditions
+scripts/feeder_dataset.m       The 124 feeder training cases in data/raw_feeder/
+scripts/feeder_retrain.m       Retrains the detector with feeder cases and replays it offline
+scripts/feeder_controllers.m   The four current controllers on the feeder
 docs/                          Model diagrams and result figures
 results/                       Result tables (.csv); simulation runs (.mat) are not tracked
-data/                          Dataset, features, noise records and closed-loop runs, generated, not tracked
-ml/islanding_classifier.mat    The detector the model runs (Phase 7, trained with noise), with its window, threshold and debounce
-ml/islanding_classifier_noisefree.mat  The Phase 6 detector, trained without noise
-paper/                         Planned
-report/, archive/              Kept locally, not tracked
+data/                          Datasets, features and closed-loop runs, generated, not tracked
+ml/islanding_classifier.mat    The step 7 detector (trained with noise), with its window, threshold and debounce
+ml/islanding_classifier_noisefree.mat  The step 6 detector, trained without noise
+ml/islanding_classifier_feeder.mat     The detector retrained with feeder cases (step 8.4)
+paper/figures/                 The paper's figures (SVG and 300 dpi PNG)
+paper/make_figures.py          Draws paper/figures/ from results/ and paper/figdata/
+paper/export_figure_data.m     Writes the simulation traces the paper figures need to paper/figdata/
+paper/export_feeder_data.m     Writes the feeder map data to paper/figdata/
+paper/ (draft text), report/, archive/  Kept locally, not tracked
 ```
 
-To run an islanding case:
+To run an islanding case on the test bed:
 
 ```matlab
 addpath scripts
@@ -549,12 +739,20 @@ P.load.P = 18.4e3; P.load.QL = P.load.P; P.load.QC = P.load.P;   % matched RLC l
 run_model(1.0, P, 'island_matched');
 ```
 
+To run every feeder stage (one simulation at a time; about a day in all):
+
+```matlab
+addpath scripts
+run_feeder()
+```
+
 ## Requirements
 
 - MATLAB with Simulink and Simscape Electrical (Specialized Power Systems)
 - Robust Control Toolbox
 - Statistics and Machine Learning Toolbox
-- Parallel Computing Toolbox (optional, for batch runs)
+- Fuzzy Logic Toolbox (fuzzy PI controller)
+- Python 3 with matplotlib, for `scripts/readme_figures.py`
 
 ## Authors
 

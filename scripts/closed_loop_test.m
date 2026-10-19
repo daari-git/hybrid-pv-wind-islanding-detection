@@ -1,4 +1,4 @@
-function T = closed_loop_test(groups, mode)
+function T = closed_loop_test(groups, mode, detector)
 % CLOSED_LOOP_TEST  Phase 7: the detector inside the model, tripping the inverter itself.
 %   T = CLOSED_LOOP_TEST(GROUPS, MODE) runs the cases of GROUPS (default all
 %   of 'cases', 'steady', 'afd', 'ndz') with current controller MODE (1 PI,
@@ -26,11 +26,18 @@ function T = closed_loop_test(groups, mode)
 %   (finished cases are skipped) and the results, with the fast and IEEE
 %   relays evaluated on the same signals up to the detector's trip, to
 %   results/closed_loop_<controller>.csv.
+%
+%   T = CLOSED_LOOP_TEST(GROUPS, MODE, DETECTOR) runs another trained detector
+%   (USE_DETECTOR, e.g. 'islanding_classifier_feeder'), saving to
+%   data/closedloop/<controller>_<DETECTOR>/ and
+%   results/closed_loop_<controller>_<DETECTOR>.csv.
 if nargin < 1 || isempty(groups), groups = {'cases', 'steady', 'afd', 'ndz'}; end
 if nargin < 2 || isempty(mode), mode = 1; end
+if nargin < 3, detector = ''; end
 root = fileparts(fileparts(mfilename('fullpath')));
 P0 = params(10);
 ctrl = lower(strrep(P0.ctrl.names{mode}, '-', ''));     % pi, hinfinity, ...
+if ~isempty(detector), ctrl = [ctrl '_' detector]; end
 out = fullfile(root, 'data', 'closedloop', ctrl);
 if ~exist(out, 'dir'), mkdir(out); end
 C = test_conditions();
@@ -40,9 +47,9 @@ T = table();
 for k = 1:numel(Q)
     q = Q(k); f = fullfile(out, [q.name '.mat']);
     if ~exist(f, 'file')
-        R = run_case(q, mode, q.post, k);
+        R = run_case(q, mode, q.post, k, detector);
         if q.island && ~isfinite(R.tTrip) && q.post < 2      % not cleared: allow the full 2 s
-            R = run_case(q, mode, 2.05, k);
+            R = run_case(q, mode, 2.05, k, detector);
         end
         save(f, '-struct', 'R');
     end
@@ -95,9 +102,10 @@ if any(strcmp(groups, 'ndz'))
 end
 end
 
-function R = run_case(q, mode, post, k)
+function R = run_case(q, mode, post, k, detector)
 c = q.c; tE = c.tEvent;
 P = condition_params(c);
+if ~isempty(detector), P = use_detector(P, detector); end
 P.ctrl.mode = mode;
 P.noise.on = 1; P.noise.seed = k;
 P.load.Qf = q.Qf; P.afd.on = q.afd;
