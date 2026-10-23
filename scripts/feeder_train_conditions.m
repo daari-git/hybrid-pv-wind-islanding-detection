@@ -1,8 +1,8 @@
 function C = feeder_train_conditions()
 % FEEDER_TRAIN_CONDITIONS  Feeder conditions for training the detector (FEEDER_DATASET).
-%   Four conditions that share no pole, loading and generation mix with the
-%   test conditions of FEEDER_CONDITIONS, so those stay unseen; A3, a test
-%   pole, is never used. The mixes are those of the Phase 5 dataset
+%   Four conditions, none of which matches a test condition of
+%   FEEDER_CONDITIONS in pole, loading and generation mix together; no
+%   generation mix is shared, and A3, a test pole, is never used. The mixes are those of the Phase 5 dataset
 %   (OPERATING_CONDITIONS):
 %     ft1_a5_low    unit at A5, feeder at 20 % of its peak, 500 W/m2, 8 m/s
 %     ft2_a4_pv     A4, 40 %, 1000 W/m2, 6 m/s

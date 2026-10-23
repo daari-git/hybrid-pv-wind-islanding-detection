@@ -341,15 +341,16 @@ The fast relay misses 38 islands, all matched or nearly matched, and still trips
 - voltage and current distortion, and a distortion-impedance ratio;
 - DC-link voltage and d/q current deviations.
 
-**How it is tested.** Cases are never split between training and testing; every test case comes from an operating condition the model never saw. One family of folds holds out each grid strength in turn, the other each PV/wind mix. Each test case is replayed window by window, as a relay in service would see it (`replay_detector.m`). Four models were trained at window lengths of 10, 20 and 40 ms: a decision tree, a random forest, an SVM and a small neural network (`train_classifiers.m`). The setting was chosen by a rule fixed in advance on the mix folds (no steady-state alarm, at most 2% false trips, then the most islands detected) and reported on the grid-strength folds.
+**How it is tested.** Cases are never split between training and testing; every test case comes from an operating condition the model never saw. One family of folds holds out each grid strength in turn, the other each PV/wind mix. Each test case is replayed window by window, as a relay in service would see it (`replay_detector.m`). Four models were trained at window lengths of 10, 20 and 40 ms: a decision tree, a random forest, an SVM and a small neural network (`train_classifiers.m`). The setting is chosen by a rule fixed in advance on the mix folds (no steady-state alarm, at most 2% false trips, then the most islands detected) and reported on the grid-strength folds. For the network the rule picks 20 ms windows, threshold 0.5 and 4 windows in a row. On unseen grid strengths that catches 222 of 224 islands but trips on 17 of 176 ordinary events: like every model here, it meets the 2% target on unseen mixes and misses it on unseen grid strengths. The table and figures also show the network's best setting on the grid-strength folds (10 ms, 0.5, 6 windows). It is picked with hindsight, on the folds it is scored on, so it is optimistic; it is shown to give the best case, not as the rule's choice. Step 7 replaces both, because sensor noise changes the picture.
 
 ![Trade-off between islands detected and false trips](docs/ml_tradeoff.png)
 
-Each point is one model, window and threshold; the best detectors sit top left (many islands, few false trips).
+Each point is one model, window and threshold; the best detectors sit top left (many islands, few false trips). The square is the rule's choice for the network, the circle its best setting in hindsight.
 
 | Detector | Islands detected (224) | Matched islands (32) | Ordinary events tripped (176) | Steady-state alarms (400) | Median detection time |
 |---|---|---|---|---|---|
-| **Neural network (unseen grid strength)** | **223** | **32** | **3** | **1** | **35 ms** (95% within 82 ms) |
+| Neural network, the rule's choice (20 ms, 0.5, 4) | 222 | 32 | 17 | 3 | 25 ms (95% within 52 ms) |
+| Neural network, best in hindsight (10 ms, 0.5, 6) | 223 | 32 | 3 | 1 | 35 ms (95% within 82 ms) |
 | Fast relay | 186 | 16 | 154 | 0 | 14 ms |
 | IEEE 1547 relay | 0 within 0.35 s | 0 | 0 | 0 | none |
 | Active frequency drift (steps 4, 5) | all tested, except with an opposing second inverter | not detected with an opposing inverter | false trip on a weak-grid sag | 0 | 160 to 488 ms |
@@ -358,8 +359,8 @@ Each point is one model, window and threshold; the best detectors sit top left (
 
 Reading the results:
 
-- **On grid strengths inside the training range the detector made no error.** All four errors are on SCR 3, the weakest grid, which is extrapolation when SCR 3 is held out.
-- **It detects islands about five times faster than active frequency drift** (median 35 ms against 160 to 488 ms) without injecting anything.
+- **At its best setting the network made no error on grid strengths inside the training range.** All four errors are on SCR 3, the weakest grid, which is extrapolation when SCR 3 is held out. At the rule's setting it is the same: all 17 false trips come when SCR 3 (14) or SCR 20 (3) is held out.
+- **It detects islands about five times faster than active frequency drift** (median 25 to 35 ms against 160 to 488 ms) without injecting anything.
 - **Matched islands are the slow ones** (median about 60 ms). The detector picks up the small voltage wander that follows when the stiff grid is gone, which is why the largest voltage change is its most important feature.
 - **Two things that did not work**: a distortion-impedance feature (the RLC load's impedance is lower than the grid's at low harmonics) and a voltage-sensitivity estimate (flat across grid strengths).
 
@@ -470,7 +471,7 @@ Every island was caught by a detector that never saw this feeder, including thos
 
 ### 8.4 Feeder training set and retraining ✅
 
-124 feeder cases (`feeder_dataset.m`) at four other conditions that share no pole, loading or generation mix with F1–F3 (A3 never used): islands at both points, the natural island, the 11 events with a household or no local load, loads of 5 and 15 kW switched on and 10 kW off at B3, and steady runs. The same network, windows, threshold and debounce were retrained on the 400 test-bed cases plus these, with and without sensor noise (`feeder_retrain.m`, `ml/islanding_classifier_feeder.mat`). Offline replay, nominal noise:
+124 feeder cases (`feeder_dataset.m`) at four other conditions (A5, A4, A2 and A1 at 20 to 70% of peak load; `feeder_train_conditions.m`). None matches F1–F3 in bus, loading and generation mix together, their generation mixes are those of the step 5 dataset, which F1–F3 do not use, and A3 is never used: islands at both points, the natural island, the 11 events with a household or no local load, loads of 5 and 15 kW switched on and 10 kW off at B3, and steady runs. The same network, windows, threshold and debounce were retrained on the 400 test-bed cases plus these, with and without sensor noise (`feeder_retrain.m`, `ml/islanding_classifier_feeder.mat`). Offline replay, nominal noise:
 
 ![Offline replay before and after retraining with feeder cases](docs/feeder_retrain.png)
 
@@ -580,18 +581,18 @@ Reading the results:
 - **The load-switching false trips are gone.** All 16 alarms on load switching near the unit (8 per controller) were rejected; their angle responses were 0.005–0.018 rad. The test-bed no-load alarm under H-infinity (step 8.7) was rejected too (0.007 rad), so the no-load weakness of steps 7 and 8 is also removed.
 - **Every island was still detected, each at its first nudge**: 120 islands and 35 mismatch-grid points, the smallest response 0.18 rad (a whole-feeder island with Q<sub>f</sub> 1.8). That includes the islands that defeat frequency drift (3 of 3 on the feeder and on the test bed, under both controllers).
 - **The cost is a fixed 30 ms.** Every detection is exactly 30 ms later than in step 8; the median is now 60–65 ms. Two of 120 islands took 260 ms (under PI: the 3 % mismatch feeder island at F2 and the SCR 7 island with a second inverter at Q<sub>f</sub> 1.8), because the network's alarm itself came late (230 ms), not because of the confirmation. The 150 ms target was met by 118 of 120 islands; all are far inside the 2 s of IEEE 1547-2018.
-- **The nudge costs little when it is a false alarm.** It was used 17 times in the 168 grid-connected runs (ordinary events and steady runs). On the feeder it lowered the PCC voltage by at most 0.8 % and moved the PLL frequency by at most 0.13 Hz, for 30 ms; on the test bed at SCR 7 (X/R 3) by 3.9 %. No relay acted on it.
+- **The nudge costs little when it is a false alarm.** It was used 17 times in the 168 grid-connected runs (ordinary events and steady runs). On the feeder it changed the PCC voltage by at most 0.8 % and moved the PLL frequency by at most 0.13 Hz, for 30 ms; on the test bed at SCR 7 (X/R 3) the voltage changed by 3.9 %. The ride-through (IEEE 1547) relay never acted on it. A fast rate-of-change-of-frequency element would: the PLL reading changes at 2.7–5.5 Hz/s on the feeder and 8.1 Hz/s on the test bed during the nudge, so the fast relay (2 Hz/s, instantaneous) trips on all 17 rejected nudges. The angle step itself (0.3° to 1°) is far smaller than the 20° phase jump the unit rides through as an ordinary event.
 - **The controller still makes no difference** to what is detected or rejected.
 
 Files: `use_confirmation.m` (switch it on), `confirm_summary.m` (the nudges of a saved run), `confirm_pilot.m` (threshold), `confirm_check.m` (rebuild and check that with the confirmation off the model is unchanged).
 
 ## Step 10: paper ⏳
 
-A full draft in IEEE Transactions format is written, with a writer's guide for the co-author who will finish it. The draft text stays local until submission; its figures are in `paper/figures/` (SVG for the PDF, 300 dpi PNG for Word), drawn at journal size by `python paper/make_figures.py` from `results/` and `paper/figdata/`. Still to go in: the feeder results of steps 8.3 to 8.8 in the text, step 9, a check of every reference, and a comparison table against recent published ML islanding methods.
+A full draft in IEEE Transactions format is written, with a writer's guide for the co-author who will finish it. The draft text stays local until submission; its figures are in `paper/figures/` (SVG for the PDF, 300 dpi PNG for Word), drawn at journal size by `python paper/make_figures.py` from `results/` and `paper/figdata/`. The draft now holds every result of steps 1 to 9, including the feeder (Section IX, Tables XIV–XVI) and the confirmation (Section IX-E, Table XVII, Fig. 16). It compares the detector with the baselines on the same model (Table XVIII) and with nine recent ML islanding detectors by what their evaluations cover (Table XIX). All 45 references are listed, and every journal reference has been checked against its Crossref record. Left for the authors: names and affiliations, the target journal and its template, a check of the recent papers against their full texts, and a language pass.
 
 ### Journal figures
 
-**Fig. 1, workflow.** Steps 1 to 6 design the test bed, the baselines and the detector; steps 7 and 8 test the frozen detector on conditions and on a network it was never trained on.
+**Fig. 1, workflow.** Steps 1 to 6 design the test bed, the baselines and the detector; steps 7 and 8 test it on conditions and on a network it was never trained on; step 9 adds the confirmation that the feeder showed to be necessary. (The paper groups the work into nine steps of its own, slightly differently from this README.)
 
 ![Paper Fig. 1: research workflow](paper/figures/fig_workflow.png)
 
@@ -651,6 +652,10 @@ A full draft in IEEE Transactions format is written, with a writer's guide for t
 
 ![Paper Fig. 15: feeder results](paper/figures/fig_feeder_results.png)
 
+**Fig. 16, the alarm-triggered confirmation (step 9).** (a) Angle response of the PCC voltage to every 30 ms reactive step in the 323 runs on the feeder and the test bed, PI and H-infinity: filled markers are the 17 alarms with the grid connected, open markers islands. (b) Feeder islands at F1–F3 detected against time, without and with the confirmation. (c) Grid-connected runs that tripped, without and with it.
+
+![Paper Fig. 16: confirmation](paper/figures/fig_confirmation.png)
+
 ---
 
 ## Known limitations
@@ -661,6 +666,7 @@ A full draft in IEEE Transactions format is written, with a writer's guide for t
 - Simulation only, with one sensor-noise model (white noise at the control rate); real sensors also drift and saturate. No hardware-in-the-loop test yet.
 - On the real feeder the network alone trips on load switching near the unit (8 of 39 events after retraining); the confirmation of step 9 removes these trips at the cost of 30 ms and a brief reactive-current nudge after each alarm. Its threshold was set on runs of the same test conditions (other noise seeds), with a margin of about 3× on both sides.
 - The confirmation was tested with an averaged neighbouring inverter and one feeder. A neighbour that reacts within 30 ms (for example a fast volt-var or frequency-watt controller) or a much stiffer island could shrink the island's angle response; the smallest seen was 0.18 rad against a 0.05 rad threshold.
+- With the grid connected the nudge's angle response is about R·ΔI<sub>q</sub>/V<sub>pk</sub>; it would reach the 0.05 rad threshold at a source resistance of about 1.6 Ω (a purely resistive grid of SCR 5 on the unit's rating), so on weaker resistive grids the nudge or the threshold must be scaled. A rejected nudge also trips an instantaneous 2 Hz/s ROCOF element such as the fast relay (not the IEEE 1547 relay).
 - The second inverter is an averaged current source with ideal current control, not a switching model.
 - The detector was trained with PI current control only; H-infinity control did not change its results, but PID and fuzzy PI were not tested in the loop.
 

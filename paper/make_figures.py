@@ -484,10 +484,12 @@ def fig_workflow():
             ("6", "Sensor noise", "Noise through PLL and loops\nbreaks it; training with\nmeasured noise restores it")]),
         ("Validation", "#f6ecf3", [
             ("7", "Closed loop", "Detector inside the switching\nmodel; 3 unseen conditions,\nPI and H∞; against AFD"),
-            ("8", "Real feeder", "NEA Pidari 400 V feeder;\nconnection-bus screening;\ndetector unchanged")]),
+            ("8", "Real feeder", "NEA Pidari 400 V feeder;\nbus screening; detector\nunchanged, then retrained")]),
+        ("Selectivity", "#fbf6dc", [
+            ("9", "Confirmation", "Alarm starts a 30 ms\nreactive pulse; the PCC\nangle decides the trip")]),
     ]
-    w, h, gap = 22.2, 9.6, 2.4
-    xs = [1.0 + k*(w + gap) for k in range(4)]
+    w, h, gap = 18.2, 9.6, 1.65
+    xs = [0.8 + k*(w + gap) for k in range(len(stages))]
     ys = [16.6, 3.0]
     for k, (name, fc, boxes) in enumerate(stages):
         x = xs[k]
@@ -502,9 +504,10 @@ def fig_workflow():
             ax.text(x + 4.4, y + h - 2.0, title, ha="left", va="center", fontsize=6.6, weight="bold")
             ax.text(x + 1.2, y + h - 3.9, body, ha="left", va="top", fontsize=5.7, linespacing=1.18, color="#333333")
     kw = dict(arrowstyle="-|>", color=INK, lw=0.7, mutation_scale=6, shrinkA=0, shrinkB=0)
-    for k in range(4):                                       # down within a stage
-        ax.annotate("", xy=(xs[k] + w/2, ys[1] + h), xytext=(xs[k] + w/2, ys[0]), arrowprops=kw)
-    for k in range(3):                                       # bottom of one stage to the top of the next
+    for k in range(len(stages)):                             # down within a stage
+        if len(stages[k][2]) > 1:
+            ax.annotate("", xy=(xs[k] + w/2, ys[1] + h), xytext=(xs[k] + w/2, ys[0]), arrowprops=kw)
+    for k in range(len(stages) - 1):                         # bottom of one stage to the top of the next
         xm = xs[k] + w + gap/2
         ax.plot([xs[k] + w, xm, xm], [ys[1] + h/2, ys[1] + h/2, ys[0] + h/2], color=INK, lw=0.7)
         ax.annotate("", xy=(xs[k + 1], ys[0] + h/2), xytext=(xm, ys[0] + h/2), arrowprops=kw)
@@ -842,7 +845,81 @@ def fig_feeder_results():
     save(fig, "fig_feeder_results")
 
 
+# ---------------------------------------------------------------- Fig. 16
+def fig_confirmation():
+    # the feeder-retrained detector without (step 8) and with (step 9) the alarm-triggered confirmation
+    det = "islanding_classifier_feeder"
+    runs = {}
+    for where, pre in (("feeder", "feeder_closed_loop"), ("test bed", "closed_loop")):
+        for ctrl in ("pi", "hinfinity"):
+            for step, suf in ((8, ""), (9, "_confirm")):
+                f = os.path.join(RES, f"{pre}_{ctrl}_{det}{suf}.csv")
+                if not os.path.exists(f):
+                    return
+                runs[(where, ctrl, step)] = rd(f)
+    fig, axs = plt.subplots(1, 3, figsize=(COL2, 2.25), gridspec_kw={"width_ratios": [1.35, 1.0, 0.95]})
+
+    ax = axs[0]
+    rows = [("Feeder, grid\nconnected", "feeder", False, lambda r: True),
+            ("Test bed, grid\nconnected", "test bed", False, lambda r: True),
+            ("Feeder, unit's\nislands", "feeder", True, lambda r: r["kind"] == "svc"),
+            ("Feeder, whole-\nfeeder islands", "feeder", True, lambda r: r["kind"] == "dt"),
+            ("Test bed,\nislands", "test bed", True, lambda r: True)]
+    for y, (lab, where, island, pick) in enumerate(rows[::-1]):
+        for ctrl, mk, col, dy in (("pi", "o", OK[0], 0.13), ("hinfinity", "D", OK[3], -0.13)):
+            v = [abs(num(r["resp_rad"])) for r in runs[(where, ctrl, 9)]
+                 if num(r["nConfirm"]) > 0 and (r["island"] == "1") == island and pick(r)]
+            ax.scatter(v, [y + dy]*len(v), s=7, marker=mk, facecolor="none" if island else col, edgecolor=col,
+                       lw=0.6, label=("PI" if ctrl == "pi" else "H$_\\infty$") if y == 0 else None, zorder=3)
+    ax.axvline(0.05, color=OK[1], lw=1.0)
+    ax.text(0.056, len(rows) - 0.55, "threshold\n0.05 rad", color=OK[1], fontsize=6.2, va="center", linespacing=1.0)
+    ax.text(0.0028, -0.8, "alarm reset", fontsize=6.2, color=GREY)
+    ax.text(0.55, -0.8, "trip", fontsize=6.2, color=GREY)
+    ax.set_xscale("log"); ax.set_xlim(0.0025, 4); ax.set_ylim(-1.05, len(rows) - 0.2)
+    ax.set_yticks(range(len(rows))); ax.set_yticklabels([r[0] for r in rows[::-1]], fontsize=6.2, linespacing=1.0)
+    ax.set_xlabel("PCC angle response |Δφ| (rad)")
+    ax.set_title("(a) Every confirmation", loc="left")
+    ax.legend(loc="upper right", fontsize=6.2, handletextpad=0.2, borderaxespad=0.1)
+
+    ax = axs[1]
+    def cdf(rows, label, **kw):
+        isl = [r for r in rows if r["group"] == "cases" and r["island"] == "1"]
+        t = sorted(num(r["tTrip_ms"]) for r in isl if r["detected"] == "1")
+        xs, ys = [0], [0]
+        for i, v in enumerate(t):
+            xs += [v, v]; ys += [100*i/len(isl), 100*(i + 1)/len(isl)]
+        xs.append(300); ys.append(ys[-1])
+        ax.plot(xs, ys, label=label, **kw)
+    cdf(runs[("feeder", "pi", 8)], "Without, PI", color=OK[4])
+    cdf(runs[("feeder", "pi", 9)], "With, PI", color=OK[0])
+    cdf(runs[("feeder", "hinfinity", 9)], "With, H$_\\infty$", color=OK[3], ls="--")
+    ax.set_xlim(0, 300); ax.set_ylim(0, 102)
+    ax.set_xlabel("Time after the island forms (ms)"); ax.set_ylabel("Feeder islands detected (%)")
+    ax.set_title("(b) Detection time, F1–F3 (30)", loc="left")
+    ax.legend(loc="lower right", fontsize=6.2)
+
+    ax = axs[2]
+    groups = [("Feeder\nPI", "feeder", "pi"), ("Feeder\nH$_\\infty$", "feeder", "hinfinity"),
+              ("Test bed\nPI", "test bed", "pi"), ("Test bed\nH$_\\infty$", "test bed", "hinfinity")]
+    for g, (lab, where, ctrl) in enumerate(groups):
+        for k, step in enumerate((8, 9)):
+            calm = [r for r in runs[(where, ctrl, step)] if r["group"] in ("cases", "steady") and r["island"] == "0"]
+            n = sum(num(r["tTrip_ms"]) < 1e9 for r in calm)       # any trip, before or after the event
+            x = g + (k - 0.5)*0.38
+            ax.bar(x, n, 0.34, color=OK[4] if step == 8 else OK[0],
+                   label=("Without" if step == 8 else "With confirmation") if g == 0 else None)
+            ax.text(x, n + 0.12, f"{n}", ha="center", va="bottom", fontsize=6.2)
+    ax.set_xticks(range(len(groups))); ax.set_xticklabels([g[0] for g in groups], fontsize=6.2, linespacing=1.0)
+    ax.set_ylim(0, 10); ax.grid(axis="x", visible=False)
+    ax.set_ylabel("Grid-connected runs tripped")
+    ax.set_title("(c) False trips", loc="left")
+    ax.legend(loc="upper right", fontsize=6.2)
+    fig.tight_layout(pad=0.3, w_pad=0.9)
+    save(fig, "fig_confirmation")
+
+
 if __name__ == "__main__":
     fig_system(); fig_ndz(); fig_rocof(); fig_afd(); fig_importance(); fig_noise(); fig_traces(); fig_closed_loop()
     fig_sources(); fig_workflow(); fig_control(); fig_controllers(); fig_feeder(); fig_screening(); fig_feeder_results()
+    fig_confirmation()
     print("figures written to", OUT)

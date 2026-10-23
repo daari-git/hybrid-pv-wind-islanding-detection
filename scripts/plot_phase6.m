@@ -3,8 +3,9 @@ function plot_phase6()
 %   docs/ml_tradeoff.png   islands detected against false trips on ordinary
 %                          events, every threshold and debounce of the four
 %                          models, with the two relays on the same cases
-%   docs/ml_detection.png  detection time of the chosen detector by kind of
-%                          island, and the features it relies on
+%   docs/ml_detection.png  detection time of the network at its best setting
+%                          in hindsight (10 ms, 0.5, 6) by kind of island, and
+%                          the features it relies on
 %   All classifier numbers are for grid strengths the model was not trained
 %   on (each SCR held out in turn).
 root = fileparts(fileparts(mfilename('fullpath')));
@@ -15,6 +16,9 @@ S = readtable(fullfile(root, 'results', 'classifier_summary.csv'), 'TextType', '
 B = readtable(fullfile(root, 'results', 'dataset_baselines.csv'), 'TextType', 'string', 'VariableNamingRule', 'preserve');
 pick = {"tree", 20, 's', 'Decision tree, 20 ms'; "forest", 40, 'd', 'Random forest, 40 ms'; ...
         "svm", 20, 'v', 'SVM, 20 ms'; "nn", 10, 'o', 'Neural network, 10 ms'};
+% the rule's choice for the network (picked on the mix folds) and, for reference, the best
+% setting on the grid-strength folds, which is picked with hindsight
+ruled = S(S.model == "nn" & S.W_ms == 20 & S.family == "scr" & abs(S.threshold - 0.5) < 1e-9 & S.debounce == 4, :);
 chosen = S(S.model == "nn" & S.W_ms == 10 & S.family == "scr" & abs(S.threshold - 0.5) < 1e-9 & S.debounce == 6, :);
 rel = {"Fast passive", 'Fast relay'; "IEEE passive", 'IEEE 1547 relay'};
 relPt = zeros(2, 2);
@@ -33,8 +37,10 @@ for p = 1:2
         scatter(ax, s.falseTrip_pct, s.detected_pct, 30, okabe(k,:), pick{k,3}, 'filled', ...
             'MarkerFaceAlpha', 0.75, 'DisplayName', pick{k,4});
     end
+    plot(ax, ruled.falseTrip_pct, ruled.detected_pct, 's', 'MarkerSize', 14, 'LineWidth', 1.5, ...
+        'Color', ink, 'DisplayName', 'Network, the rule''s choice (20 ms)');
     plot(ax, chosen.falseTrip_pct, chosen.detected_pct, 'o', 'MarkerSize', 14, 'LineWidth', 1.5, ...
-        'Color', ink, 'DisplayName', 'Chosen setting');
+        'Color', grey, 'DisplayName', 'Network, best in hindsight (10 ms)');
     for k = 1:2
         plot(ax, relPt(k,1), relPt(k,2), 'p', 'MarkerSize', 13, 'MarkerFaceColor', grey, 'MarkerEdgeColor', ink, ...
             'HandleVisibility', 'off');
@@ -55,8 +61,10 @@ for p = 1:2
         set(ax, 'XLim', [0 20], 'YLim', [85 100.5]);
         plot(ax, [chosen.falseTrip_pct + 0.3, 7.8], [chosen.detected_pct - 0.3, 91.6], '-', 'Color', ink, ...
             'LineWidth', 0.8, 'HandleVisibility', 'off');
-        text(ax, 8, 91.2, sprintf('Chosen: %.1f%% detected, %.1f%% false trips,\nmedian %.0f ms (threshold 0.5, 6 windows in a row)', ...
+        text(ax, 8, 91.2, sprintf('Best in hindsight: %.1f%% detected, %.1f%% false trips,\nmedian %.0f ms (10 ms, threshold 0.5, 6 windows in a row)', ...
             chosen.detected_pct, chosen.falseTrip_pct, chosen.median_ms), 'FontSize', 9, 'Color', ink, 'BackgroundColor', 'w');
+        text(ax, ruled.falseTrip_pct + 0.6, ruled.detected_pct - 2.2, sprintf('Rule''s choice: %.1f%% detected,\n%.1f%% false trips, median %.0f ms\n(20 ms, threshold 0.5, 4 in a row)', ...
+            ruled.detected_pct, ruled.falseTrip_pct, ruled.median_ms), 'FontSize', 9, 'Color', ink, 'BackgroundColor', 'w');
         title(ax, 'Enlarged: the better corner is top left', 'FontWeight', 'normal', 'FontSize', 10);
     end
 end
@@ -89,7 +97,7 @@ stairs(ax, [0; t; 350], 100*[0; (1:numel(t))'; numel(t)]/height(b), '-', 'Color'
 set(ax, 'XLim', [0 350], 'YLim', [0 102]); style(ax);
 xlabel(ax, 'Time after the grid breaker opens (ms)'); ylabel(ax, 'Islands detected (%)');
 legend(ax, 'Location', 'southeast', 'Box', 'off', 'FontSize', 9);
-title(ax, 'Chosen detector: when each kind of island is detected', 'FontWeight', 'normal', 'FontSize', 10);
+title(ax, 'Best setting in hindsight: when each kind of island is detected', 'FontWeight', 'normal', 'FontSize', 10);
 
 ax = nexttile(tl);
 F = readtable(fullfile(root, 'results', 'feature_importance_noisefree.csv'), 'TextType', 'string');

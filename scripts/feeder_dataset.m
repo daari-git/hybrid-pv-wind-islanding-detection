@@ -1,6 +1,6 @@
 function T = feeder_dataset()
 % FEEDER_DATASET  Labelled feeder cases for training the detector (the feeder's Phase 5).
-%   For each condition of FEEDER_TRAIN_CONDITIONS, 32 cases with active
+%   For each condition of FEEDER_TRAIN_CONDITIONS, 31 cases with active
 %   frequency drift and sensor noise off, recorded as MAKE_DATASET records
 %   them (0.1 s before to 0.35 s after the event) in data/raw_feeder/:
 %     8 islands at the unit's breaker   Q_f 1 and 2.5 at (dP, dQ) in % of
