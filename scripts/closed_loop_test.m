@@ -1,4 +1,4 @@
-function T = closed_loop_test(groups, mode, detector)
+function T = closed_loop_test(groups, mode, detector, confirm, only)
 % CLOSED_LOOP_TEST  Phase 7: the detector inside the model, tripping the inverter itself.
 %   T = CLOSED_LOOP_TEST(GROUPS, MODE) runs the cases of GROUPS (default all
 %   of 'cases', 'steady', 'afd', 'ndz') with current controller MODE (1 PI,
@@ -31,33 +31,44 @@ function T = closed_loop_test(groups, mode, detector)
 %   (USE_DETECTOR, e.g. 'islanding_classifier_feeder'), saving to
 %   data/closedloop/<controller>_<DETECTOR>/ and
 %   results/closed_loop_<controller>_<DETECTOR>.csv.
+%
+%   T = CLOSED_LOOP_TEST(GROUPS, MODE, DETECTOR, CONFIRM) switches on the
+%   ML-triggered confirmation of step 9 (USE_CONFIRMATION; CONFIRM is a struct
+%   with a 'tag' and any settings of P.ml.confirm to change), saving to
+%   data/closedloop/<controller>_<DETECTOR>_<tag>/ and the matching csv.
+%   ONLY, a cell array of case names, runs just those (no csv is written).
 if nargin < 1 || isempty(groups), groups = {'cases', 'steady', 'afd', 'ndz'}; end
 if nargin < 2 || isempty(mode), mode = 1; end
 if nargin < 3, detector = ''; end
+if nargin < 4, confirm = []; end
+if nargin < 5, only = {}; end
 root = fileparts(fileparts(mfilename('fullpath')));
 P0 = params(10);
 ctrl = lower(strrep(P0.ctrl.names{mode}, '-', ''));     % pi, hinfinity, ...
 if ~isempty(detector), ctrl = [ctrl '_' detector]; end
+if ~isempty(confirm), ctrl = [ctrl '_' confirm.tag]; end
 out = fullfile(root, 'data', 'closedloop', ctrl);
 if ~exist(out, 'dir'), mkdir(out); end
 C = test_conditions();
 test_operating_points(root, C);
 Q = case_list(C, groups);
+if ~isempty(only), Q = Q(ismember({Q.name}, only)); end
 T = table();
 for k = 1:numel(Q)
     q = Q(k); f = fullfile(out, [q.name '.mat']);
     if ~exist(f, 'file')
-        R = run_case(q, mode, q.post, k, detector);
+        R = run_case(q, mode, q.post, k, detector, confirm);
         if q.island && ~isfinite(R.tTrip) && q.post < 2      % not cleared: allow the full 2 s
-            R = run_case(q, mode, 2.05, k, detector);
+            R = run_case(q, mode, 2.05, k, detector, confirm);
         end
         save(f, '-struct', 'R');
     end
     R = load(f);
     T = [T; score_case(q, R, P0)]; %#ok<AGROW>
 end
-disp(T(:, {'group', 'case', 'island', 'detector', 'tTrip_ms', 'detected', 'falseTrip', 'steadyAlarm', 'fast_ms', 'ieee_ms'}));
-writetable(T, fullfile(root, 'results', sprintf('closed_loop_%s.csv', ctrl)));
+disp(T(:, {'group', 'case', 'island', 'detector', 'tTrip_ms', 'detected', 'falseTrip', 'steadyAlarm', 'fast_ms', 'ieee_ms', ...
+    'nConfirm', 'resp_rad'}));
+if isempty(only), writetable(T, fullfile(root, 'results', sprintf('closed_loop_%s.csv', ctrl))); end
 end
 
 function Q = case_list(C, groups)
@@ -102,10 +113,11 @@ if any(strcmp(groups, 'ndz'))
 end
 end
 
-function R = run_case(q, mode, post, k, detector)
+function R = run_case(q, mode, post, k, detector, confirm)
 c = q.c; tE = c.tEvent;
 P = condition_params(c);
 if ~isempty(detector), P = use_detector(P, detector); end
+if ~isempty(confirm), P = use_confirmation(P, confirm); end
 P.ctrl.mode = mode;
 P.noise.on = 1; P.noise.seed = k;
 P.load.Qf = q.Qf; P.afd.on = q.afd;
@@ -122,7 +134,8 @@ fprintf('\n##### %s (%s)\n', q.name, P.ctrl.names{mode});
 S = run_model(tE + post, P, '');
 t = (0:1e-3:S.freq.Time(end))';
 R.P = P; R.tEvent = tE;
-for n = {'Vpcc_rms', 'freq', 'VDC', 'ml_score', 'trip'}
+for n = {'Vpcc_rms', 'freq', 'VDC', 'ml_score', 'trip', 'ml_nudge', 'ml_resp', 'ml_raw'}
+    if ~isfield(S, n{1}), continue, end                    % the last three since the step 9 build
     R.(n{1}) = timeseries(interp1(S.(n{1}).Time, double(S.(n{1}).Data(:,1)), t, 'previous'), t);
 end
 tw = (tE - 0.1:1e-4:S.Igrid_true.Time(end))';
@@ -160,13 +173,15 @@ if q.afd, det = "AFD + IEEE"; tDet = Di.t; end           % drift runs: the IEEE 
 evName = "island";
 if q.event > 0, ev = disturbance_events(tE, q.c.G, q.c.v); evName = string(ev(q.event).name); end
 if strcmp(q.group, 'steady'), evName = "none"; end
+cf = confirm_summary(R);
 r = table(string(q.group), string(q.name), string(q.c.id), q.c.scr, q.island, evName, q.Qf, 100*q.dP, 100*q.dQ, ...
     q.Kq, q.afd, det, 1e3*tDet, q.island & tDet > 0 & tDet <= 2, ~q.island & tDet > 0 & isfinite(tDet), ...
     (ml && tT <= 0) || (~ml && ~isnan(Di.falseTrip)), ...
     1e3*Df.t, 1e3*Di.t, R.pre.thd, R.pre.Q, Iafter, max(R.ml_score.Data(R.ml_score.Time < tE)), ...
+    cf.n, 1e3*cf.t, cf.resp, cf.raw, ...
     'VariableNames', {'group', 'case', 'cond', 'scr', 'island', 'event', 'Qf', 'dP_pct', 'dQ_pct', 'Kq2', 'afd', ...
     'detector', 'tTrip_ms', 'detected', 'falseTrip', 'steadyAlarm', 'fast_ms', 'ieee_ms', 'preTHD_pct', 'preQ_var', ...
-    'Iafter_A', 'maxScorePre'});
+    'Iafter_A', 'maxScorePre', 'nConfirm', 'tConfirm_ms', 'resp_rad', 'raw_rad'});
 end
 
 function test_operating_points(root, C)

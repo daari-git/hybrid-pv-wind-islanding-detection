@@ -14,8 +14,14 @@ function run_feeder(stages)
 %     testbed      the retrained detector on the test-bed conditions of Phase 7,
 %                  PI and H-infinity
 %     controllers  the four current controllers on the feeder (FEEDER_CONTROLLERS)
+%     pilot        step 9: the confirmation's angle response on the cases that
+%                  set its threshold (CONFIRM_PILOT; needs the step 9 build)
+%     confirm      step 9: the retrained detector with the confirmation, on the
+%                  feeder (PI with the mismatch grid, then H-infinity) and on
+%                  the test-bed conditions (PI and H-infinity)
 if nargin < 1
-    stages = {'screen', 'build', 'closedloop', 'dataset', 'features', 'retrain', 'retrained', 'testbed', 'controllers'};
+    stages = {'screen', 'build', 'closedloop', 'dataset', 'features', 'retrain', 'retrained', 'testbed', 'controllers', ...
+              'pilot', 'confirm'};
 end
 det = 'islanding_classifier_feeder';
 if any(strcmp(stages, 'screen')), feeder_screening(); end
@@ -36,4 +42,12 @@ if any(strcmp(stages, 'testbed'))
     closed_loop_test({'cases', 'steady'}, 3, det);
 end
 if any(strcmp(stages, 'controllers')), feeder_controllers(); end
+if any(strcmp(stages, 'pilot')), confirm_pilot(); end
+if any(strcmp(stages, 'confirm'))
+    c = struct('tag', 'confirm');                       % the settings of P.ml.confirm
+    feeder_closed_loop({'cases', 'steady', 'ndz'}, 1, {}, det, c);
+    feeder_closed_loop({'cases', 'steady'}, 3, {}, det, c);
+    closed_loop_test({'cases', 'steady'}, 1, det, c);
+    closed_loop_test({'cases', 'steady'}, 3, det, c);
+end
 end

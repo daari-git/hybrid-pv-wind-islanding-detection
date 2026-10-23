@@ -24,8 +24,8 @@ Ride-through-compatible islanding detection for a grid-connected hybrid solar PV
 | 8.6 | Retrained detector on the feeder, H-infinity | ✅ Done |
 | 8.7 | Retrained detector back on the test bed, PI and H-infinity | ✅ Done |
 | 8.8 | Four current controllers on the feeder | ✅ Done |
-| 9 | ML-triggered confirmation, to remove the load-switching false trips (decision 1) | ⬜ To do (next) |
-| 10 | Paper | ⏳ Draft written; feeder results and step 9 still to go in |
+| 9 | ML-triggered confirmation, to remove the load-switching false trips (decision 1) | ✅ Done |
+| 10 | Paper | ⏳ Draft written; feeder results and step 9 still to go in (next) |
 
 In the scripts, steps 1 to 7 are called Phase 1 to Phase 7 (for example `run_phase7.m`).
 
@@ -33,7 +33,7 @@ In the scripts, steps 1 to 7 are called Phase 1 to Phase 7 (for example `run_pha
 
 | No. | Date | Question | Decision |
 |---|---|---|---|
-| 1 | 2026-10-19 | On the real feeder the detector, retrained or not, still trips on load switching close to the unit (8 of 39 ordinary events). How to deal with it? Options were (1) an ML-triggered confirmation, (2) a longer confirmation delay, (3) report it as a limitation. | **Option 1: ML-triggered confirmation** (step 9). When the network raises an alarm, the inverter applies a short reactive-power nudge and trips only if the PCC responds as an island does. |
+| 1 | 2026-10-19 | On the real feeder the detector, retrained or not, still trips on load switching close to the unit (8 of 39 ordinary events). How to deal with it? Options were (1) an ML-triggered confirmation, (2) a longer confirmation delay, (3) report it as a limitation. | **Option 1: ML-triggered confirmation** (step 9). When the network raises an alarm, the inverter applies a short reactive-power nudge and trips only if the PCC responds as an island does. Outcome (2026-10-23): 0 of 39 feeder events tripped under PI and under H-infinity, every island still detected, 30 ms added. |
 
 ## Problem
 
@@ -111,7 +111,7 @@ The PV–wind unit, its inverter and control, the local RLC load and a second in
 
 ![Sensor noise](docs/sensor_noise.png)
 
-**The ML detector block**: buffers the inverter's measurements, computes the features with the same code as offline (`ml_features.m`), runs the network and drives the trip.
+**The ML detector block**: buffers the inverter's measurements, computes the features with the same code as offline (`ml_features.m`), runs the network and drives the trip. Since step 9 it also holds the confirmation: the `Confirmation` settings (`P.ml.confirm`) switch it on, and on an alarm the block sends a reactive-current nudge (`ml_nudge`, added to the q-axis reference in the inverter control) and reports the PCC voltage angle's response (`ml_resp`, `ml_raw`) before it decides. With the confirmation off it behaves exactly as before (checked by `confirm_check.m`).
 
 ![The detector block inside the model](docs/ml_detector_block.png)
 
@@ -543,20 +543,47 @@ Reading the results:
 - **The DC-link response is set by the DC-link loop, not the current controller**: every controller gives the same dip (8.6 to 13.0 V) and settling time (107 to 134 ms).
 - No controller tripped or lost synchronism at any feeder condition.
 
-## Step 9: ML-triggered confirmation (decision 1) ⬜
+## Step 9: ML-triggered confirmation (decision 1) ✅
 
 **Goal:** no false trip on load switching, without losing the detector's speed or its immunity to a neighbour's drift.
 
-**Idea:** the network's alarm no longer trips the inverter directly. It starts a short confirmation: for one to two cycles the inverter shifts its reactive current by a small fixed amount. With the grid connected the PCC voltage and frequency barely move; in an island the RLC load and the rest of the island must absorb the change, and the frequency shifts measurably. The inverter trips only if the response confirms an island; otherwise it returns to normal and the alarm resets. Unlike frequency drift, the nudge is applied only after an alarm and only for a few tens of milliseconds, so it costs nothing in normal operation and a neighbouring inverter's slow drift cannot cancel it.
+**How it works.** The network's alarm (4 windows in a row above 0.8) no longer trips the inverter by itself. It starts a confirmation inside the same detector block (`build_model.m` section 7e, settings `P.ml.confirm`):
 
-**Plan:**
+1. **Nudge**: the q-axis current reference steps by −0.25 pu of rated current (−10.2 A, about 5 kvar) for 30 ms.
+2. **Measure**: the PCC voltage angle is taken from the positive-sequence phasor of the last cycle (demodulated at 50 Hz) just before the nudge and at its end; the drift of the two cycles before the nudge is removed.
+3. **Decide**: if the angle moved by more than 0.05 rad, it is an island and the inverter trips. Otherwise the nudge ends, the alarm resets, and no new alarm is taken for 60 ms (until the nudge has left the detector's windows).
 
-1. Add the confirmation stage to the detector block (`build_model.m`, `build_feeder_model.m`): alarm → nudge → measure → trip or reset; size the nudge and the confirmation threshold from the feeder and test-bed islands.
-2. Rerun the feeder conditions F1–F3 (islands, the 13 events, steady runs, mismatch grid) with PI and H-infinity.
-3. Rerun the test-bed conditions of step 7, to show nothing is lost there.
-4. Report the cost: added detection time, and the size and duration of the nudge.
+Why the angle tells them apart: with the grid connected, the nudge only adds a small voltage drop across the grid's resistance, Δφ ≈ R·ΔI<sub>q</sub>/V<sub>pk</sub> ≈ 0.31 Ω × 10.2 A / 326 V ≈ 0.01 rad at A5. In an island nothing holds the voltage: the load must take the extra reactive current, so the voltage angle swings by about atan(ΔI<sub>q</sub>/I<sub>d</sub>) (0.4 rad for the unit alone) and the frequency starts to run. Unlike frequency drift, the nudge is applied only after an alarm and only for 30 ms, so it costs nothing in normal operation, and it is a step far faster than a neighbour's frequency-proportional drift, which therefore cannot cancel it.
 
-**Targets:** 0 false trips on the 39 feeder events; every island detected; detection within 150 ms (IEEE 1547-2018 allows 2 s).
+**Setting the threshold** (`confirm_pilot.m`, `results/confirm_pilot.csv`): 31 runs with the confirmation on and no threshold, so every alarm trips after one nudge and reports its response: the 8 load-switching events that tripped in step 8.5, the hardest islands of each feeder condition (unit's island at Q<sub>f</sub> 1.8, natural, matched and opposing-drift feeder islands), the test-bed islands with a second inverter, and the no-load steady run that tripped in step 8.7. Grid-connected alarms moved the angle by 0.006–0.016 rad, islands by at least 0.185 rad. 0.05 rad sits about 3× above the one and 3.7× below the other. These runs used the test conditions with other noise seeds than the evaluation below, so the threshold was set with knowledge of those conditions; the wide margin on both sides is what makes this acceptable.
+
+**Results** (`run_feeder('confirm')`: the retrained detector of step 8.4 with the confirmation, on exactly the cases and noise seeds of steps 8.5–8.7; `results/*_islanding_classifier_feeder_confirm.csv`):
+
+![Step 9: the confirmation's angle response, detection time and wrong trips](docs/confirmation.png)
+
+(a) Every confirmation in the 323 runs: filled markers are the 17 grid-connected alarms, all below the threshold; open markers are islands, all far above it. (b) Feeder islands F1–F3: every detection is exactly 30 ms later than in step 8, the length of the nudge. (c) Ordinary events and steady runs that tripped, step 8 against step 9.
+
+| | Feeder, PI | Feeder, H-infinity | Test bed, PI | Test bed, H-infinity |
+|---|---|---|---|---|
+| Islands detected (30) | 30 → **30** | 30 → **30** | 30 → **30** | 30 → **30** |
+| Median / slowest detection (ms) | 35 / 230 → 65 / 260 | 35 / 120 → 65 / 150 | 30 / 230 → 60 / 260 | 30 / 115 → 60 / 145 |
+| Islands with opposing drift (3) | 3 → 3 | 3 → 3 | 3 → 3 | 3 → 3 |
+| Mismatch grid at F1 (35) | 35, max 90 → 35, max 120 ms | – | – | – |
+| **Ordinary events tripped** | **8/39 → 0/39** | **8/39 → 0/39** | 0/33 → 0/33 | 0/33 → 0/33 |
+| Steady runs tripped (6) | 0 → 0 | 0 → 0 | 0 → 0 | **1 → 0** |
+| Alarms rejected by the confirmation | 8 | 8 | 0 | 1 |
+
+Each cell is step 8 (retrained detector) → step 9 (with the confirmation).
+
+Reading the results:
+
+- **The load-switching false trips are gone.** All 16 alarms on load switching near the unit (8 per controller) were rejected; their angle responses were 0.005–0.018 rad. The test-bed no-load alarm under H-infinity (step 8.7) was rejected too (0.007 rad), so the no-load weakness of steps 7 and 8 is also removed.
+- **Every island was still detected, each at its first nudge**: 120 islands and 35 mismatch-grid points, the smallest response 0.18 rad (a whole-feeder island with Q<sub>f</sub> 1.8). That includes the islands that defeat frequency drift (3 of 3 on the feeder and on the test bed, under both controllers).
+- **The cost is a fixed 30 ms.** Every detection is exactly 30 ms later than in step 8; the median is now 60–65 ms. Two of 120 islands took 260 ms (under PI: the 3 % mismatch feeder island at F2 and the SCR 7 island with a second inverter at Q<sub>f</sub> 1.8), because the network's alarm itself came late (230 ms), not because of the confirmation. The 150 ms target was met by 118 of 120 islands; all are far inside the 2 s of IEEE 1547-2018.
+- **The nudge costs little when it is a false alarm.** It was used 17 times in the 168 grid-connected runs (ordinary events and steady runs). On the feeder it lowered the PCC voltage by at most 0.8 % and moved the PLL frequency by at most 0.13 Hz, for 30 ms; on the test bed at SCR 7 (X/R 3) by 3.9 %. No relay acted on it.
+- **The controller still makes no difference** to what is detected or rejected.
+
+Files: `use_confirmation.m` (switch it on), `confirm_summary.m` (the nudges of a saved run), `confirm_pilot.m` (threshold), `confirm_check.m` (rebuild and check that with the confirmation off the model is unchanged).
 
 ## Step 10: paper ⏳
 
@@ -632,8 +659,8 @@ A full draft in IEEE Transactions format is written, with a writer's guide for t
 - PV current readings are unreliable when the PV voltage is far above its operating point, including after a trip.
 - Generator stator inductance (3 mH) and rotor inertia (10 kg m²) were changed from the original so the machine can deliver 10 kW through a diode rectifier.
 - Simulation only, with one sensor-noise model (white noise at the control rate); real sensors also drift and saturate. No hardware-in-the-loop test yet.
-- **On the real feeder the detector trips on load switching near the unit** (8 of 39 events after retraining). Step 9 addresses this.
-- With a negligible local load the step 7 detector false-tripped in 1 of 3 steady runs per controller; the feeder-trained detector had no steady alarm in 6 runs, but the no-load case still needs a dedicated test.
+- On the real feeder the network alone trips on load switching near the unit (8 of 39 events after retraining); the confirmation of step 9 removes these trips at the cost of 30 ms and a brief reactive-current nudge after each alarm. Its threshold was set on runs of the same test conditions (other noise seeds), with a margin of about 3× on both sides.
+- The confirmation was tested with an averaged neighbouring inverter and one feeder. A neighbour that reacts within 30 ms (for example a fast volt-var or frequency-watt controller) or a much stiffer island could shrink the island's angle response; the smallest seen was 0.18 rad against a 0.05 rad threshold.
 - The second inverter is an averaged current source with ideal current control, not a switching model.
 - The detector was trained with PI current control only; H-infinity control did not change its results, but PID and fuzzy PI were not tested in the loop.
 
@@ -649,7 +676,7 @@ scripts/build_model.m          Rebuilds the corrected model from the original, c
 scripts/run_model.m            Runs a model and reports power, DC link, frequency, distortion, trip
 scripts/run_baseline.m         Runs the original model for the before/after comparison
 scripts/export_diagrams.m      Saves the model diagrams to docs/
-scripts/readme_figures.py      Draws docs/steps.png, docs/feeder_results.png, docs/feeder_retrain.png
+scripts/readme_figures.py      Draws docs/steps.png and the feeder and step 9 figures from the result tables
 scripts/plant_model.m          Current-loop plant: inverter, LCL filter, grid and voltage feedforward
 scripts/loop_margins.m         Stability margins of the current loop
 scripts/analyze_pi.m           Margins of the PI baseline at each grid strength
@@ -703,7 +730,7 @@ scripts/test_conditions.m      The three test-bed conditions outside the dataset
 scripts/closed_loop_test.m     The detector in the loop on the test bed (any trained detector)
 scripts/plot_phase7.m          Draws docs/noise_robustness.png, docs/closed_loop_traces.png, docs/closed_loop_summary.png
 scripts/use_detector.m         Loads another trained detector into the model's parameters
-scripts/run_feeder.m           Runs every step 8 stage in order (finished cases are skipped)
+scripts/run_feeder.m           Runs every step 8 and step 9 stage in order (finished cases are skipped)
 scripts/feeder_loadflow.m      Backward/forward sweep load flow of the 400 V feeder
 scripts/feeder_screening.m     Connection-bus screening and operating window
 scripts/build_feeder_model.m   Builds hybrid_pv_wind_feeder.slx
@@ -716,6 +743,10 @@ scripts/feeder_train_conditions.m  The four feeder training conditions
 scripts/feeder_dataset.m       The 124 feeder training cases in data/raw_feeder/
 scripts/feeder_retrain.m       Retrains the detector with feeder cases and replays it offline
 scripts/feeder_controllers.m   The four current controllers on the feeder
+scripts/use_confirmation.m     Switches on the ML-triggered confirmation of step 9 (settings in P.ml.confirm)
+scripts/confirm_summary.m      The confirmation nudges of a saved closed-loop run and their angle responses
+scripts/confirm_pilot.m        Step 9: the runs that set the confirmation's threshold
+scripts/confirm_check.m        Step 9: rebuilds both models and checks them with the confirmation off and on
 docs/                          Model diagrams and result figures
 results/                       Result tables (.csv); simulation runs (.mat) are not tracked
 data/                          Datasets, features and closed-loop runs, generated, not tracked
@@ -726,7 +757,12 @@ paper/figures/                 The paper's figures (SVG and 300 dpi PNG)
 paper/make_figures.py          Draws paper/figures/ from results/ and paper/figdata/
 paper/export_figure_data.m     Writes the simulation traces the paper figures need to paper/figdata/
 paper/export_feeder_data.m     Writes the feeder map data to paper/figdata/
-paper/ (draft text), report/, archive/  Kept locally, not tracked
+explainer/explainer.md         Long-form explanation of the whole project (steps 1-8), every model, graph and the ML detector
+explainer/build_explainer.py   Builds the explainer PDF from explainer.md (pandoc and Chrome)
+explainer/video_script.py      Slide text and narration for the explainer video
+explainer/make_video.py        Builds the narrated explainer video from video_script.py
+explainer/ml_diagrams.py       Draws the ML network, window, fold and trip diagrams to explainer/figures/
+paper/ (draft text), report/, archive/, explainer PDF and video  Kept locally, not tracked
 ```
 
 To run an islanding case on the test bed:
@@ -739,11 +775,12 @@ P.load.P = 18.4e3; P.load.QL = P.load.P; P.load.QC = P.load.P;   % matched RLC l
 run_model(1.0, P, 'island_matched');
 ```
 
-To run every feeder stage (one simulation at a time; about a day in all):
+To run every feeder stage (one simulation at a time; about a day in all), or one stage, such as step 9 (about 6 hours):
 
 ```matlab
 addpath scripts
-run_feeder()
+run_feeder()               % every stage
+run_feeder({'confirm'})    % step 9 only: the retrained detector with the confirmation
 ```
 
 ## Requirements

@@ -1,4 +1,4 @@
-function T = feeder_closed_loop(groups, mode, only, detector)
+function T = feeder_closed_loop(groups, mode, only, detector, confirm)
 % FEEDER_CLOSED_LOOP  The Phase 7 detector, unchanged, on the Pidari 400 V feeder.
 %   T = FEEDER_CLOSED_LOOP(GROUPS, MODE, ONLY) runs the cases of GROUPS
 %   (default all of 'cases', 'steady', 'afd', 'ndz') on hybrid_pv_wind_feeder
@@ -35,14 +35,20 @@ function T = feeder_closed_loop(groups, mode, only, detector)
 %   detector (USE_DETECTOR, e.g. 'islanding_classifier_feeder'), saving to
 %   data/feeder/<controller>_<DETECTOR>/ and
 %   results/feeder_closed_loop_<controller>_<DETECTOR>.csv.
+%   T = FEEDER_CLOSED_LOOP(GROUPS, MODE, ONLY, DETECTOR, CONFIRM) switches on
+%   the ML-triggered confirmation of step 9 (USE_CONFIRMATION; CONFIRM is a
+%   struct with a 'tag' and any settings of P.ml.confirm to change), saving
+%   to data/feeder/<controller>_<DETECTOR>_<tag>/ and the matching csv.
 if nargin < 1 || isempty(groups), groups = {'cases', 'steady', 'afd', 'ndz'}; end
 if nargin < 2 || isempty(mode), mode = 1; end
 if nargin < 3, only = {}; end
 if nargin < 4, detector = ''; end
+if nargin < 5, confirm = []; end
 root = fileparts(fileparts(mfilename('fullpath')));
 P0 = params(10);
 ctrl = lower(strrep(P0.ctrl.names{mode}, '-', ''));
 if ~isempty(detector), ctrl = [ctrl '_' detector]; end
+if ~isempty(confirm), ctrl = [ctrl '_' confirm.tag]; end
 out = fullfile(root, 'data', 'feeder', ctrl);
 if ~exist(out, 'dir'), mkdir(out); end
 C = feeder_conditions();
@@ -53,16 +59,16 @@ T = table();
 for k = 1:numel(Q)
     q = Q(k); f = fullfile(out, [q.name '.mat']);
     if ~exist(f, 'file')
-        R = run_case(q, mode, q.post, k, detector);
+        R = run_case(q, mode, q.post, k, detector, confirm);
         if q.island && ~isfinite(R.tTrip) && q.post < 2
-            R = run_case(q, mode, 2.05, k, detector);
+            R = run_case(q, mode, 2.05, k, detector, confirm);
         end
         save(f, '-struct', 'R');
     end
     R = load(f);
     T = [T; score_case(q, R, P0)]; %#ok<AGROW>
 end
-disp(T(:, {'case', 'detector', 'tTrip_ms', 'detected', 'falseTrip', 'steadyAlarm', 'fast_ms', 'ieee_ms', 'Pdt_pre_W'}));
+disp(T(:, {'case', 'detector', 'tTrip_ms', 'detected', 'falseTrip', 'steadyAlarm', 'fast_ms', 'ieee_ms', 'nConfirm', 'resp_rad'}));
 if isempty(only), writetable(T, fullfile(root, 'results', sprintf('feeder_closed_loop_%s.csv', ctrl))); end
 end
 
@@ -112,10 +118,11 @@ if any(strcmp(groups, 'ndz'))
 end
 end
 
-function R = run_case(q, mode, post, k, detector)
+function R = run_case(q, mode, post, k, detector, confirm)
 c = q.c; tE = c.tEvent;
 P = feeder_condition_params(c);
 if ~isempty(detector), P = use_detector(P, detector); end
+if ~isempty(confirm), P = use_confirmation(P, confirm); end
 P.ctrl.mode = mode;
 P.noise.on = 1; P.noise.seed = k;
 P.afd.on = q.afd;
@@ -138,7 +145,8 @@ fprintf('\n##### %s (%s)\n', q.name, P.ctrl.names{mode});
 S = run_model(tE + post, P, '');
 t = (0:1e-3:S.freq.Time(end))';
 R.P = P; R.tEvent = tE;
-for n = {'Vpcc_rms', 'freq', 'VDC', 'ml_score', 'trip'}
+for n = {'Vpcc_rms', 'freq', 'VDC', 'ml_score', 'trip', 'ml_nudge', 'ml_resp', 'ml_raw'}
+    if ~isfield(S, n{1}), continue, end                % the last three since the step 9 build
     R.(n{1}) = timeseries(interp1(S.(n{1}).Time, double(S.(n{1}).Data(:,1)), t, 'previous'), t);
 end
 tw = (tE - 0.1:1e-4:S.Igrid_true.Time(end))';
@@ -211,14 +219,17 @@ if q.afd, det = "AFD + IEEE"; tDet = Di.t; end
 evName = string(q.kind) + " island";
 if q.event > 0, evName = string(event_name(q.event, q.c)); end
 if strcmp(q.group, 'steady'), evName = "none"; end
+cf = confirm_summary(R);
 r = table(string(q.group), string(q.name), string(q.c.id), q.c.load, q.c.pcc, q.island, string(q.kind), evName, ...
     string(q.local), q.Qf, 100*q.dP, 100*q.dQ, q.der2, q.Kq, q.afd, det, 1e3*tDet, ...
     q.island & tDet > 0 & tDet <= 2, ~q.island & tDet > 0 & isfinite(tDet), ...
     (ml && tT <= 0) || (~ml && ~isnan(Di.falseTrip)), 1e3*Df.t, 1e3*Di.t, ...
     R.pre.thd, R.pre.P, R.pre.Q, R.pre.V, R.pre.Pdt, R.pre.Qdt, Iafter, max(R.ml_score.Data(R.ml_score.Time < tE)), ...
+    cf.n, 1e3*cf.t, cf.resp, cf.raw, ...
     'VariableNames', {'group', 'case', 'cond', 'load', 'pcc', 'island', 'kind', 'event', 'local', 'Qf', 'dP_pct', 'dQ_pct', ...
     'der2', 'Kq2', 'afd', 'detector', 'tTrip_ms', 'detected', 'falseTrip', 'steadyAlarm', 'fast_ms', 'ieee_ms', ...
-    'preTHD_pct', 'preP_W', 'preQ_var', 'preV_pu', 'Pdt_pre_W', 'Qdt_pre_var', 'Iafter_A', 'maxScorePre'});
+    'preTHD_pct', 'preP_W', 'preQ_var', 'preV_pu', 'Pdt_pre_W', 'Qdt_pre_var', 'Iafter_A', 'maxScorePre', ...
+    'nConfirm', 'tConfirm_ms', 'resp_rad', 'raw_rad'});
 end
 
 function feeder_operating_points(root, C)

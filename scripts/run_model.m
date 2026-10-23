@@ -32,6 +32,7 @@ t0 = tic; out = sim(in);
 fprintf('Simulated %.2f s in %.0f s of wall time\n', stopTime, toc(t0));
 
 tags = {'Vabc','Igrid','Iabc','VDC','ID','IQ','freq','Vpcc_rms','VPV','IPV','trip','wm_wind','ml_score','ml_trip','Igrid_true', ...
+        'ml_nudge','ml_resp','ml_raw', ...             % the step 9 confirmation (builds since then)
         'Vdt','Idt','Vder2'};                          % the last three on the feeder model only
 S = struct('P', P);
 have = out.who;

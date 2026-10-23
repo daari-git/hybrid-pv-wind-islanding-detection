@@ -4,6 +4,8 @@ Writes to docs/:
   steps.png            the project's steps and which are done
   feeder_results.png   the detector in the loop on the real feeder, before and after retraining
   feeder_retrain.png   offline replay before and after retraining with feeder cases
+  feeder_controllers.png  the four current controllers on the feeder
+  confirmation.png     step 9: the ML-triggered confirmation's angle response, detection time, wrong trips
 and copies the block diagrams drawn by paper/make_figures.py (system, PV and
 wind models, control, feeder map, connection-bus screening) when they exist.
 Run from the repository root: python scripts/readme_figures.py
@@ -44,7 +46,7 @@ STEPS = [
     ("6", "ML classifier on unseen conditions", DONE),
     ("7", "Detector in the model, sensor noise", DONE),
     ("8", "Real feeder (NEA Pidari, 400 V)", DONE),
-    ("9", "ML-triggered confirmation (decision 1)", TODO),
+    ("9", "ML-triggered confirmation (decision 1)", DONE),
     ("10", "Paper", RUN),
 ]
 SUBSTEPS = [
@@ -256,6 +258,72 @@ def fig_feeder_controllers():
     save(fig, "feeder_controllers")
 
 
+def fig_confirmation():
+    det = "islanding_classifier_feeder"
+    runs = {(where, ctrl, step): rd(os.path.join(RES, f"{pre}_{ctrl}_{det}{suf}.csv"))
+            for where, pre in (("feeder", "feeder_closed_loop"), ("test bed", "closed_loop"))
+            for ctrl in ("pi", "hinfinity") for step, suf in ((8, ""), (9, "_confirm"))}
+    fig, axs = plt.subplots(1, 3, figsize=(15, 4.4), gridspec_kw={"width_ratios": [1.25, 1.0, 0.9]})
+
+    ax = axs[0]
+    rows = [("Feeder, grid connected\n(load switching alarms)", "feeder", False, lambda r: True),
+            ("Test bed, grid connected\n(no-load steady alarm)", "test bed", False, lambda r: True),
+            ("Feeder islands,\nunit's breaker", "feeder", True, lambda r: r["kind"] == "svc"),
+            ("Feeder islands,\nwhole feeder", "feeder", True, lambda r: r["kind"] == "dt"),
+            ("Test-bed islands", "test bed", True, lambda r: True)]
+    for y, (lab, where, island, pick) in enumerate(rows[::-1]):
+        for ctrl, mk, col, dy in (("pi", "o", OK[0], 0.12), ("hinfinity", "D", OK[3], -0.12)):
+            v = [abs(num(r["resp_rad"])) for r in runs[(where, ctrl, 9)]
+                 if num(r["nConfirm"]) > 0 and yes(r["island"]) == island and pick(r)]
+            ax.scatter(v, [y + dy]*len(v), s=16, marker=mk, facecolor="none" if island else col, edgecolor=col,
+                       lw=0.9, label=("PI" if ctrl == "pi" else "H-infinity") if y == 0 else None, zorder=3)
+    ax.axvline(0.05, color=OK[1], lw=1.5)
+    ax.text(0.052, len(rows) - 0.45, "threshold 0.05 rad", color=OK[1], fontsize=8.5, va="center")
+    ax.text(0.0028, -0.75, "no trip: alarm reset", fontsize=8.5, color=GREY)
+    ax.text(0.6, -0.75, "trip", fontsize=8.5, color=GREY)
+    ax.set_xscale("log"); ax.set_xlim(0.0025, 4); ax.set_ylim(-1.0, len(rows) - 0.2)
+    ax.set_yticks(range(len(rows))); ax.set_yticklabels([r[0] for r in rows[::-1]])
+    ax.set_xlabel("PCC voltage angle response to the nudge, |Δφ| (rad)")
+    ax.set_title("(a) Every confirmation: feeder and test bed, PI and H-infinity", loc="left")
+    ax.legend(loc="upper right", fontsize=8)
+
+    ax = axs[1]
+    def cdf(rows, label, **kw):
+        isl = [r for r in rows if r["group"] == "cases" and yes(r["island"])]
+        t = sorted(num(r["tTrip_ms"]) for r in isl if yes(r["detected"]))
+        xs, ys = [0], [0]
+        for i, v in enumerate(t):
+            xs += [v, v]; ys += [100*i/len(isl), 100*(i + 1)/len(isl)]
+        xs.append(300); ys.append(ys[-1])
+        ax.plot(xs, ys, label=f"{label}: {len(t)} of {len(isl)}", lw=1.8, **kw)
+    cdf(runs[("feeder", "pi", 8)], "Step 8 (retrained), PI", color=OK[4])
+    cdf(runs[("feeder", "pi", 9)], "Step 9 (confirmed), PI", color=OK[0])
+    cdf(runs[("feeder", "hinfinity", 9)], "Step 9 (confirmed), H-infinity", color=OK[3], ls="--")
+    ax.set_xlim(0, 300); ax.set_ylim(0, 102)
+    ax.set_xlabel("Time after the island forms (ms)"); ax.set_ylabel("Islands detected (%)")
+    ax.set_title("(b) Feeder islands F1-F3: every one 30 ms later", loc="left")
+    ax.legend(loc="lower right")
+
+    ax = axs[2]
+    groups = [("Feeder\nPI", "feeder", "pi"), ("Feeder\nH-infinity", "feeder", "hinfinity"),
+              ("Test bed\nPI", "test bed", "pi"), ("Test bed\nH-infinity", "test bed", "hinfinity")]
+    for g, (lab, where, ctrl) in enumerate(groups):
+        for k, step in enumerate((8, 9)):
+            calm = [r for r in runs[(where, ctrl, step)] if r["group"] in ("cases", "steady") and not yes(r["island"])]
+            n = sum(num(r["tTrip_ms"]) < 1e9 for r in calm)       # any trip, before or after the event
+            tot = len(calm)
+            x = g + (k - 0.5)*0.36
+            ax.bar(x, n, 0.32, color=OK[4] if step == 8 else OK[0], label=f"Step {step}" if g == 0 else None)
+            ax.text(x, n + 0.1, f"{n}/{tot}", ha="center", va="bottom", fontsize=8)
+    ax.set_xticks(range(len(groups))); ax.set_xticklabels([g[0] for g in groups])
+    ax.set_ylim(0, 10); ax.grid(axis="x", visible=False)
+    ax.set_ylabel("Ordinary events and steady runs tripped")
+    ax.set_title("(c) Wrong trips", loc="left")
+    ax.legend(loc="upper right")
+    fig.tight_layout(w_pad=2.5)
+    save(fig, "confirmation")
+
+
 def copy_paper_figures():
     names = {"fig_system": "system_diagram", "fig_sources": "pv_wind_models", "fig_control": "control_diagram",
              "fig_feeder": "feeder_map", "fig_screening": "feeder_screening"}
@@ -270,5 +338,6 @@ if __name__ == "__main__":
     fig_feeder_results()
     fig_feeder_retrain()
     fig_feeder_controllers()
+    fig_confirmation()
     copy_paper_figures()
     print("README figures written to", DOCS)

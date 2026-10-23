@@ -23,6 +23,13 @@ results/ndz/
 results/stress/
 results/classifier_cases.csv
 results/classifier_cases_noise.csv
+results/*.log
+
+# Explainer: the sources are public; the built page, video and caches stay local
+explainer/explainer.html
+explainer/*.mp4
+explainer/video_build/
+explainer/__pycache__/
 
 # Paper: only the figures and the code that draws them are public; the draft text stays local
 paper/*

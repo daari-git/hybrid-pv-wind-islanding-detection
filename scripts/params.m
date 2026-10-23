@@ -181,6 +181,25 @@ P.ml.tArm = 1e6;
 P.ml.trip = 1;
 P.ml.threshold = 0.5; P.ml.debounce = 6; P.ml.W = 0.01; P.ml.Wb = 0.04; P.ml.step = 0.005;
 P.ml.theta = 0; P.ml.layers = [22 20 10 2];
+% ML-triggered confirmation (step 9). With P.ml.confirm.on = 1 an alarm
+% (P.ml.debounce windows in a row above the threshold) no longer trips by
+% itself: the inverter adds P.ml.confirm.amp to its q-axis current reference
+% for P.ml.confirm.T and measures how far the PCC voltage angle moves, from
+% the positive-sequence phasor of the last cycle before and at the end of the
+% nudge. Connected to the grid the angle hardly moves (by about R*amp/Vpk on
+% a resistive feeder); in an island the load must take the extra reactive
+% current, so the angle swings and the frequency runs. mode 1 removes the
+% angle's drift over the two cycles before the nudge, mode 2 does not. If
+% sign*dphi (abs(dphi) for sign 0) exceeds thr the inverter trips; otherwise
+% the alarm resets and no new alarm is taken for P.ml.confirm.hold, so that
+% the nudge itself has left the detector's windows.
+P.ml.confirm.on = 0;
+P.ml.confirm.amp = -0.25*P.Ipk;                  % A
+P.ml.confirm.T = 0.03;                           % s
+P.ml.confirm.thr = 0.05;                         % rad; CONFIRM_PILOT: grid-connected alarms 0.006-0.016, islands >= 0.18
+P.ml.confirm.sign = 0;                           % abs: natural feeder islands swing either way
+P.ml.confirm.mode = 1;
+P.ml.confirm.hold = 0.06;                        % s
 f = fullfile(fileparts(here), 'ml', 'islanding_classifier.mat');
 if exist(f, 'file')
     M = load(f);
